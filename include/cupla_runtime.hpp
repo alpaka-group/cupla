@@ -89,3 +89,6 @@ cuplaMemcpy(
     size_t count,
     enum cuplaMemcpyKind kind
 );
+
+cuplaError_t
+cuplaDeviceReset( );

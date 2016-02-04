@@ -284,3 +284,27 @@ cuplaError_t cuplaMemcpy(
     return cuplaSuccess;
   }
 
+cuplaError_t
+cuplaDeviceReset( )
+{   
+    // delete all events on the current device
+    cupla::manager::Event< 
+        cupla::AccDev, 
+        cupla::AccStream 
+    >::get().reset( );
+    
+    // delete all memory on the current device
+    cupla::manager::Memory<
+        cupla::AccDev,
+        cupla::AlpakaDim<1u>
+    >::get().reset( );
+    
+    // delete all streams on the current device
+    cupla::manager::Stream< 
+        cupla::AccDev, 
+        cupla::AccStream 
+    >::get().reset( );
+        
+    cupla::manager::Device< cupla::AccDev >::get( ).reset( );
+    return cuplaSuccess;
+}
