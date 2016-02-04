@@ -22,11 +22,15 @@
 
 #pragma once
 
+#define cudaGetDeviceCount(...) cuplaGetDeviceCount(__VA_ARGS__)
+
 #define cudaMalloc(...) cuplaMalloc(__VA_ARGS__)
+#define cudaMallocHost(...) cuplaMallocHost(__VA_ARGS__)
 
 #define cudaGetErrorString(...) cuplaGetErrorString(__VA_ARGS__)
 
 #define cudaFree(...) cuplaFree(__VA_ARGS__)
+#define cudaFreeHost(...) cuplaFreeHost(__VA_ARGS__)
 
 #define cudaSetDevice(...) cuplaSetDevice(__VA_ARGS__)
 
@@ -42,7 +46,15 @@
 #define cudaEventSynchronize(...) cuplaEventSynchronize(__VA_ARGS__)
 
 #define cudaMemcpy(...) cuplaMemcpy(__VA_ARGS__)
+#define cudaMemcpyAsync(...) cuplaMemcpyAsync(__VA_ARGS__)
 
 #define cudaDeviceReset() cuplaDeviceReset()
 
 #define cudaDeviceSynchronize() cuplaDeviceSynchronize()
+
+#define cudaGetLastError() cuplaGetLastError()
+
+#define cudaMemset(...) cuplaMemset(__VA_ARGS__)
+#define cudaMemsetAsync(...) cuplaMemsetAsync(__VA_ARGS__)
+
+#define cudaEventQuery(...) cuplaEventQuery(__VA_ARGS__)

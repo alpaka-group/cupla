@@ -28,6 +28,13 @@
 
 
 cuplaError_t
+cuplaGetDeviceCount( int * count)
+{
+    *count = cupla::manager::Device< cupla::AccDev >::get().count();
+    return cuplaSuccess;        
+}
+
+cuplaError_t
 cuplaSetDevice( int idx)
 {
     cupla::manager::Device< cupla::AccDev >::get().device( idx );
@@ -142,6 +149,32 @@ cuplaMalloc(
     return cuplaSuccess;
 }
 
+cuplaError_t
+cuplaMallocHost(
+    void **ptrptr,
+    size_t size
+)
+{
+    const ::alpaka::Vec<
+        cupla::AlpakaDim<1u>, 
+        cupla::MemSizeType
+    > extent( size );
+
+    auto& buf = cupla::manager::Memory<
+        cupla::AccHost,
+        cupla::AlpakaDim<1u>
+    >::get().alloc( extent );
+    
+#if defined(ALPAKA_ACC_GPU_CUDA_ENABLED)
+    // only implemented if nvcc is used
+    ::alpaka::mem::buf::pin( buf );
+#endif
+
+    // @toto catch errors
+    *ptrptr = ::alpaka::mem::view::getPtrNative(buf);
+    return cuplaSuccess;
+}
+
 cuplaError_t cuplaFree(void *ptr)
 {
 
@@ -157,17 +190,33 @@ cuplaError_t cuplaFree(void *ptr)
 
 }
 
+cuplaError_t cuplaFreeHost(void *ptr)
+{
+
+    if(
+        cupla::manager::Memory<
+            cupla::AccHost,
+            cupla::AlpakaDim<1u>
+        >::get().free( ptr )
+    )
+        return cuplaSuccess;
+    else
+        return cuplaErrorMemoryAllocation;
+
+}
+
 const char *
 cuplaGetErrorString(cuplaError_t)
 {
     return "cuplaGetErrorString is currently not supported\n";
 }
 
-cuplaError_t cuplaMemcpy(
+cuplaError_t cuplaMemcpyAsync(
     void *dst,
     const void *src,
     size_t count,
-    enum cuplaMemcpyKind kind
+    enum cuplaMemcpyKind kind,
+    cuplaStream_t stream
 ) 
 {
     const ::alpaka::Vec<
@@ -181,11 +230,11 @@ cuplaError_t cuplaMemcpy(
         >::get().current() 
     );
 
-    auto& stream( 
+    auto& streamObject( 
         cupla::manager::Stream< 
             cupla::AccDev, 
             cupla::AccStream 
-        >::get().stream( 0 ) 
+        >::get().stream( stream ) 
     );
 
     switch(kind)
@@ -214,7 +263,7 @@ cuplaError_t cuplaMemcpy(
             );
 
             ::alpaka::mem::view::copy(
-                stream,
+                streamObject,
                 dBuf,
                 hBuf,
                 numBytes
@@ -245,7 +294,7 @@ cuplaError_t cuplaMemcpy(
             );
 
             ::alpaka::mem::view::copy(
-                stream,
+                streamObject,
                 hBuf,
                 dBuf,
                 numBytes
@@ -271,7 +320,7 @@ cuplaError_t cuplaMemcpy(
             );
 
             ::alpaka::mem::view::copy(
-                stream,
+                streamObject,
                 dDestBuf,
                 dSrcBuf,
                 numBytes
@@ -280,9 +329,37 @@ cuplaError_t cuplaMemcpy(
         } 
         break;
     }
-    ::alpaka::wait::wait(stream);
     return cuplaSuccess;
-  }
+}
+
+cuplaError_t 
+cuplaMemcpy(
+    void *dst,
+    const void *src,
+    size_t count,
+    enum cuplaMemcpyKind kind
+)
+{
+    cuplaDeviceSynchronize();
+    
+    cuplaMemcpyAsync(
+        dst,
+        src,
+        count,
+        kind,
+        0
+    );
+    
+    auto& streamObject( 
+        cupla::manager::Stream< 
+            cupla::AccDev, 
+            cupla::AccStream 
+        >::get().stream( 0 ) 
+    );
+    ::alpaka::wait::wait( streamObject );
+    
+    return cuplaSuccess;
+}
 
 cuplaError_t
 cuplaDeviceReset( )
@@ -319,4 +396,100 @@ cuplaDeviceSynchronize( )
         cupla::manager::Device< cupla::AccDev >::get( ).current( )
     );
     return cuplaSuccess;
+}
+
+cuplaError_t 
+cuplaGetLastError()
+{
+    return cuplaSuccess;
+}
+
+cuplaError_t
+cuplaMemsetAsync(
+    void * devPtr,
+    int value,
+    size_t count,
+    cuplaStream_t stream
+)
+{
+    auto& device( 
+        cupla::manager::Device< 
+            cupla::AccDev 
+        >::get().current() 
+    );
+        
+    auto& streamObject( 
+        cupla::manager::Stream< 
+            cupla::AccDev, 
+            cupla::AccStream 
+        >::get().stream( stream ) 
+    );
+    
+    ::alpaka::Vec<
+        cupla::AlpakaDim<1u>,
+        cupla::MemSizeType
+    > const
+    numBytes(count);
+    
+    cupla::DeviceBufWrapper< 1u >
+    dBuf(
+        static_cast< uint8_t * >( devPtr ),
+        device,
+        numBytes
+    );
+    
+    ::alpaka::mem::view::set(
+        streamObject,
+        dBuf,
+        value,
+        numBytes
+    );
+    
+    return cuplaSuccess;
+}
+
+cuplaError_t
+cuplaMemset(
+    void * devPtr,
+    int value,
+    size_t count
+)
+{
+    cuplaDeviceSynchronize();
+    
+    cuplaMemsetAsync(
+        devPtr,
+        value,
+        count,
+        0
+    );
+    
+    auto& streamObject( 
+        cupla::manager::Stream< 
+            cupla::AccDev, 
+            cupla::AccStream 
+        >::get().stream( 0 ) 
+    );
+    ::alpaka::wait::wait( streamObject );
+    
+    return cuplaSuccess;
+}
+
+
+cuplaError_t
+cuplaEventQuery( cuplaEvent_t event )
+{
+    auto& eventObject = cupla::manager::Event< 
+        cupla::AccDev, 
+        cupla::AccStream 
+    >::get().event( event );
+    
+    if( ::alpaka::event::test( *eventObject ) )
+    {
+        return cuplaSuccess;
+    }
+    else
+    {
+        return cuplaErrorNotReady;
+    }
 }

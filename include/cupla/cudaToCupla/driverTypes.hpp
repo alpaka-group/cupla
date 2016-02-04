@@ -27,6 +27,7 @@
 #define cudaSuccess cuplaSuccess
 #define cudaErrorMemoryAllocation cuplaErrorMemoryAllocation
 #define cudaErrorInitializationError cuplaErrorInitializationError
+#define cudaErrorNotReady cuplaErrorNotReady
 
 #define cudaError_t cuplaError_t
 
