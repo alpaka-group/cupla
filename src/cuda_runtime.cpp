@@ -287,6 +287,9 @@ cuplaError_t cuplaMemcpy(
 cuplaError_t
 cuplaDeviceReset( )
 {   
+    // wait that all work on the device is finished
+    cuplaDeviceSynchronize( );
+    
     // delete all events on the current device
     cupla::manager::Event< 
         cupla::AccDev, 
@@ -306,5 +309,14 @@ cuplaDeviceReset( )
     >::get().reset( );
         
     cupla::manager::Device< cupla::AccDev >::get( ).reset( );
+    return cuplaSuccess;
+}
+
+cuplaError_t
+cuplaDeviceSynchronize( )
+{   
+    ::alpaka::wait::wait(
+        cupla::manager::Device< cupla::AccDev >::get( ).current( )
+    );
     return cuplaSuccess;
 }

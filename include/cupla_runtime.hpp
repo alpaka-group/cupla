@@ -92,3 +92,6 @@ cuplaMemcpy(
 
 cuplaError_t
 cuplaDeviceReset( );
+
+cuplaError_t
+cuplaDeviceSynchronize( );

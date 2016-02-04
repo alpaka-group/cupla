@@ -44,3 +44,5 @@
 #define cudaMemcpy(...) cuplaMemcpy(__VA_ARGS__)
 
 #define cudaDeviceReset() cuplaDeviceReset()
+
+#define cudaDeviceSynchronize() cuplaDeviceSynchronize()
