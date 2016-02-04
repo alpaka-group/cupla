@@ -39,16 +39,16 @@ static const char *_cudaGetErrorEnum(cudaError_t error)
     {
         case cudaSuccess:
             return "cudaSuccess";
-
+/*
         case cudaErrorMissingConfiguration:
             return "cudaErrorMissingConfiguration";
-
+*/
         case cudaErrorMemoryAllocation:
             return "cudaErrorMemoryAllocation";
 
         case cudaErrorInitializationError:
             return "cudaErrorInitializationError";
-
+/*
         case cudaErrorLaunchFailure:
             return "cudaErrorLaunchFailure";
 
@@ -138,10 +138,10 @@ static const char *_cudaGetErrorEnum(cudaError_t error)
 
         case cudaErrorInvalidResourceHandle:
             return "cudaErrorInvalidResourceHandle";
-
+*/
         case cudaErrorNotReady:
             return "cudaErrorNotReady";
-
+/*
         case cudaErrorInsufficientDriver:
             return "cudaErrorInsufficientDriver";
 
@@ -207,8 +207,9 @@ static const char *_cudaGetErrorEnum(cudaError_t error)
 
         case cudaErrorProfilerAlreadyStopped:
             return "cudaErrorProfilerAlreadyStopped";
-
+*/
         /* Since CUDA 4.0*/
+/*
         case cudaErrorAssert:
             return "cudaErrorAssert";
 
@@ -220,8 +221,9 @@ static const char *_cudaGetErrorEnum(cudaError_t error)
 
         case cudaErrorHostMemoryNotRegistered:
             return "cudaErrorHostMemoryNotRegistered";
-
+*/
         /* Since CUDA 5.0 */
+/*
         case cudaErrorOperatingSystem:
             return "cudaErrorOperatingSystem";
 
@@ -248,8 +250,9 @@ static const char *_cudaGetErrorEnum(cudaError_t error)
 
         case cudaErrorNotSupported:
             return "cudaErrorNotSupported";
-
+*/
         /* Since CUDA 6.0 */
+/*
         case cudaErrorHardwareStackError:
             return "cudaErrorHardwareStackError";
 
@@ -267,8 +270,9 @@ static const char *_cudaGetErrorEnum(cudaError_t error)
 
         case cudaErrorIllegalAddress:
             return "cudaErrorIllegalAddress";
-
+*/
         /* Since CUDA 6.5*/
+/*
         case cudaErrorInvalidPtx:
             return "cudaErrorInvalidPtx";
 
@@ -280,6 +284,7 @@ static const char *_cudaGetErrorEnum(cudaError_t error)
 
         case cudaErrorApiFailureBase:
             return "cudaErrorApiFailureBase";
+*/
     }
 
     return "<unknown>";
@@ -996,7 +1001,7 @@ inline int gpuDeviceInit(int devID)
         return -devID;
     }
 
-    cudaDeviceProp deviceProp;
+/*  cudaDeviceProp deviceProp;
     checkCudaErrors(cudaGetDeviceProperties(&deviceProp, devID));
 
     if (deviceProp.computeMode == cudaComputeModeProhibited)
@@ -1010,9 +1015,9 @@ inline int gpuDeviceInit(int devID)
         fprintf(stderr, "gpuDeviceInit(): GPU device does not support CUDA.\n");
         exit(EXIT_FAILURE);
     }
-
+*/
     checkCudaErrors(cudaSetDevice(devID));
-    printf("gpuDeviceInit() CUDA Device [%d]: \"%s\n", devID, deviceProp.name);
+//    printf("gpuDeviceInit() CUDA Device [%d]: \"%s\n", devID, deviceProp.name);
 
     return devID;
 }
@@ -1024,11 +1029,11 @@ inline int gpuGetMaxGflopsDeviceId()
     int max_perf_device    = 0;
     int device_count       = 0, best_SM_arch      = 0;
     int devices_prohibited = 0;
-    
+
     unsigned long long max_compute_perf = 0;
     cudaDeviceProp deviceProp;
     cudaGetDeviceCount(&device_count);
-    
+
     checkCudaErrors(cudaGetDeviceCount(&device_count));
 
     if (device_count == 0)
@@ -1115,7 +1120,7 @@ inline int gpuGetMaxGflopsDeviceId()
 // Initialization code to find the best CUDA Device
 inline int findCudaDevice(int argc, const char **argv)
 {
-    cudaDeviceProp deviceProp;
+//    cudaDeviceProp deviceProp;
     int devID = 0;
 
     // If the command-line has a device number specified, use it
@@ -1144,8 +1149,8 @@ inline int findCudaDevice(int argc, const char **argv)
         // Otherwise pick the device with highest Gflops/s
         devID = gpuGetMaxGflopsDeviceId();
         checkCudaErrors(cudaSetDevice(devID));
-        checkCudaErrors(cudaGetDeviceProperties(&deviceProp, devID));
-        printf("GPU Device %d: \"%s\" with compute capability %d.%d\n\n", devID, deviceProp.name, deviceProp.major, deviceProp.minor);
+//        checkCudaErrors(cudaGetDeviceProperties(&deviceProp, devID));
+//        printf("GPU Device %d: \"%s\" with compute capability %d.%d\n\n", devID, deviceProp.name, deviceProp.major, deviceProp.minor);
     }
 
     return devID;
@@ -1154,14 +1159,17 @@ inline int findCudaDevice(int argc, const char **argv)
 // General check for CUDA GPU SM Capabilities
 inline bool checkCudaCapabilities(int major_version, int minor_version)
 {
-    cudaDeviceProp deviceProp;
+/*    cudaDeviceProp deviceProp;
     deviceProp.major = 0;
     deviceProp.minor = 0;
+ */
     int dev;
 
     checkCudaErrors(cudaGetDevice(&dev));
-    checkCudaErrors(cudaGetDeviceProperties(&deviceProp, dev));
+//    checkCudaErrors(cudaGetDeviceProperties(&deviceProp, dev));
 
+    return true;
+/*
     if ((deviceProp.major > major_version) ||
         (deviceProp.major == major_version && deviceProp.minor >= minor_version))
     {
@@ -1173,6 +1181,7 @@ inline bool checkCudaCapabilities(int major_version, int minor_version)
         printf("  No GPU device was found that can support CUDA compute capability %d.%d.\n", major_version, minor_version);
         return false;
     }
+*/
 }
 #endif
 

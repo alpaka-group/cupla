@@ -23,17 +23,25 @@
 #include <stdio.h>
 
 // includes CUDA Runtime
-#include <cuda_runtime.h>
+#include <cuda_to_cupla.hpp>
 
 // includes, project
 #include <helper_cuda.h>
 #include <helper_functions.h> // helper utility functions 
 
-__global__ void increment_kernel(int *g_data, int inc_value)
+struct increment_kernel
+{
+
+template<
+    typename T_Acc
+>
+ALPAKA_FN_ACC 
+void operator()(T_Acc const & acc, int *g_data, int inc_value) const
 {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     g_data[idx] = g_data[idx] + inc_value;
 }
+};
 
 int correct_output(int *data, const int n, const int x)
 {
@@ -49,17 +57,17 @@ int correct_output(int *data, const int n, const int x)
 
 int main(int argc, char *argv[])
 {
-    int devID;
-    cudaDeviceProp deviceProps;
+//    int devID;
+//    cudaDeviceProp deviceProps;
 
     printf("[%s] - Starting...\n", argv[0]);
 
     // This will pick the best possible CUDA capable device
-    devID = findCudaDevice(argc, (const char **)argv);
+//    devID = findCudaDevice(argc, (const char **)argv);
 
     // get device name
-    checkCudaErrors(cudaGetDeviceProperties(&deviceProps, devID));
-    printf("CUDA device [%s]\n", deviceProps.name);
+//    checkCudaErrors(cudaGetDeviceProperties(&deviceProps, devID));
+//    printf("CUDA device [%s]\n", deviceProps.name);
 
     int n = 16 * 1024 * 1024;
     int nbytes = n * sizeof(int);
@@ -95,7 +103,7 @@ int main(int argc, char *argv[])
     sdkStartTimer(&timer);
     cudaEventRecord(start, 0);
     cudaMemcpyAsync(d_a, a, nbytes, cudaMemcpyHostToDevice, 0);
-    increment_kernel<<<blocks, threads, 0, 0>>>(d_a, value);
+    CUPLA_KERNEL(increment_kernel)(blocks, threads, 0, 0)(d_a, value);
     cudaMemcpyAsync(a, d_a, nbytes, cudaMemcpyDeviceToHost, 0);
     cudaEventRecord(stop, 0);
     sdkStopTimer(&timer);
