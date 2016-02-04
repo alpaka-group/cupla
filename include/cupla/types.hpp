@@ -123,7 +123,7 @@ namespace cupla {
 
 #ifdef ALPAKA_ACC_GPU_CUDA_ENABLED
     using AccDev = ::alpaka::dev::DevCudaRt;
-    using AccStream = ::alpaka::stream::StreamCudaRtSync;
+    using AccStream = ::alpaka::stream::StreamCudaRtAsync;
     using Acc = ::alpaka::acc::AccGpuCudaRt<
         KernelDim,
         IdxType
