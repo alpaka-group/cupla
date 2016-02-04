@@ -28,9 +28,8 @@
 // System includes
 #include <stdio.h>
 #include <assert.h>
-
 // CUDA runtime
-#include <cuda_runtime.h>
+#include <cuda_to_cupla.hpp>
 
 // Helper functions and utilities to work with CUDA
 #include <helper_functions.h>
@@ -39,8 +38,13 @@
  * Matrix multiplication (CUDA Kernel) on the device: C = A * B
  * wA is A's width and wB is B's width
  */
-template <int BLOCK_SIZE> __global__ void
-matrixMulCUDA(float *C, float *A, float *B, int wA, int wB)
+template <int BLOCK_SIZE> 
+struct matrixMulCUDA
+{
+
+template<typename T_Acc>
+ALPAKA_FN_HOST_ACC
+void operator()(T_Acc const& acc,float *C, float *A, float *B, int wA, int wB) const
 {
     // Block index
     int bx = blockIdx.x;
@@ -69,6 +73,9 @@ matrixMulCUDA(float *C, float *A, float *B, int wA, int wB)
     // that is computed by the thread
     float Csub = 0;
 
+   sharedMem(As, cupla::Array<cupla::Array<float,BLOCK_SIZE>,BLOCK_SIZE>);
+   sharedMem(Bs, cupla::Array<cupla::Array<float,BLOCK_SIZE>,BLOCK_SIZE>);
+    
     // Loop over all the sub-matrices of A and B
     // required to compute the block sub-matrix
     for (int a = aBegin, b = bBegin;
@@ -78,11 +85,11 @@ matrixMulCUDA(float *C, float *A, float *B, int wA, int wB)
 
         // Declaration of the shared memory array As used to
         // store the sub-matrix of A
-        __shared__ float As[BLOCK_SIZE][BLOCK_SIZE];
+        //__shared__ float As[BLOCK_SIZE][BLOCK_SIZE];
 
         // Declaration of the shared memory array Bs used to
         // store the sub-matrix of B
-        __shared__ float Bs[BLOCK_SIZE][BLOCK_SIZE];
+        //__shared__ float Bs[BLOCK_SIZE][BLOCK_SIZE];
 
         // Load the matrices from device memory
         // to shared memory; each thread loads
@@ -114,6 +121,7 @@ matrixMulCUDA(float *C, float *A, float *B, int wA, int wB)
     int c = wB * BLOCK_SIZE * by + BLOCK_SIZE * bx;
     C[c + wB * ty + tx] = Csub;
 }
+};
 
 void constantInit(float *data, int size, float val)
 {
@@ -208,16 +216,16 @@ int matrixMultiply(int argc, char **argv, int block_size, dim3 &dimsA, dim3 &dim
     // Performs warmup operation using matrixMul CUDA kernel
     if (block_size == 16)
     {
-        matrixMulCUDA<16><<< grid, threads >>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+        CUPLA_KERNEL(matrixMulCUDA<16>)( grid, threads )(d_C, d_A, d_B, dimsA.x, dimsB.x);
     }
     else
     {
-        matrixMulCUDA<32><<< grid, threads >>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+        CUPLA_KERNEL(matrixMulCUDA<32>)( grid, threads )(d_C, d_A, d_B, dimsA.x, dimsB.x);
     }
 
     printf("done\n");
 
-    cudaDeviceSynchronize();
+    //cudaDeviceSynchronize();
 
     // Allocate CUDA events that we'll use for timing
     cudaEvent_t start;
@@ -248,17 +256,17 @@ int matrixMultiply(int argc, char **argv, int block_size, dim3 &dimsA, dim3 &dim
     }
 
     // Execute the kernel
-    int nIter = 300;
+    int nIter = 1; //300;
 
     for (int j = 0; j < nIter; j++)
     {
         if (block_size == 16)
         {
-            matrixMulCUDA<16><<< grid, threads >>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+            CUPLA_KERNEL(matrixMulCUDA<16>)( grid, threads )(d_C, d_A, d_B, dimsA.x, dimsB.x);
         }
         else
         {
-            matrixMulCUDA<32><<< grid, threads >>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+            CUPLA_KERNEL(matrixMulCUDA<32>)( grid, threads )(d_C, d_A, d_B, dimsA.x, dimsB.x);
         }
     }
 
@@ -347,7 +355,7 @@ int matrixMultiply(int argc, char **argv, int block_size, dim3 &dimsA, dim3 &dim
     // needed to ensure correct operation when the application is being
     // profiled. Calling cudaDeviceReset causes all profile data to be
     // flushed before the application exits
-    cudaDeviceReset();
+    //cudaDeviceReset();
 
     if (correct)
     {
@@ -388,14 +396,14 @@ int main(int argc, char **argv)
     }
 
     cudaError_t error;
-    cudaDeviceProp deviceProp;
+//  cudaDeviceProp deviceProp;
     error = cudaGetDevice(&devID);
 
     if (error != cudaSuccess)
     {
         printf("cudaGetDevice returned error code %d, line(%d)\n", error, __LINE__);
     }
-
+/*
     error = cudaGetDeviceProperties(&deviceProp, devID);
 
     if (deviceProp.computeMode == cudaComputeModeProhibited)
@@ -412,9 +420,10 @@ int main(int argc, char **argv)
     {
         printf("GPU Device %d: \"%s\" with compute capability %d.%d\n\n", devID, deviceProp.name, deviceProp.major, deviceProp.minor);
     }
+ */
 
     // Use a larger block size for Fermi and above
-    int block_size = (deviceProp.major < 2) ? 16 : 32;
+    int block_size = 16; // (deviceProp.major < 2) ? 16 : 32;
 
     dim3 dimsA(5*2*block_size, 5*2*block_size, 1);
     dim3 dimsB(5*4*block_size, 5*2*block_size, 1);
