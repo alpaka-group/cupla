@@ -225,7 +225,7 @@ int matrixMultiply(int argc, char **argv, int block_size, dim3 &dimsA, dim3 &dim
 
     printf("done\n");
 
-    //cudaDeviceSynchronize();
+    cudaDeviceSynchronize();
 
     // Allocate CUDA events that we'll use for timing
     cudaEvent_t start;
@@ -355,7 +355,7 @@ int matrixMultiply(int argc, char **argv, int block_size, dim3 &dimsA, dim3 &dim
     // needed to ensure correct operation when the application is being
     // profiled. Calling cudaDeviceReset causes all profile data to be
     // flushed before the application exits
-    //cudaDeviceReset();
+    cudaDeviceReset();
 
     if (correct)
     {
