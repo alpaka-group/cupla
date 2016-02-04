@@ -35,6 +35,8 @@
 
 
 
+cuplaError_t
+cuplaGetDeviceCount( int * count);
 
 
 cuplaError_t
@@ -77,7 +79,16 @@ cuplaMalloc(
 );
 
 cuplaError_t
+cuplaMallocHost(
+    void **ptrptr,
+    size_t size
+);
+
+cuplaError_t
 cuplaFree(void *ptr);
+
+cuplaError_t
+cuplaFreeHost(void *ptr);
 
 const char *
 cuplaGetErrorString(cuplaError_t);
@@ -91,7 +102,41 @@ cuplaMemcpy(
 );
 
 cuplaError_t
+cuplaMemcpyAsync(
+    void *dst,
+    const void *src,
+    size_t count,
+    enum cuplaMemcpyKind kind,
+    cuplaStream_t stream = 0
+);
+
+cuplaError_t
 cuplaDeviceReset( );
 
 cuplaError_t
 cuplaDeviceSynchronize( );
+
+/** not supported
+ *
+ * @return always cuplaSuccess
+ */
+cuplaError_t
+cuplaGetLastError();
+
+cuplaError_t
+cuplaMemsetAsync(
+    void * devPtr,
+    int value,
+    size_t count,
+    cuplaStream_t stream = 0
+);
+
+cuplaError_t
+cuplaMemset(
+    void * devPtr,
+    int value,
+    size_t count
+);
+
+cuplaError_t
+cuplaEventQuery( cuplaEvent_t event );

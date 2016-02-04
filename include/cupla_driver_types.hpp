@@ -22,7 +22,10 @@
 
 #pragma once
 
-
+// emulated that cuda runtime is loaded
+#ifndef __DRIVER_TYPES_H__
+# define __DRIVER_TYPES_H__
+#endif
 
 enum cuplaMemcpyKind
 {
@@ -35,7 +38,8 @@ enum cuplaError
 {
     cuplaSuccess = 0,
     cuplaErrorMemoryAllocation = 2,
-    cuplaErrorInitializationError = 3
+    cuplaErrorInitializationError = 3,
+    cuplaErrorNotReady = 34
 };
 
 enum EventProp
