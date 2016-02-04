@@ -125,6 +125,21 @@ namespace manager
             }
         }
 
+        /** delete all memory on the current device
+         *
+         * @return true in success case else false
+         */
+        bool
+        reset( )
+        {
+            auto& device = Device< DeviceType >::get();
+            const auto deviceId = device.id();
+
+            m_mapVector[ deviceId ].clear( );
+
+            // @todo: check if clear creates errors
+            return true;
+        }
 
     protected:
         Memory() : m_mapVector( Device< DeviceType >::get().count() )

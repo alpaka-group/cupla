@@ -202,6 +202,22 @@ namespace detail
             }
         }
 
+        /** delete all events on the current device
+         *
+         * @return true in success case else false
+         */
+        bool
+        reset( )
+        {
+            auto& device = Device< DeviceType >::get();
+            const auto deviceId = device.id();
+
+            m_mapVector[ deviceId ].clear( );
+
+            // @todo: check if clear creates errors
+            return true;
+        }
+
 
     protected:
         Event() :  m_mapVector( Device< DeviceType >::get().count() )

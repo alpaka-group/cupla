@@ -140,6 +140,22 @@ namespace manager
         }
 
 
+        /** delete all streams on the current device
+         *
+         * @return true in success case else false
+         */
+        bool
+        reset( )
+        {
+            auto& device = Device< DeviceType >::get();
+            const auto deviceId = device.id();
+
+            m_mapVector[ deviceId ].clear( );
+
+            // @todo: check if clear creates errors
+            return true;
+        }
+
     protected:
         Stream() :  m_mapVector( Device< DeviceType >::get().count() )
         {

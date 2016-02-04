@@ -91,6 +91,32 @@ namespace manager
             }
         }
 
+        /**! reset the current device
+         *
+         * streams, memory and events on the current device must be
+         * deleted at first by the user
+         *
+         * @return true in success case else false
+         */
+        bool reset()
+        {
+            ::alpaka::dev::reset( this->current( ) );
+            auto iter = m_map.find( this->id( ) );
+
+            if( iter == m_map.end() )
+            {
+                std::cerr << "device " << this->id( ) <<
+                    " can not destroyed (was never created) " <<
+                    std::endl;
+                return false;
+            }
+            else
+            {
+                m_map.erase( iter );
+                return true;
+            }
+        }
+
         auto
         id()
         -> int
@@ -111,8 +137,6 @@ namespace manager
         {
             return ::alpaka::dev::DevMan< DeviceType >::getDevCount( );
         }
-
-
 
     protected:
         Device() : m_currentDevice( 0 )
