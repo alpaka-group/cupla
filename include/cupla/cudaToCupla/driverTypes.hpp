@@ -37,10 +37,15 @@
 
 #define dim3 cupla::dim3
 
+#define cudaEventDisableTiming cuplaEventDisableTiming
+
 #define sharedMem(ppName, ...)                                                 \
   __VA_ARGS__ &ppName =                                                        \
       ::alpaka::block::shared::st::allocVar<__VA_ARGS__, __COUNTER__>(acc)
 
+#define sharedMemExtern(ppName, ...)                                           \
+    __VA_ARGS__ ppName =                                                       \
+        ::alpaka::block::shared::dyn::getMem<__VA_ARGS__>(acc)
 
 #define cudaMemcpyHostToDevice cuplaMemcpyHostToDevice
 #define cudaMemcpyDeviceToHost cuplaMemcpyDeviceToHost
