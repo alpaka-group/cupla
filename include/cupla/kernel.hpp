@@ -29,7 +29,40 @@
 #include "cupla/manager/Stream.hpp"
 #include "cupla/manager/Device.hpp"
 
+#include <utility>
+
+
 namespace cupla{
+
+#if defined(ALPAKA_ACC_CPU_B_SEQ_T_OMP2_ENABLED) || \
+    defined(ALPAKA_ACC_CPU_B_SEQ_T_THREADS_ENABLED) || \
+    defined(ALPAKA_ACC_GPU_CUDA_ENABLED)
+    /** optimize elemSize and blockSize for a special device
+     *
+     * This implementation does nothing (empty wrapper)
+     */
+    struct OptimizeBlockElem
+    {
+        static void get( dim3 const & , dim3 const &  )
+        {
+
+        }
+    };
+#endif
+
+#ifdef ALPAKA_ACC_CPU_B_OMP2_T_SEQ_ENABLED
+    /** optimize elemSize and blockSize for a special device
+     *
+     * This implementation swap elemSize and blockSize
+     */
+    struct OptimizeBlockElem
+    {
+        static void get( dim3 & blockSize, dim3 & elemSize )
+        {
+            std::swap(blockSize,elemSize);
+        }
+    };
+#endif
 
 struct KernelHelper
 {
@@ -146,6 +179,7 @@ namespace traits
 #define CUPLA_CUDA_KERNEL_CONFIG(gridSize,blockSize,...)                       \
     const cupla::uint3 m_gridSize = dim3(gridSize);                            \
     const cupla::uint3 m_blockSize = dim3(blockSize);                          \
+    const cupla::uint3 m_elemPerThread = dim3();                               \
     auto& stream(                                                              \
         cupla::manager::Stream<                                                \
             cupla::AccDev,                                                     \
@@ -159,7 +193,36 @@ namespace traits
     );                                                                         \
     CUPLA_CUDA_KERNEL_PARAMS
 
+/** default cupla kernel call */
 #define CUPLA_KERNEL(...) {                                                    \
     using KernelType = ::cupla::CuplaKernel< __VA_ARGS__ >;                    \
-    const cupla::uint3 m_elemPerThread = dim3();                               \
     CUPLA_CUDA_KERNEL_CONFIG
+
+#define CUPLA_CUDA_KERNEL_CONFIG_OPTI(gridSize,blockSize,...)                  \
+    const cupla::uint3 m_gridSize = dim3(gridSize);                            \
+    dim3 tmp_blockSize = dim3( blockSize );                                    \
+    dim3 tmp_elemSize;                                                         \
+    cupla::OptimizeBlockElem::get( tmp_blockSize, tmp_elemSize );              \
+    const cupla::uint3 m_blockSize = tmp_blockSize;                            \
+    const cupla::uint3 m_elemPerThread = tmp_elemSize;                         \
+    auto& stream(                                                              \
+        cupla::manager::Stream<                                                \
+            cupla::AccDev,                                                     \
+            cupla::AccStream                                                   \
+        >::get().stream(                                                       \
+            cupla::KernelHelper::getStream( __VA_ARGS__ )                      \
+        )                                                                      \
+    );                                                                         \
+    size_t const sharedMemSize = cupla::KernelHelper::getSharedMemSize(        \
+        __VA_ARGS__                                                            \
+    );                                                                         \
+    CUPLA_CUDA_KERNEL_PARAMS
+
+/** call the kernel with an element layer
+ *
+ * This kernel call swap the blockSize and the elemSize depending
+ * on the activated accelerator.
+ */
+#define CUPLA_KERNEL_OPTI(...) {                                               \
+    using KernelType = ::cupla::CuplaKernel< __VA_ARGS__ >;                    \
+    CUPLA_CUDA_KERNEL_CONFIG_OPTI
