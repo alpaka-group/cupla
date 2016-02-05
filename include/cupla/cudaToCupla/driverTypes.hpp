@@ -37,6 +37,8 @@
 #define cudaStream_t cuplaStream_t
 
 #define dim3 cupla::dim3
+#define cudaExtent cupla::Extent
+#define cudaPitchedPtr cupla::PitchedPtr
 
 #ifdef cudaEventDisableTiming
 #undef cudaEventDisableTiming

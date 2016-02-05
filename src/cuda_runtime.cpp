@@ -176,6 +176,75 @@ cuplaMalloc(
     return cuplaSuccess;
 }
 
+cuplaError_t 
+cuplaMallocPitch(
+    void ** devPtr,
+    size_t * pitch,
+    size_t const width,
+    size_t const height	 
+)
+{
+    const ::alpaka::Vec<
+        cupla::AlpakaDim< 2u >, 
+        cupla::MemSizeType
+    > extent( width, height );
+
+    auto& buf = cupla::manager::Memory<
+        cupla::AccDev,
+        cupla::AlpakaDim< 2u >
+    >::get().alloc( extent );
+
+    // @toto catch errors
+    *devPtr = ::alpaka::mem::view::getPtrNative(buf);
+    *pitch = ::alpaka::mem::view::getPitchBytes< 1u >( buf );
+    
+    return cuplaSuccess;
+};
+
+cuplaError_t
+cuplaMalloc3D(
+    cupla::PitchedPtr * const pitchedDevPtr,
+    cupla::Extent const extent
+)
+{
+
+    auto& buf = cupla::manager::Memory<
+        cupla::AccDev,
+        cupla::AlpakaDim< 3u >
+    >::get().alloc( extent );
+
+    // @toto catch errors
+    *pitchedDevPtr = make_cuplaPitchedPtr(
+        ::alpaka::mem::view::getPtrNative(buf),
+        ::alpaka::mem::view::getPitchBytes< 2u >( buf ),
+        extent.width,
+        extent.height
+    );
+    
+    return cuplaSuccess;
+}
+
+cupla::Extent
+make_cuplaExtent(
+    size_t const w,
+    size_t const h,
+    size_t const d
+)
+{
+    return cupla::Extent( w, h, d );
+}
+
+cupla::PitchedPtr
+make_cuplaPitchedPtr(
+    void * const d,
+    size_t const p,
+    size_t const xsz,
+    size_t const ysz
+)
+{
+    return cupla::PitchedPtr( d, p, xsz, ysz );
+}
+
 cuplaError_t
 cuplaMallocHost(
     void **ptrptr,
@@ -209,6 +278,20 @@ cuplaError_t cuplaFree(void *ptr)
         cupla::manager::Memory<
             cupla::AccDev,
             cupla::AlpakaDim<1u>
+        >::get().free( ptr )
+    )
+        return cuplaSuccess;
+    else if(
+        cupla::manager::Memory<
+            cupla::AccDev,
+            cupla::AlpakaDim<2u>
+        >::get().free( ptr )
+    )
+        return cuplaSuccess;
+    else if(
+        cupla::manager::Memory<
+            cupla::AccDev,
+            cupla::AlpakaDim<3u>
         >::get().free( ptr )
     )
         return cuplaSuccess;
@@ -404,6 +487,16 @@ cuplaDeviceReset( )
     cupla::manager::Memory<
         cupla::AccDev,
         cupla::AlpakaDim<1u>
+    >::get().reset( );
+    
+    cupla::manager::Memory<
+        cupla::AccDev,
+        cupla::AlpakaDim<2u>
+    >::get().reset( );
+    
+    cupla::manager::Memory<
+        cupla::AccDev,
+        cupla::AlpakaDim<3u>
     >::get().reset( );
     
     // delete all streams on the current device

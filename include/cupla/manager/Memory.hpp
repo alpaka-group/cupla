@@ -112,10 +112,6 @@ namespace manager
 
             if( iter == m_mapVector[ deviceId ].end() )
             {
-                std::cerr << "pointer " << ptr <<
-                    " is not allocated on device " <<
-                    deviceId <<
-                    std::endl;
                 return false;
             }
             else

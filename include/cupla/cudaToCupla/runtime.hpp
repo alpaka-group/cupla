@@ -25,6 +25,8 @@
 #define cudaGetDeviceCount(...) cuplaGetDeviceCount(__VA_ARGS__)
 
 #define cudaMalloc(...) cuplaMalloc(__VA_ARGS__)
+#define cudaMallocPitch(...) cuplaMallocPitch(__VA_ARGS__)
+#define cudaMalloc3D(...) cuplaMalloc3D(__VA_ARGS__)
 #define cudaMallocHost(...) cuplaMallocHost(__VA_ARGS__)
 
 #define cudaGetErrorString(...) cuplaGetErrorString(__VA_ARGS__)
@@ -61,4 +63,8 @@
 
 #define cudaEventQuery(...) cuplaEventQuery(__VA_ARGS__)
 
-#define cudaMemGetInfo(... ) cuplaMemGetInfo(__VA_ARGS__)
+#define cudaMemGetInfo(...) cuplaMemGetInfo(__VA_ARGS__)
+
+#define make_cudaExtent(...) make_cuplaExtent(__VA_ARGS__)
+
+#define make_cudaPitchedPtr(...) make_cuplaPitchedPtr(__VA_ARGS__)
