@@ -38,8 +38,10 @@ template<
 ALPAKA_FN_ACC 
 void operator()(T_Acc const & acc, int *g_data, int inc_value) const
 {
-    int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    g_data[idx] = g_data[idx] + inc_value;
+    int idx = blockIdx.x * (blockDim.x * elemDim.x) + threadIdx.x;
+    
+    for(int i = 0; i < elemDim.x; ++i)
+        g_data[idx + i] = g_data[idx + i] + inc_value;
 }
 };
 
@@ -103,7 +105,7 @@ int main(int argc, char *argv[])
     sdkStartTimer(&timer);
     cudaEventRecord(start, 0);
     cudaMemcpyAsync(d_a, a, nbytes, cudaMemcpyHostToDevice, 0);
-    CUPLA_KERNEL(increment_kernel)(blocks, threads, 0, 0)(d_a, value);
+    CUPLA_KERNEL_OPTI(increment_kernel)(blocks, threads, 0, 0)(d_a, value);
     cudaMemcpyAsync(a, d_a, nbytes, cudaMemcpyDeviceToHost, 0);
     cudaEventRecord(stop, 0);
     sdkStopTimer(&timer);
