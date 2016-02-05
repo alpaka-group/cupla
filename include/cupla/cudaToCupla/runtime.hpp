@@ -33,11 +33,13 @@
 #define cudaFreeHost(...) cuplaFreeHost(__VA_ARGS__)
 
 #define cudaSetDevice(...) cuplaSetDevice(__VA_ARGS__)
-
 #define cudaGetDevice(...) cuplaGetDevice(__VA_ARGS__)
 
 #define cudaEventCreate(...) cuplaEventCreate(__VA_ARGS__)
 #define cudaEventDestroy(...) cuplaEventDestroy(__VA_ARGS__)
+
+#define cudaStreamCreate(...) cuplaStreamCreate(__VA_ARGS__)
+#define cudaStreamDestroy(...) cuplaStreamDestroy(__VA_ARGS__)
 
 #define cudaEventRecord(...) cuplaEventRecord(__VA_ARGS__)
 
@@ -48,13 +50,15 @@
 #define cudaMemcpy(...) cuplaMemcpy(__VA_ARGS__)
 #define cudaMemcpyAsync(...) cuplaMemcpyAsync(__VA_ARGS__)
 
-#define cudaDeviceReset() cuplaDeviceReset()
+#define cudaDeviceReset(...) cuplaDeviceReset(__VA_ARGS__)
 
-#define cudaDeviceSynchronize() cuplaDeviceSynchronize()
+#define cudaDeviceSynchronize(...) cuplaDeviceSynchronize(__VA_ARGS__)
 
-#define cudaGetLastError() cuplaGetLastError()
+#define cudaGetLastError(...) cuplaGetLastError(__VA_ARGS__)
 
 #define cudaMemset(...) cuplaMemset(__VA_ARGS__)
 #define cudaMemsetAsync(...) cuplaMemsetAsync(__VA_ARGS__)
 
 #define cudaEventQuery(...) cuplaEventQuery(__VA_ARGS__)
+
+#define cudaMemGetInfo(... ) cuplaMemGetInfo(__VA_ARGS__)
