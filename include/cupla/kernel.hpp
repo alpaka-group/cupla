@@ -165,22 +165,22 @@ namespace traits
 
 
 #define CUPLA_CUDA_KERNEL_PARAMS(...)                                          \
-    const KernelType theOneAndOnlyKernel( sharedMemSize );                     \
+    const KernelType cuplaTheOneAndOnlyKernel( cuplaSharedMemSize );           \
     cupla::startKernel(                                                        \
-        theOneAndOnlyKernel,                                                   \
-        m_gridSize,                                                            \
-        m_blockSize,                                                           \
-        m_elemPerThread,                                                       \
-        stream,                                                                \
+        cuplaTheOneAndOnlyKernel,                                              \
+        cuplaGridSize,                                                         \
+        cuplaBlockSize,                                                        \
+        cuplaElemPerThread,                                                    \
+        cuplaStream,                                                           \
         __VA_ARGS__                                                            \
     );                                                                         \
     }
 
-#define CUPLA_CUDA_KERNEL_CONFIG(gridSize,blockSize,...)                       \
-    const cupla::uint3 m_gridSize = dim3(gridSize);                            \
-    const cupla::uint3 m_blockSize = dim3(blockSize);                          \
-    const cupla::uint3 m_elemPerThread = dim3();                               \
-    auto& stream(                                                              \
+#define CUPLA_CUDA_KERNEL_CONFIG(gridSize,blockSize,elemSize,...)              \
+    const cupla::uint3 cuplaGridSize = dim3(gridSize);                         \
+    const cupla::uint3 cuplaBlockSize = dim3(blockSize);                       \
+    const cupla::uint3 cuplaElemPerThread = dim3(elemSize);                    \
+    auto& cuplaStream(                                                         \
         cupla::manager::Stream<                                                \
             cupla::AccDev,                                                     \
             cupla::AccStream                                                   \
@@ -188,41 +188,46 @@ namespace traits
             cupla::KernelHelper::getStream( __VA_ARGS__ )                      \
         )                                                                      \
     );                                                                         \
-    size_t const sharedMemSize = cupla::KernelHelper::getSharedMemSize(        \
+    size_t const cuplaSharedMemSize = cupla::KernelHelper::getSharedMemSize(   \
         __VA_ARGS__                                                            \
     );                                                                         \
     CUPLA_CUDA_KERNEL_PARAMS
 
-/** default cupla kernel call */
+#define CUPLA_CUDA_KERNEL_CONFIG_DEFAULT(gridSize,blockSize,...)               \
+    CUPLA_CUDA_KERNEL_CONFIG(gridSize,blockSize,dim3(),__VA_ARGS__)
+
+/** default cupla kernel call
+ *
+ * The alpaka element level is ignored and always set to dim3(1,1,1)
+ */
 #define CUPLA_KERNEL(...) {                                                    \
     using KernelType = ::cupla::CuplaKernel< __VA_ARGS__ >;                    \
-    CUPLA_CUDA_KERNEL_CONFIG
+    CUPLA_CUDA_KERNEL_CONFIG_DEFAULT
 
 #define CUPLA_CUDA_KERNEL_CONFIG_OPTI(gridSize,blockSize,...)                  \
-    const cupla::uint3 m_gridSize = dim3(gridSize);                            \
-    dim3 tmp_blockSize = dim3( blockSize );                                    \
-    dim3 tmp_elemSize;                                                         \
-    cupla::OptimizeBlockElem::get( tmp_blockSize, tmp_elemSize );              \
-    const cupla::uint3 m_blockSize = tmp_blockSize;                            \
-    const cupla::uint3 m_elemPerThread = tmp_elemSize;                         \
-    auto& stream(                                                              \
-        cupla::manager::Stream<                                                \
-            cupla::AccDev,                                                     \
-            cupla::AccStream                                                   \
-        >::get().stream(                                                       \
-            cupla::KernelHelper::getStream( __VA_ARGS__ )                      \
-        )                                                                      \
-    );                                                                         \
-    size_t const sharedMemSize = cupla::KernelHelper::getSharedMemSize(        \
-        __VA_ARGS__                                                            \
-    );                                                                         \
-    CUPLA_CUDA_KERNEL_PARAMS
+    dim3 tmp_cuplaBlockSize = dim3( blockSize );                               \
+    dim3 tmp_cuplaElemSize;                                                    \
+    cupla::OptimizeBlockElem::get( tmp_cuplaBlockSize, tmp_cuplaElemSize );    \
+    CUPLA_CUDA_KERNEL_CONFIG(gridSize,tmp_cuplaBlockSize,tmp_cuplaElemSize,__VA_ARGS__)
 
-/** call the kernel with an element layer
+/** call the kernel with an hidden element layer
+ *
+ * The kernel must support the alpaka element level
  *
  * This kernel call swap the blockSize and the elemSize depending
  * on the activated accelerator.
+ * This mean that in some devices the blockSize is set to one ( dim3(1,1,1) )
+ * and the elemSize is set to the user defined blockSize
  */
 #define CUPLA_KERNEL_OPTI(...) {                                               \
     using KernelType = ::cupla::CuplaKernel< __VA_ARGS__ >;                    \
     CUPLA_CUDA_KERNEL_CONFIG_OPTI
+
+/** cupla kernel call with elements
+ *
+ * The kernel must support the alpaka element level
+ */
+#define CUPLA_KERNEL_ELEM(...) {                                               \
+    using KernelType = ::cupla::CuplaKernel< __VA_ARGS__ >;                    \
+    CUPLA_CUDA_KERNEL_CONFIG
+
