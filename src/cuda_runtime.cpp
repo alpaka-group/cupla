@@ -77,6 +77,33 @@ cuplaEventDestroy( cuplaEvent_t event )
 };
 
 cuplaError_t
+cuplaStreamCreate(
+    cuplaStream_t * stream
+)
+{
+    *stream = cupla::manager::Stream< 
+        cupla::AccDev, 
+        cupla::AccStream 
+    >::get().create();
+  
+    return cuplaSuccess;
+};
+
+cuplaError_t
+cuplaStreamDestroy( cuplaStream_t stream )
+{
+    if( 
+        cupla::manager::Stream< 
+            cupla::AccDev, 
+            cupla::AccStream 
+        >::get().destroy( stream ) 
+    )
+        return cuplaSuccess;
+    else
+        return cuplaErrorInitializationError;
+};
+
+cuplaError_t
 cuplaEventRecord(
     cuplaEvent_t event,
     cuplaStream_t stream
@@ -492,4 +519,20 @@ cuplaEventQuery( cuplaEvent_t event )
     {
         return cuplaErrorNotReady;
     }
+}
+
+cuplaError_t
+cuplaMemGetInfo(
+    size_t * free,
+    size_t * total
+)
+{
+    auto& device( 
+        cupla::manager::Device< 
+            cupla::AccDev 
+        >::get().current() 
+    );
+    *total = ::alpaka::dev::getMemBytes( device );
+    *free = ::alpaka::dev::getFreeMemBytes( device );
+    return cuplaSuccess;
 }

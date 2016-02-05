@@ -61,6 +61,14 @@ cuplaEventRecord(
 );
 
 cuplaError_t
+cuplaStreamCreate(
+    cuplaStream_t * stream
+);
+
+cuplaError_t
+cuplaStreamDestroy( cuplaStream_t stream );
+
+cuplaError_t
 cuplaEventElapsedTime(
     float * ms,
     cuplaEvent_t start,
@@ -140,3 +148,9 @@ cuplaMemset(
 
 cuplaError_t
 cuplaEventQuery( cuplaEvent_t event );
+
+cuplaError_t
+cuplaMemGetInfo(
+    size_t * free,
+    size_t * total
+);

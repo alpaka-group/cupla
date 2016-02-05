@@ -30,6 +30,7 @@
 #define cudaErrorNotReady cuplaErrorNotReady
 
 #define cudaError_t cuplaError_t
+#define cudaError cuplaError
 
 #define cudaEvent_t cuplaEvent_t
 
@@ -37,7 +38,13 @@
 
 #define dim3 cupla::dim3
 
-#define cudaEventDisableTiming cuplaEventDisableTiming
+#ifdef cudaEventDisableTiming
+#undef cudaEventDisableTiming
+    /* cudaEventDisableTiming is a define in CUDA therefore we must remove
+     * the old definition with the cupla enum
+     */
+    #define cudaEventDisableTiming cuplaEventDisableTiming
+#endif
 
 #define sharedMem(ppName, ...)                                                 \
   __VA_ARGS__ &ppName =                                                        \
@@ -68,3 +75,7 @@
 #define elemDim                                                               \
   static_cast<cupla::uint3>(                                                \
       ::alpaka::workdiv::getWorkDiv<::alpaka::Thread, ::alpaka::Elems>(acc))
+
+// atomic functions
+#define atomicAdd(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Add>(acc, ppPointer, ppValue)
+
