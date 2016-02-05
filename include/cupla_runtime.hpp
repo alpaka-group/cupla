@@ -29,6 +29,8 @@
 #include "cupla/datatypes/Array.hpp"
 #include "cupla/datatypes/dim3.hpp"
 #include "cupla/datatypes/uint.hpp"
+#include "cupla/datatypes/Extent.hpp"
+#include "cupla/datatypes/PitchedPtr.hpp"
 
 #include "cupla/types.hpp"
 #include "cupla_driver_types.hpp"
@@ -90,6 +92,37 @@ cuplaError_t
 cuplaMallocHost(
     void **ptrptr,
     size_t size
+);
+
+
+cuplaError_t
+cuplaMallocPitch(
+    void ** devPtr,
+    size_t * pitch,
+    size_t const width,
+    size_t const height
+);
+
+cuplaError_t
+cuplaMalloc3D(
+    cupla::PitchedPtr * pitchedDevPtr,
+    cupla::Extent const extent
+);
+
+
+cupla::Extent
+make_cuplaExtent(
+    size_t const w,
+    size_t const h,
+    size_t const d
+);
+
+cupla::PitchedPtr
+make_cuplaPitchedPtr(
+    void * const d,
+    size_t const p,
+    size_t const xsz,
+    size_t const ysz
 );
 
 cuplaError_t

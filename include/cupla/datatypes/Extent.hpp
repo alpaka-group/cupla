@@ -1,5 +1,5 @@
 /**
- * Copyright 2015-2016 Rene Widera
+ * Copyright 2016 Rene Widera
  *
  * This file is part of cupla.
  *
@@ -27,11 +27,22 @@
 namespace cupla
 {
 
-    struct uint3{
-        IdxType x, y, z;
+    struct Extent{
+        MemSizeType width, height, depth;
 
         ALPAKA_FN_HOST_ACC
-        uint3() = default;
+        Extent() = default;
+
+        ALPAKA_FN_HOST_ACC
+        Extent(
+            MemSizeType const w,
+            MemSizeType const h,
+            MemSizeType const d
+        ) :
+            width( w ),
+            height( h ),
+            depth( d )
+        {}
 
         template<
           typename TDim,
@@ -41,28 +52,29 @@ namespace cupla
           >::type
         >
         ALPAKA_FN_HOST_ACC
-        uint3(
-          ::alpaka::Vec<
-              TDim,
-              TSize
-          > const &vec
-        ){
-            for (uint32_t i(0); i < 3u; ++i) {
+        Extent(
+            ::alpaka::Vec<
+                TDim,
+                TSize
+            > const &vec
+        )
+        {
+            for( uint32_t i(0); i < 3u; ++i ) {
                 // alpaka vectors are z,y,x.
-                (&(this->x))[i] = vec[(3u - 1u) - i];
+                ( &this->width )[ i ] = vec[ ( 3u - 1u ) - i ];
             }
         }
 
         ALPAKA_FN_HOST_ACC
         operator ::alpaka::Vec<
             cupla::AlpakaDim< 3u >,
-            IdxType
+            MemSizeType
         >(void) const
         {
             ::alpaka::Vec<
                 cupla::AlpakaDim< 3u >,
-                IdxType
-            > vec(z, y, x);
+                MemSizeType
+            > vec( depth, height, width );
             return vec;
         }
     };
@@ -80,7 +92,7 @@ namespace traits
     //! dimension get trait specialization
     template<>
     struct DimType<
-        cupla::uint3
+        cupla::Extent
     >{
       using type = ::alpaka::dim::DimInt<3u>;
     };
@@ -96,9 +108,9 @@ namespace traits
     //! element type trait specialization
     template<>
     struct ElemType<
-        cupla::uint3
+        cupla::Extent
     >{
-        using type = cupla::IdxType;
+        using type = cupla::MemSizeType;
     };
 
 } // namespace traits
@@ -115,7 +127,7 @@ namespace traits
     >
     struct GetExtent<
         T_Idx,
-        cupla::uint3,
+        cupla::Extent,
         typename std::enable_if<
             (3u > T_Idx::value)
         >::type
@@ -123,9 +135,9 @@ namespace traits
 
         ALPAKA_FN_HOST_ACC
         static auto
-        getExtent( cupla::uint3 const &extents )
-        -> cupla::IdxType {
-        return (&extents.x)[(3u - 1u) - T_Idx::value];
+        getExtent( cupla::Extent const & extents )
+        -> cupla::MemSizeType {
+        return (&extents.width)[(3u - 1u) - T_Idx::value];
       }
     };
 
@@ -135,7 +147,8 @@ namespace traits
         typename T_Extent
     >
     struct SetExtent<
-        T_Idx, cupla::uint3,
+        T_Idx,
+        cupla::Extent,
         T_Extent,
         typename std::enable_if<
             (3u > T_Idx::value)
@@ -144,12 +157,12 @@ namespace traits
         ALPAKA_FN_HOST_ACC
         static auto
         setExtent(
-            cupla::uint3 &extents,
+            cupla::Extent &extents,
             T_Extent const &extent
         )
         -> void
         {
-            (&extents.x)[(3u - 1u) - T_Idx::value] = extent;
+            (&extents.width)[(3u - 1u) - T_Idx::value] = extent;
         }
     };
 } // namespace traits
@@ -166,16 +179,16 @@ namespace traits
     >
     struct GetOffset<
         T_Idx,
-        cupla::uint3,
+        cupla::Extent,
         typename std::enable_if<
             (3u > T_Idx::value)
         >::type
     >{
         ALPAKA_FN_HOST_ACC
         static auto
-        getOffset( cupla::uint3 const & offsets )
-        -> cupla::IdxType{
-            return (&offsets.x)[(3u - 1u) - T_Idx::value];
+        getOffset( cupla::Extent const & offsets )
+        -> cupla::MemSizeType{
+            return (&offsets.width)[(3u - 1u) - T_Idx::value];
         }
     };
 
@@ -187,7 +200,7 @@ namespace traits
     >
     struct SetOffset<
         T_Idx,
-        cupla::uint3,
+        cupla::Extent,
         T_Offset,
         typename std::enable_if<
             (3u > T_Idx::value)
@@ -196,7 +209,7 @@ namespace traits
         ALPAKA_FN_HOST_ACC
         static auto
         setOffset(
-            cupla::uint3 &offsets,
+            cupla::Extent &offsets,
             T_Offset const &offset
         )
         -> void {
@@ -214,9 +227,9 @@ namespace traits
     //! size type trait specialization.
     template<>
     struct SizeType<
-        cupla::uint3
+        cupla::Extent
     >{
-        using type = cupla::IdxType;
+        using type = cupla::MemSizeType;
     };
 
 } // namespace traits
