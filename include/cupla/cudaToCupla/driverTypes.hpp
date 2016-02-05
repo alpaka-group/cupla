@@ -60,3 +60,6 @@
 #define blockDim                                                               \
   static_cast<cupla::uint3>(                                                \
       ::alpaka::workdiv::getWorkDiv<::alpaka::Block, ::alpaka::Threads>(acc))
+#define elemDim                                                               \
+  static_cast<cupla::uint3>(                                                \
+      ::alpaka::workdiv::getWorkDiv<::alpaka::Thread, ::alpaka::Elems>(acc))
