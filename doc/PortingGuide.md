@@ -126,3 +126,7 @@ sharedMemExtern( fooPtr, float * );
 int bar = fooCArray2D[ threadIdx.x ][ 0 ];
 ...
 ```
+
+- Cupla code can be mixed with alpaka low level code. This is necessary for 
+  platform independent math functions inside the kernels or for functionality
+  which is currently not implemented in cupla.

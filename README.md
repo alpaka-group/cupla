@@ -38,8 +38,10 @@ Dependencies
 Usage
 -----
 
-See our notes in [INSTALL.md](INSTALL.md).
-Checkout the [guide](doc/PortingGuide.md) how to port your project.
+- See our notes in [INSTALL.md](INSTALL.md).
+- Checkout the [guide](doc/PortingGuide.md) how to port your project.
+- Checkout the [tuning guide](doc/TuningGuide.md) for a step further to performance
+  portable code.
 
 
 Authors
