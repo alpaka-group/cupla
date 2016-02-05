@@ -24,19 +24,35 @@
 
 #include <alpaka/alpaka.hpp>
 
-#include "cupla/kernel.hpp"
-
-#include "cupla/datatypes/Array.hpp"
-#include "cupla/datatypes/dim3.hpp"
-#include "cupla/datatypes/uint.hpp"
-#include "cupla/datatypes/Extent.hpp"
-#include "cupla/datatypes/PitchedPtr.hpp"
-
 #include "cupla/types.hpp"
 #include "cupla_driver_types.hpp"
 
-#include "cupla/api/common.hpp"
-#include "cupla/api/device.hpp"
-#include "cupla/api/stream.hpp"
-#include "cupla/api/event.hpp"
-#include "cupla/api/memory.hpp"
+cuplaError_t
+cuplaEventCreate(
+    cuplaEvent_t * event,
+    unsigned int flags = 0
+);
+
+cuplaError_t
+cuplaEventDestroy( cuplaEvent_t event );
+
+cuplaError_t
+cuplaEventRecord(
+    cuplaEvent_t event,
+    cuplaStream_t stream = 0
+);
+
+cuplaError_t
+cuplaEventElapsedTime(
+    float * ms,
+    cuplaEvent_t start,
+    cuplaEvent_t end
+);
+
+cuplaError_t
+cuplaEventSynchronize(
+    cuplaEvent_t event
+);
+
+cuplaError_t
+cuplaEventQuery( cuplaEvent_t event );

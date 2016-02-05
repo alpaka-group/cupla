@@ -25,134 +25,8 @@
 #include "cupla/manager/Device.hpp"
 #include "cupla/manager/Stream.hpp"
 #include "cupla/manager/Event.hpp"
+#include "cupla/api/memory.hpp"
 
-
-cuplaError_t
-cuplaGetDeviceCount( int * count)
-{
-    *count = cupla::manager::Device< cupla::AccDev >::get().count();
-    return cuplaSuccess;        
-}
-
-cuplaError_t
-cuplaSetDevice( int idx)
-{
-    cupla::manager::Device< cupla::AccDev >::get().device( idx );
-    return cuplaSuccess;
-}
-
-cuplaError_t
-cuplaGetDevice( int * deviceId )
-{
-    *deviceId = cupla::manager::Device< cupla::AccDev >::get().id();
-    return cuplaSuccess;
-}
-
-cuplaError_t
-cuplaEventCreate(
-    cuplaEvent_t * event,
-    unsigned int flags
-)
-{
-    *event = cupla::manager::Event< 
-        cupla::AccDev, 
-        cupla::AccStream 
-    >::get().create( flags );
-    
-    return cuplaSuccess;
-};
-
-cuplaError_t
-cuplaEventDestroy( cuplaEvent_t event )
-{
-    if( 
-        cupla::manager::Event< 
-            cupla::AccDev, 
-            cupla::AccStream 
-        >::get().destroy( event ) 
-    )
-        return cuplaSuccess;
-    else
-        return cuplaErrorInitializationError;
-};
-
-cuplaError_t
-cuplaStreamCreate(
-    cuplaStream_t * stream
-)
-{
-    *stream = cupla::manager::Stream< 
-        cupla::AccDev, 
-        cupla::AccStream 
-    >::get().create();
-  
-    return cuplaSuccess;
-};
-
-cuplaError_t
-cuplaStreamDestroy( cuplaStream_t stream )
-{
-    if( 
-        cupla::manager::Stream< 
-            cupla::AccDev, 
-            cupla::AccStream 
-        >::get().destroy( stream ) 
-    )
-        return cuplaSuccess;
-    else
-        return cuplaErrorInitializationError;
-};
-
-cuplaError_t
-cuplaEventRecord(
-    cuplaEvent_t event,
-    cuplaStream_t stream
-)
-{
-    auto& streamObject = cupla::manager::Stream< 
-        cupla::AccDev, 
-        cupla::AccStream 
-    >::get().stream( stream );
-    auto& eventObject = cupla::manager::Event< 
-        cupla::AccDev, 
-        cupla::AccStream 
-    >::get().event( event );
-    
-    eventObject.record( streamObject );
-    return cuplaSuccess;
-}
-
-cuplaError_t
-cuplaEventElapsedTime(
-    float * ms,
-    cuplaEvent_t start,
-    cuplaEvent_t end
-)
-{
-    auto& eventStart = cupla::manager::Event< 
-        cupla::AccDev, 
-        cupla::AccStream 
-    >::get().event( start );
-    auto& eventEnd = cupla::manager::Event< 
-        cupla::AccDev, 
-        cupla::AccStream 
-    >::get().event( end );
-    *ms = eventEnd.elapsedSince(eventStart);
-    return cuplaSuccess;
-}
-
-cuplaError_t
-cuplaEventSynchronize(
-    cuplaEvent_t event
-)
-{
-    auto& eventObject = cupla::manager::Event< 
-        cupla::AccDev, 
-        cupla::AccStream 
-    >::get().event( event );
-    ::alpaka::wait::wait( *eventObject );
-    return cuplaSuccess;
-}
 
 cuplaError_t
 cuplaMalloc(
@@ -315,12 +189,6 @@ cuplaError_t cuplaFreeHost(void *ptr)
 
 }
 
-const char *
-cuplaGetErrorString(cuplaError_t)
-{
-    return "cuplaGetErrorString is currently not supported\n";
-}
-
 cuplaError_t cuplaMemcpyAsync(
     void *dst,
     const void *src,
@@ -472,59 +340,6 @@ cuplaMemcpy(
 }
 
 cuplaError_t
-cuplaDeviceReset( )
-{   
-    // wait that all work on the device is finished
-    cuplaDeviceSynchronize( );
-    
-    // delete all events on the current device
-    cupla::manager::Event< 
-        cupla::AccDev, 
-        cupla::AccStream 
-    >::get().reset( );
-    
-    // delete all memory on the current device
-    cupla::manager::Memory<
-        cupla::AccDev,
-        cupla::AlpakaDim<1u>
-    >::get().reset( );
-    
-    cupla::manager::Memory<
-        cupla::AccDev,
-        cupla::AlpakaDim<2u>
-    >::get().reset( );
-    
-    cupla::manager::Memory<
-        cupla::AccDev,
-        cupla::AlpakaDim<3u>
-    >::get().reset( );
-    
-    // delete all streams on the current device
-    cupla::manager::Stream< 
-        cupla::AccDev, 
-        cupla::AccStream 
-    >::get().reset( );
-        
-    cupla::manager::Device< cupla::AccDev >::get( ).reset( );
-    return cuplaSuccess;
-}
-
-cuplaError_t
-cuplaDeviceSynchronize( )
-{   
-    ::alpaka::wait::wait(
-        cupla::manager::Device< cupla::AccDev >::get( ).current( )
-    );
-    return cuplaSuccess;
-}
-
-cuplaError_t 
-cuplaGetLastError()
-{
-    return cuplaSuccess;
-}
-
-cuplaError_t
 cuplaMemsetAsync(
     void * devPtr,
     int value,
@@ -592,40 +407,5 @@ cuplaMemset(
     );
     ::alpaka::wait::wait( streamObject );
     
-    return cuplaSuccess;
-}
-
-
-cuplaError_t
-cuplaEventQuery( cuplaEvent_t event )
-{
-    auto& eventObject = cupla::manager::Event< 
-        cupla::AccDev, 
-        cupla::AccStream 
-    >::get().event( event );
-    
-    if( ::alpaka::event::test( *eventObject ) )
-    {
-        return cuplaSuccess;
-    }
-    else
-    {
-        return cuplaErrorNotReady;
-    }
-}
-
-cuplaError_t
-cuplaMemGetInfo(
-    size_t * free,
-    size_t * total
-)
-{
-    auto& device( 
-        cupla::manager::Device< 
-            cupla::AccDev 
-        >::get().current() 
-    );
-    *total = ::alpaka::dev::getMemBytes( device );
-    *free = ::alpaka::dev::getFreeMemBytes( device );
     return cuplaSuccess;
 }

@@ -24,19 +24,29 @@
 
 #include <alpaka/alpaka.hpp>
 
-#include "cupla/kernel.hpp"
-
-#include "cupla/datatypes/Array.hpp"
-#include "cupla/datatypes/dim3.hpp"
-#include "cupla/datatypes/uint.hpp"
-#include "cupla/datatypes/Extent.hpp"
-#include "cupla/datatypes/PitchedPtr.hpp"
-
 #include "cupla/types.hpp"
 #include "cupla_driver_types.hpp"
 
-#include "cupla/api/common.hpp"
-#include "cupla/api/device.hpp"
-#include "cupla/api/stream.hpp"
-#include "cupla/api/event.hpp"
-#include "cupla/api/memory.hpp"
+
+
+cuplaError_t
+cuplaGetDeviceCount( int * count);
+
+
+cuplaError_t
+cuplaSetDevice( int idx);
+
+cuplaError_t
+cuplaGetDevice( int * deviceId );
+
+cuplaError_t
+cuplaDeviceReset( );
+
+cuplaError_t
+cuplaDeviceSynchronize( );
+
+cuplaError_t
+cuplaMemGetInfo(
+    size_t * free,
+    size_t * total
+);
