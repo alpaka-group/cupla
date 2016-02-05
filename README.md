@@ -26,6 +26,7 @@ Usage
 -----
 
 See our notes in [INSTALL.md](INSTALL.md).
+Checkout the [guide](doc/PortingGuide.md) how to port your project.
 
 
 Authors
