@@ -27,6 +27,7 @@ or `cuplaEventDisableTiming` while the event creation.
 Poring step by step
 ===================
 
+- change the suffix `*.cu` of the CUDA source files to `*.cpp`
 - Remove cuda specific includes on top of your header and source files
 - Add include `cuda_to_cupla.hpp`
 
