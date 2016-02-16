@@ -50,7 +50,8 @@ namespace cupla{
     };
 #endif
 
-#ifdef ALPAKA_ACC_CPU_B_OMP2_T_SEQ_ENABLED
+#if defined(ALPAKA_ACC_CPU_B_OMP2_T_SEQ_ENABLED) ||                            \
+    defined(ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED)
     /** optimize elemSize and blockSize for a special device
      *
      * This implementation swap elemSize and blockSize

@@ -45,11 +45,17 @@
 #   define ALPAKA_ACC_GPU_CUDA_ENABLED 1
 #endif
 
+#ifdef ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED
+#   undef ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED
+#   define ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED 1
+#endif
+
 #define CUPLA_NUM_SELECTED_DEVICES (                                           \
         ALPAKA_ACC_CPU_B_SEQ_T_OMP2_ENABLED +                                  \
         ALPAKA_ACC_CPU_B_SEQ_T_THREADS_ENABLED +                               \
         ALPAKA_ACC_CPU_B_OMP2_T_SEQ_ENABLED  +                                 \
-        ALPAKA_ACC_GPU_CUDA_ENABLED                                            \
+        ALPAKA_ACC_GPU_CUDA_ENABLED +                                          \
+        ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED                                     \
     )
 
 #if( CUPLA_NUM_SELECTED_DEVICES > 1 )
@@ -92,7 +98,8 @@ namespace cupla {
 
 #if defined(ALPAKA_ACC_CPU_B_SEQ_T_OMP2_ENABLED) ||                            \
     defined(ALPAKA_ACC_CPU_B_SEQ_T_THREADS_ENABLED) ||                         \
-    defined(ALPAKA_ACC_CPU_B_OMP2_T_SEQ_ENABLED)
+    defined(ALPAKA_ACC_CPU_B_OMP2_T_SEQ_ENABLED) ||                            \
+    defined(ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED)
 
     using AccDev = ::alpaka::dev::DevCpu;
     using AccStream = ::alpaka::stream::StreamCpuAsync;
@@ -113,6 +120,13 @@ namespace cupla {
 
 #ifdef ALPAKA_ACC_CPU_B_SEQ_T_THREADS_ENABLED
     using Acc = ::alpaka::acc::AccCpuThreads<
+        KernelDim,
+        IdxType
+    >;
+#endif
+
+#ifdef ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED
+    using Acc = ::alpaka::acc::AccCpuSerial<
         KernelDim,
         IdxType
     >;
