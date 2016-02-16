@@ -115,3 +115,26 @@ cuplaMemset(
     int value,
     size_t count
 );
+
+cuplaError_t
+cuplaMemcpy2D(
+    void * dst,
+    size_t const dPitch,
+    void const * const src,
+    size_t const spitch,
+    size_t const width,
+    size_t const height,
+    enum cuplaMemcpyKind kind
+);
+
+cuplaError_t
+cuplaMemcpy2DAsync(
+    void * dst,
+    size_t const dPitch,
+    void const * const src,
+    size_t const spitch,
+    size_t const width,
+    size_t const height,
+    enum cuplaMemcpyKind kind,
+    cuplaStream_t const stream = 0
+);

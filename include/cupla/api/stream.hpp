@@ -35,3 +35,8 @@ cuplaStreamCreate(
 
 cuplaError_t
 cuplaStreamDestroy( cuplaStream_t stream );
+
+cuplaError_t
+cuplaStreamSynchronize(
+    cuplaStream_t stream
+);
