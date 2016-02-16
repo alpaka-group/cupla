@@ -55,3 +55,16 @@ cuplaStreamDestroy( cuplaStream_t stream )
     else
         return cuplaErrorInitializationError;
 };
+
+cuplaError_t
+cuplaStreamSynchronize(
+    cuplaStream_t stream
+)
+{
+    auto& streamObject = cupla::manager::Stream< 
+        cupla::AccDev, 
+        cupla::AccStream 
+    >::get().stream( stream );
+    ::alpaka::wait::wait( streamObject );
+    return cuplaSuccess;
+}

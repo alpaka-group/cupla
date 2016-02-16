@@ -42,6 +42,7 @@
 
 #define cudaStreamCreate(...) cuplaStreamCreate(__VA_ARGS__)
 #define cudaStreamDestroy(...) cuplaStreamDestroy(__VA_ARGS__)
+#define cudaStreamSynchronize(...) cuplaStreamSynchronize(__VA_ARGS__)
 
 #define cudaEventRecord(...) cuplaEventRecord(__VA_ARGS__)
 
@@ -60,6 +61,8 @@
 
 #define cudaMemset(...) cuplaMemset(__VA_ARGS__)
 #define cudaMemsetAsync(...) cuplaMemsetAsync(__VA_ARGS__)
+#define cudaMemcpy2D(...) cuplaMemcpy2D(__VA_ARGS__)
+#define cudaMemcpy2DAsync(...) cuplaMemcpy2DAsync(__VA_ARGS__)
 
 #define cudaEventQuery(...) cuplaEventQuery(__VA_ARGS__)
 
