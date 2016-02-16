@@ -33,7 +33,10 @@ For more information see [LICENSE.md](LICENSE.md).
 Dependencies
 ------------
 
-... (coming soon)
+- **cmake 3.3.0**
+- **alpaka** 
+  - is loaded as `git submodule` within cupla (see [INSTALL.md](INSTALL.md))
+  - for more information please read [README.md](https://github.com/ComputationalRadiationPhysics/alpaka/blob/master/README.md)
 
 Usage
 -----
