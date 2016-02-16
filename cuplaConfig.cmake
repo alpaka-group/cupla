@@ -22,7 +22,7 @@
 # Required cmake version.
 ################################################################################
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.3.0)
 
 ################################################################################
 # cupla
@@ -74,7 +74,7 @@ set(_cupla_FOUND TRUE)
 ################################################################################
 # own modules for find_packages
 list(APPEND CMAKE_MODULE_PATH "${_cupla_ROOT_DIR}")
-list(APPEND CMAKE_MODULE_PATH "$ENV{ALPAKA_ROOT}")
+#list(APPEND CMAKE_MODULE_PATH "$ENV{ALPAKA_ROOT}")
 
 
 ################################################################################
@@ -91,12 +91,20 @@ OPTION(ALPAKA_ACC_CPU_B_SEQ_T_OMP2_ENABLE "Enable the OpenMP 2.0 CPU block threa
 OPTION(ALPAKA_ACC_CPU_BT_OMP4_ENABLE "Enable the OpenMP 4.0 CPU block and block thread accelerator" OFF)
 OPTION(ALPAKA_ACC_GPU_CUDA_ENABLE "Enable the CUDA GPU accelerator" OFF)
 
-set("ALPAKA_ROOT" "$ENV{ALPAKA_ROOT}" CACHE STRING  "The location of the alpaka library")
-list(APPEND CMAKE_MODULE_PATH "${ALPAKA_ROOT}")
-find_package(alpaka)
+if("$ENV{ALPAKA_ROOT}" STREQUAL "")
+    if(NOT EXISTS "${_cupla_ROOT_DIR}/alpaka/Findalpaka.cmake")
+        # Init the sub molules
+        execute_process (COMMAND git submodule init WORKING_DIRECTORY ${_cupla_ROOT_DIR})
+        # Update the sub modules
+        execute_process (COMMAND git submodule update WORKING_DIRECTORY ${_cupla_ROOT_DIR})
+    endif()
+endif()
+
+find_package(alpaka HINTS $ENV{ALPAKA_ROOT} "${_cupla_ROOT_DIR}/alpaka")
+
 if(NOT alpaka_FOUND)
     message(WARNING "Required cupla dependency alpaka could not be found!")
-    set(_cupla_FOUND FALSE)
+        set(_cupla_FOUND FALSE)
 else()
     list(APPEND _cupla_COMPILE_OPTIONS_PUBLIC ${alpaka_COMPILE_OPTIONS})
     list(APPEND _cupla_COMPILE_DEFINITIONS_PUBLIC ${alpaka_COMPILE_DEFINITIONS})

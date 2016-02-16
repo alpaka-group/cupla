@@ -4,20 +4,20 @@ cupla Install Guide
 Requirements
 ------------
 
-- **alpaka** 
-  - `git@github.com:ComputationalRadiationPhysics/alpaka.git`
-  - `git checkout dev`
-  - `export ALPAKA_ROOT=<alpaka_SRC_CODE_DIR>`
-  - for more information please read [README.md](https://github.com/ComputationalRadiationPhysics/alpaka/blob/master/README.md)
+- **cmake**  3.3.0 or higher
+  - *Debian/Ubuntu:* `sudo apt-get install cmake file cmake-curses-gui`
+  - *Arch Linux:* `sudo pacman --sync cmake`
 
 - **cupla** 
   - `git@github.com:ComputationalRadiationPhysics/cupla.git`
   - `export CUPLA_ROOT=<cupla_SRC_CODE_DIR>`
-
-- **cmake**  2.8.12 or higher
-  - *Debian/Ubuntu:* `sudo apt-get install cmake file cmake-curses-gui`
-  - *Arch Linux:* `sudo pacman --sync cmake`
-
+  - example:
+    - `mkdir -p $HOME/src`
+    - `git clone git@github.com:ComputationalRadiationPhysics/cupla.git $HOME/src/cupla`
+    - `cd $HOME/src/cupla`
+    - `git submodule init`
+    - `git submodule update`
+    - `export CUPLA_ROOT=$HOME/src/cupla`
 
 compile a example
 -----------------
