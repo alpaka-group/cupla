@@ -38,11 +38,13 @@
 #define cudaGetDevice(...) cuplaGetDevice(__VA_ARGS__)
 
 #define cudaEventCreate(...) cuplaEventCreate(__VA_ARGS__)
+#define cudaEventCreateWithFlags(...) cuplaEventCreateWithFlags(__VA_ARGS__)
 #define cudaEventDestroy(...) cuplaEventDestroy(__VA_ARGS__)
 
 #define cudaStreamCreate(...) cuplaStreamCreate(__VA_ARGS__)
 #define cudaStreamDestroy(...) cuplaStreamDestroy(__VA_ARGS__)
 #define cudaStreamSynchronize(...) cuplaStreamSynchronize(__VA_ARGS__)
+#define cudaStreamWaitEvent(...) cuplaStreamWaitEvent(__VA_ARGS__)
 
 #define cudaEventRecord(...) cuplaEventRecord(__VA_ARGS__)
 

@@ -28,9 +28,14 @@
 #include "cupla_driver_types.hpp"
 
 cuplaError_t
-cuplaEventCreate(
+cuplaEventCreateWithFlags(
     cuplaEvent_t * event,
-    unsigned int flags = 0
+    unsigned int flags
+);
+
+cuplaError_t
+cuplaEventCreate(
+    cuplaEvent_t * event
 );
 
 cuplaError_t

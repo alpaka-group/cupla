@@ -42,11 +42,11 @@
 
 #ifdef cudaEventDisableTiming
 #undef cudaEventDisableTiming
-    /* cudaEventDisableTiming is a define in CUDA therefore we must remove
-     * the old definition with the cupla enum
-     */
-    #define cudaEventDisableTiming cuplaEventDisableTiming
 #endif
+/* cudaEventDisableTiming is a define in CUDA therefore we must remove
+ * the old definition with the cupla enum
+ */
+#define cudaEventDisableTiming cuplaEventDisableTiming
 
 #define sharedMem(ppName, ...)                                                 \
   __VA_ARGS__ &ppName =                                                        \
@@ -56,9 +56,11 @@
     __VA_ARGS__ ppName =                                                       \
         ::alpaka::block::shared::dyn::getMem<__VA_ARGS__>(acc)
 
+#define cudaMemcpyKind cuplaMemcpyKind
 #define cudaMemcpyHostToDevice cuplaMemcpyHostToDevice
 #define cudaMemcpyDeviceToHost cuplaMemcpyDeviceToHost
 #define cudaMemcpyDeviceToDevice cuplaMemcpyDeviceToDevice
+#define cudaMemcpyHostToHost cuplaMemcpyHostToHost
 
 // index renaming
 #define blockIdx                                                               \
@@ -81,3 +83,4 @@
 // atomic functions
 #define atomicAdd(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Add>(acc, ppPointer, ppValue)
 
+#define uint3 cupla::uint3

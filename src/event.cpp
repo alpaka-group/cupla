@@ -29,27 +29,40 @@
 
 
 cuplaError_t
-cuplaEventCreate(
+cuplaEventCreateWithFlags(
     cuplaEvent_t * event,
     unsigned int flags
 )
 {
-    *event = cupla::manager::Event< 
-        cupla::AccDev, 
-        cupla::AccStream 
+    *event = cupla::manager::Event<
+        cupla::AccDev,
+        cupla::AccStream
     >::get().create( flags );
-    
+
+    return cuplaSuccess;
+};
+
+cuplaError_t
+cuplaEventCreate(
+    cuplaEvent_t * event
+)
+{
+    *event = cupla::manager::Event<
+        cupla::AccDev,
+        cupla::AccStream
+    >::get().create( 0 );
+
     return cuplaSuccess;
 };
 
 cuplaError_t
 cuplaEventDestroy( cuplaEvent_t event )
 {
-    if( 
-        cupla::manager::Event< 
-            cupla::AccDev, 
-            cupla::AccStream 
-        >::get().destroy( event ) 
+    if(
+        cupla::manager::Event<
+            cupla::AccDev,
+            cupla::AccStream
+        >::get().destroy( event )
     )
         return cuplaSuccess;
     else
@@ -62,15 +75,15 @@ cuplaEventRecord(
     cuplaStream_t stream
 )
 {
-    auto& streamObject = cupla::manager::Stream< 
-        cupla::AccDev, 
-        cupla::AccStream 
+    auto& streamObject = cupla::manager::Stream<
+        cupla::AccDev,
+        cupla::AccStream
     >::get().stream( stream );
-    auto& eventObject = cupla::manager::Event< 
-        cupla::AccDev, 
-        cupla::AccStream 
+    auto& eventObject = cupla::manager::Event<
+        cupla::AccDev,
+        cupla::AccStream
     >::get().event( event );
-    
+
     eventObject.record( streamObject );
     return cuplaSuccess;
 }
@@ -82,13 +95,13 @@ cuplaEventElapsedTime(
     cuplaEvent_t end
 )
 {
-    auto& eventStart = cupla::manager::Event< 
-        cupla::AccDev, 
-        cupla::AccStream 
+    auto& eventStart = cupla::manager::Event<
+        cupla::AccDev,
+        cupla::AccStream
     >::get().event( start );
-    auto& eventEnd = cupla::manager::Event< 
-        cupla::AccDev, 
-        cupla::AccStream 
+    auto& eventEnd = cupla::manager::Event<
+        cupla::AccDev,
+        cupla::AccStream
     >::get().event( end );
     *ms = eventEnd.elapsedSince(eventStart);
     return cuplaSuccess;
@@ -99,9 +112,9 @@ cuplaEventSynchronize(
     cuplaEvent_t event
 )
 {
-    auto& eventObject = cupla::manager::Event< 
-        cupla::AccDev, 
-        cupla::AccStream 
+    auto& eventObject = cupla::manager::Event<
+        cupla::AccDev,
+        cupla::AccStream
     >::get().event( event );
     ::alpaka::wait::wait( *eventObject );
     return cuplaSuccess;

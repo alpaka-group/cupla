@@ -29,6 +29,7 @@
 
 enum cuplaMemcpyKind
 {
+  cuplaMemcpyHostToHost,
   cuplaMemcpyHostToDevice,
   cuplaMemcpyDeviceToHost,
   cuplaMemcpyDeviceToDevice

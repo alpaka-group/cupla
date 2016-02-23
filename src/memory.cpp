@@ -305,6 +305,37 @@ cuplaError_t cuplaMemcpyAsync(
             );
 
         }
+            break;
+        case cuplaMemcpyHostToHost:
+        {
+            auto& host(
+                cupla::manager::Device<
+                    cupla::AccHost
+                >::get().current()
+            );
+            const cupla::HostBufWrapper< 1u > hSrcBuf(
+                const_cast<uint8_t *>(
+                    static_cast<const uint8_t *>(src)
+                ),
+                host,
+                numBytes
+            );
+            cupla::HostBufWrapper< 1u > hDestBuf(
+                static_cast<uint8_t *>(
+                    dst
+                ),
+                host,
+                numBytes
+            );
+
+            ::alpaka::mem::view::copy(
+                streamObject,
+                hDestBuf,
+                hSrcBuf,
+                numBytes
+            );
+
+        }
         break;
     }
     return cuplaSuccess;
@@ -542,6 +573,39 @@ cuplaMemcpy2DAsync(
                 streamObject,
                 dDestBuf,
                 dSrcBuf,
+                numBytes
+            );
+
+        }
+        break;
+        case cuplaMemcpyHostToHost:
+        {
+            auto& host(
+                cupla::manager::Device<
+                    cupla::AccHost
+                >::get().current()
+            );
+            const cupla::HostBufWrapper< 2u > hSrcBuf(
+                const_cast<uint8_t *>(
+                    static_cast<const uint8_t *>(src)
+                ),
+                host,
+                numBytes,
+                srcPitch
+            );
+            cupla::HostBufWrapper< 2u > hDestBuf(
+                static_cast<uint8_t *>(
+                    dst
+                ),
+                host,
+                numBytes,
+                dstPitch
+            );
+
+            ::alpaka::mem::view::copy(
+                streamObject,
+                hDestBuf,
+                hSrcBuf,
                 numBytes
             );
 
