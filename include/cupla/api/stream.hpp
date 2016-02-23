@@ -40,3 +40,10 @@ cuplaError_t
 cuplaStreamSynchronize(
     cuplaStream_t stream
 );
+
+cuplaError_t
+cuplaStreamWaitEvent(
+    cuplaStream_t stream,
+    cuplaEvent_t event,
+    unsigned int flags
+);

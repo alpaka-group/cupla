@@ -34,22 +34,22 @@ cuplaStreamCreate(
     cuplaStream_t * stream
 )
 {
-    *stream = cupla::manager::Stream< 
-        cupla::AccDev, 
-        cupla::AccStream 
+    *stream = cupla::manager::Stream<
+        cupla::AccDev,
+        cupla::AccStream
     >::get().create();
-  
+
     return cuplaSuccess;
 };
 
 cuplaError_t
 cuplaStreamDestroy( cuplaStream_t stream )
 {
-    if( 
-        cupla::manager::Stream< 
-            cupla::AccDev, 
-            cupla::AccStream 
-        >::get().destroy( stream ) 
+    if(
+        cupla::manager::Stream<
+            cupla::AccDev,
+            cupla::AccStream
+        >::get().destroy( stream )
     )
         return cuplaSuccess;
     else
@@ -61,10 +61,30 @@ cuplaStreamSynchronize(
     cuplaStream_t stream
 )
 {
-    auto& streamObject = cupla::manager::Stream< 
-        cupla::AccDev, 
-        cupla::AccStream 
+    auto& streamObject = cupla::manager::Stream<
+        cupla::AccDev,
+        cupla::AccStream
     >::get().stream( stream );
     ::alpaka::wait::wait( streamObject );
+    return cuplaSuccess;
+}
+cuplaError_t
+cuplaStreamWaitEvent(
+    cuplaStream_t stream,
+    cuplaEvent_t event,
+    unsigned int
+)
+{
+    auto& streamObject = cupla::manager::Stream<
+        cupla::AccDev,
+        cupla::AccStream
+    >::get().stream( stream );
+
+    auto& eventObject = cupla::manager::Event<
+        cupla::AccDev,
+        cupla::AccStream
+    >::get().event( event );
+
+    ::alpaka::wait::wait(streamObject,eventObject);
     return cuplaSuccess;
 }
