@@ -95,6 +95,7 @@ namespace cupla {
     >;
 
     using AccHost = ::alpaka::dev::DevCpu;
+    using AccHostStream = ::alpaka::stream::StreamCpuSync;
 
 #if defined(ALPAKA_ACC_CPU_B_SEQ_T_OMP2_ENABLED) ||                            \
     defined(ALPAKA_ACC_CPU_B_SEQ_T_THREADS_ENABLED) ||                         \
@@ -178,8 +179,30 @@ namespace cupla {
     template<
         unsigned T_dim
     >
+    using HostViewWrapper =
+        ::alpaka::mem::view::ViewSubView<
+            AccHost,
+            uint8_t,
+            AlpakaDim< T_dim >,
+            MemSizeType
+        >;
+
+    template<
+        unsigned T_dim
+    >
     using DeviceBufWrapper =
         ::alpaka::mem::view::ViewPlainPtr<
+            AccDev,
+            uint8_t,
+            AlpakaDim< T_dim >,
+            MemSizeType
+        >;
+
+    template<
+        unsigned T_dim
+    >
+    using DeviceViewWrapper =
+        ::alpaka::mem::view::ViewSubView<
             AccDev,
             uint8_t,
             AlpakaDim< T_dim >,

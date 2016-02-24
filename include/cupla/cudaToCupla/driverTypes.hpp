@@ -38,7 +38,11 @@
 
 #define dim3 cupla::dim3
 #define cudaExtent cupla::Extent
+#define cudaPos cupla::Pos
+#define cudaArray cupla::cuplaArray;
 #define cudaPitchedPtr cupla::PitchedPtr
+
+#define cudaMemcpy3DParms cupla::Memcpy3DParms
 
 #ifdef cudaEventDisableTiming
 #undef cudaEventDisableTiming
@@ -64,23 +68,23 @@
 
 // index renaming
 #define blockIdx                                                               \
-  static_cast<cupla::uint3>(                                                \
+  static_cast<uint3>(                                                \
       ::alpaka::idx::getIdx<::alpaka::Grid, ::alpaka::Blocks>(acc))
 #define threadIdx                                                              \
-  static_cast<cupla::uint3>(                                                \
+  static_cast<uint3>(                                                \
       ::alpaka::idx::getIdx<::alpaka::Block, ::alpaka::Threads>(acc))
 
 #define gridDim                                                                \
-  static_cast<cupla::uint3>(                                                \
+  static_cast<uint3>(                                                \
       ::alpaka::workdiv::getWorkDiv<::alpaka::Grid, ::alpaka::Blocks>(acc))
 #define blockDim                                                               \
-  static_cast<cupla::uint3>(                                                \
+  static_cast<uint3>(                                                \
       ::alpaka::workdiv::getWorkDiv<::alpaka::Block, ::alpaka::Threads>(acc))
 #define elemDim                                                               \
-  static_cast<cupla::uint3>(                                                \
+  static_cast<uint3>(                                                \
       ::alpaka::workdiv::getWorkDiv<::alpaka::Thread, ::alpaka::Elems>(acc))
 
 // atomic functions
 #define atomicAdd(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Add>(acc, ppPointer, ppValue)
 
-#define uint3 cupla::uint3
+#define uint3 ::cupla::uint3

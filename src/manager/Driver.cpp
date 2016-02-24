@@ -19,23 +19,49 @@
  *
  */
 
-
+#include "cupla/types.hpp"
 #include "cupla_runtime.hpp"
+#include "cupla/manager/Driver.hpp"
 #include "cupla/manager/Memory.hpp"
 #include "cupla/manager/Device.hpp"
 #include "cupla/manager/Stream.hpp"
 #include "cupla/manager/Event.hpp"
-#include "cupla/api/common.hpp"
 
-
-const char *
-cuplaGetErrorString(cuplaError_t)
+namespace cupla
 {
-    return "cuplaGetErrorString is currently not supported\n";
+namespace manager
+{
+
+Driver::Driver()
+{
+    cupla::manager::Device< cupla::AccDev >::get( );
+
+    cupla::manager::Stream<
+        cupla::AccDev,
+        cupla::AccStream
+    >::get();
+
+    cupla::manager::Memory<
+        cupla::AccDev,
+        cupla::AlpakaDim<3u>
+    >::get();
+
+    cupla::manager::Memory<
+        cupla::AccDev,
+        cupla::AlpakaDim<2u>
+    >::get();
+
+    cupla::manager::Memory<
+        cupla::AccDev,
+        cupla::AlpakaDim<1u>
+    >::get();
+
+    cupla::manager::Event<
+        cupla::AccDev,
+        cupla::AccStream
+    >::get();
 }
 
-cuplaError_t
-cuplaGetLastError()
-{
-    return cuplaSuccess;
-}
+
+} //namespace manager
+} //namespace cupla

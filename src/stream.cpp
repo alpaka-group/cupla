@@ -80,7 +80,7 @@ cuplaStreamWaitEvent(
         cupla::AccStream
     >::get().stream( stream );
 
-    auto& eventObject = cupla::manager::Event<
+    auto& eventObject = *cupla::manager::Event<
         cupla::AccDev,
         cupla::AccStream
     >::get().event( event );

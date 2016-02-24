@@ -22,29 +22,28 @@
 
 #pragma once
 
-#include <alpaka/alpaka.hpp>
-
-#include "cupla/kernel.hpp"
-
-#include "cupla/datatypes/Array.hpp"
-#include "cupla/datatypes/dim3.hpp"
-#include "cupla/datatypes/uint.hpp"
-#include "cupla/datatypes/Extent.hpp"
-#include "cupla/datatypes/Pos.hpp"
-#include "cupla/datatypes/Memcpy3DParms.hpp"
-#include "cupla/datatypes/PitchedPtr.hpp"
-
-#include "cupla/types.hpp"
-#include "cupla_driver_types.hpp"
-
-#include "cupla/api/common.hpp"
-#include "cupla/api/device.hpp"
-#include "cupla/api/stream.hpp"
-#include "cupla/api/event.hpp"
-#include "cupla/api/memory.hpp"
-#include "cupla/manager/Driver.hpp"
-
 namespace cupla
 {
-    const auto driver = manager::Driver::get();
-}
+namespace manager
+{
+
+/** initialize the cupla environment
+ *
+ * avoid side effects with singletons in the user code
+ */
+class Driver
+{
+
+public:
+    static Driver& get()
+    {
+        static Driver driver;
+        return driver;
+    }
+private:
+
+    Driver();
+};
+
+} //namespace manager
+} //namespace cupla
