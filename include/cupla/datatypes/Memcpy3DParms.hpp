@@ -22,29 +22,31 @@
 
 #pragma once
 
-#include <alpaka/alpaka.hpp>
-
-#include "cupla/kernel.hpp"
-
-#include "cupla/datatypes/Array.hpp"
-#include "cupla/datatypes/dim3.hpp"
-#include "cupla/datatypes/uint.hpp"
-#include "cupla/datatypes/Extent.hpp"
-#include "cupla/datatypes/Pos.hpp"
-#include "cupla/datatypes/Memcpy3DParms.hpp"
-#include "cupla/datatypes/PitchedPtr.hpp"
-
 #include "cupla/types.hpp"
-#include "cupla_driver_types.hpp"
-
-#include "cupla/api/common.hpp"
-#include "cupla/api/device.hpp"
-#include "cupla/api/stream.hpp"
-#include "cupla/api/event.hpp"
-#include "cupla/api/memory.hpp"
-#include "cupla/manager/Driver.hpp"
+#include "cupla/datatypes/PitchedPtr.hpp"
+#include "cupla/datatypes/Pos.hpp"
+#include "cupla/datatypes/Extent.hpp"
 
 namespace cupla
 {
-    const auto driver = manager::Driver::get();
-}
+
+    struct cuplaArray
+    {
+    };
+
+    struct Memcpy3DParms
+    {
+        cuplaArray* dstArray;
+        Pos dstPos;
+        PitchedPtr dstPtr;
+        Extent extent;
+        cuplaMemcpyKind kind;
+        cuplaArray * srcArray;
+        Pos srcPos;
+        PitchedPtr srcPtr;
+
+        ALPAKA_FN_HOST_ACC
+        Memcpy3DParms() = default;
+    };
+
+} //namespace cupla

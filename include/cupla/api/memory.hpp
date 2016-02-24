@@ -70,6 +70,13 @@ make_cuplaExtent(
     size_t const d
 );
 
+cupla::Pos
+make_cuplaPos(
+    size_t const x,
+    size_t const y,
+    size_t const z
+);
+
 cupla::PitchedPtr
 make_cuplaPitchedPtr(
     void * const d,
@@ -137,4 +144,15 @@ cuplaMemcpy2DAsync(
     size_t const height,
     enum cuplaMemcpyKind kind,
     cuplaStream_t const stream = 0
+);
+
+cuplaError_t
+cuplaMemcpy3DAsync(
+    const cupla::Memcpy3DParms * const p,
+    cuplaStream_t stream = 0
+);
+
+cuplaError_t
+cuplaMemcpy3D(
+    const cupla::Memcpy3DParms * const p
 );

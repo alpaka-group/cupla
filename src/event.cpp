@@ -119,3 +119,21 @@ cuplaEventSynchronize(
     ::alpaka::wait::wait( *eventObject );
     return cuplaSuccess;
 }
+
+cuplaError_t
+cuplaEventQuery( cuplaEvent_t event )
+{
+    auto& eventObject = cupla::manager::Event<
+        cupla::AccDev,
+        cupla::AccStream
+    >::get().event( event );
+
+    if( ::alpaka::event::test( *eventObject ) )
+    {
+        return cuplaSuccess;
+    }
+    else
+    {
+        return cuplaErrorNotReady;
+    }
+}

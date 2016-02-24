@@ -65,11 +65,14 @@
 #define cudaMemsetAsync(...) cuplaMemsetAsync(__VA_ARGS__)
 #define cudaMemcpy2D(...) cuplaMemcpy2D(__VA_ARGS__)
 #define cudaMemcpy2DAsync(...) cuplaMemcpy2DAsync(__VA_ARGS__)
+#define cudaMemcpy3DAsync(...) cuplaMemcpy3DAsync(__VA_ARGS__)
+#define cudaMemcpy3D(...) cuplaMemcpy3D(__VA_ARGS__)
 
 #define cudaEventQuery(...) cuplaEventQuery(__VA_ARGS__)
 
 #define cudaMemGetInfo(...) cuplaMemGetInfo(__VA_ARGS__)
 
 #define make_cudaExtent(...) make_cuplaExtent(__VA_ARGS__)
+#define make_cudaPos(...) make_cuplaPos(__VA_ARGS__)
 
 #define make_cudaPitchedPtr(...) make_cuplaPitchedPtr(__VA_ARGS__)

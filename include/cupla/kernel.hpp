@@ -178,9 +178,9 @@ namespace traits
     }
 
 #define CUPLA_CUDA_KERNEL_CONFIG(gridSize,blockSize,elemSize,...)              \
-    const cupla::uint3 cuplaGridSize = dim3(gridSize);                         \
-    const cupla::uint3 cuplaBlockSize = dim3(blockSize);                       \
-    const cupla::uint3 cuplaElemPerThread = dim3(elemSize);                    \
+    const uint3 cuplaGridSize = dim3(gridSize);                                \
+    const uint3 cuplaBlockSize = dim3(blockSize);                              \
+    const uint3 cuplaElemPerThread = dim3(elemSize);                           \
     auto& cuplaStream(                                                         \
         cupla::manager::Stream<                                                \
             cupla::AccDev,                                                     \

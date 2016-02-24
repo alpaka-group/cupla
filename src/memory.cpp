@@ -108,6 +108,16 @@ make_cuplaExtent(
     return cupla::Extent( w, h, d );
 }
 
+cupla::Pos
+make_cuplaPos(
+    size_t const x,
+    size_t const y,
+    size_t const z
+)
+{
+    return cupla::Pos( x, y, z );
+}
+
 cupla::PitchedPtr
 make_cuplaPitchedPtr(
     void * const d,
@@ -308,6 +318,12 @@ cuplaError_t cuplaMemcpyAsync(
             break;
         case cuplaMemcpyHostToHost:
         {
+            auto& hostStreamObject(
+                cupla::manager::Stream<
+                    cupla::AccHost,
+                    cupla::AccHostStream
+                >::get().stream( stream )
+            );
             auto& host(
                 cupla::manager::Device<
                     cupla::AccHost
@@ -329,7 +345,7 @@ cuplaError_t cuplaMemcpyAsync(
             );
 
             ::alpaka::mem::view::copy(
-                streamObject,
+                hostStreamObject,
                 hDestBuf,
                 hSrcBuf,
                 numBytes
@@ -580,6 +596,12 @@ cuplaMemcpy2DAsync(
         break;
         case cuplaMemcpyHostToHost:
         {
+             auto& hostStreamObject(
+                cupla::manager::Stream<
+                    cupla::AccHost,
+                    cupla::AccHostStream
+                >::get().stream( stream )
+            );
             auto& host(
                 cupla::manager::Device<
                     cupla::AccHost
@@ -603,7 +625,7 @@ cuplaMemcpy2DAsync(
             );
 
             ::alpaka::mem::view::copy(
-                streamObject,
+                hostStreamObject,
                 hDestBuf,
                 hSrcBuf,
                 numBytes
@@ -638,6 +660,284 @@ cuplaMemcpy2D(
         kind,
         0
     );
+
+    auto& streamObject(
+        cupla::manager::Stream<
+            cupla::AccDev,
+            cupla::AccStream
+        >::get().stream( 0 )
+    );
+    ::alpaka::wait::wait( streamObject );
+
+    return cuplaSuccess;
+}
+
+cuplaError_t
+cuplaMemcpy3DAsync(
+    const cupla::Memcpy3DParms * const p,
+    cuplaStream_t stream
+)
+{
+    const ::alpaka::Vec<
+        cupla::AlpakaDim<3u>,
+        cupla::MemSizeType
+    > numBytes( p->extent );
+
+    const ::alpaka::Vec<
+        cupla::AlpakaDim<3u>,
+        cupla::MemSizeType
+    > extentSrc(
+        p->srcPtr.xsize * p->srcPtr.ysize * ( p->extent.depth + p->srcPos.z ),
+        p->srcPtr.xsize * p->srcPtr.ysize,
+        p->srcPtr.xsize
+    );
+
+    const ::alpaka::Vec<
+        cupla::AlpakaDim<3u>,
+        cupla::MemSizeType
+    > extentDst(
+        p->dstPtr.xsize * p->dstPtr.ysize * ( p->extent.depth + p->dstPos.z ),
+        p->dstPtr.xsize * p->dstPtr.ysize,
+        p->dstPtr.xsize
+    );
+
+    const ::alpaka::Vec<
+        cupla::AlpakaDim<3u>,
+        cupla::MemSizeType
+    > offsetSrc(
+        p->srcPos.z,
+        p->srcPos.y,
+        p->srcPos.x
+    );
+
+    const ::alpaka::Vec<
+        cupla::AlpakaDim<3u>,
+        cupla::MemSizeType
+    > offsetDst(
+        p->dstPos.z,
+        p->dstPos.y,
+        p->dstPos.x
+    );
+
+    const ::alpaka::Vec<
+        cupla::AlpakaDim<3u>,
+        cupla::MemSizeType
+    > dstPitch(
+        p->dstPtr.pitch * p->dstPtr.ysize * ( p->extent.depth + p->dstPos.z ), // @todo: can't create z pitch,  but is not needed by alpaka
+        p->dstPtr.pitch * p->dstPtr.ysize,
+        p->dstPtr.pitch
+    );
+
+    const ::alpaka::Vec<
+        cupla::AlpakaDim<3u>,
+        cupla::MemSizeType
+    > srcPitch(
+        p->srcPtr.pitch * p->srcPtr.ysize * ( p->extent.depth + p->srcPos.z ), // @todo: can't create z pitch, but is not needed by alpaka
+        p->srcPtr.pitch * p->srcPtr.ysize,
+        p->srcPtr.pitch
+    );
+
+    auto& device(
+        cupla::manager::Device<
+            cupla::AccDev
+        >::get().current()
+    );
+
+    auto& streamObject(
+        cupla::manager::Stream<
+            cupla::AccDev,
+            cupla::AccStream
+        >::get().stream( stream )
+    );
+
+    switch(p->kind)
+    {
+        case cuplaMemcpyHostToDevice:
+        {
+            auto& host(
+                cupla::manager::Device<
+                    cupla::AccHost
+                >::get().current()
+            );
+
+            cupla::HostBufWrapper< 3u > hBuf(
+                const_cast<uint8_t *>(
+                    static_cast<const uint8_t *>(p->srcPtr.ptr)
+                ),
+                host,
+                extentSrc,
+                srcPitch
+            );
+            cupla::DeviceBufWrapper< 3u > dBuf(
+                static_cast<uint8_t *>(
+                    p->dstPtr.ptr
+                ),
+                device,
+                extentDst,
+                dstPitch
+            );
+
+            cupla::DeviceViewWrapper< 3u > dView(
+                dBuf,
+                extentDst - offsetDst,
+                offsetDst
+            );
+
+            ::alpaka::mem::view::copy(
+                streamObject,
+                dView,
+                cupla::HostViewWrapper< 3u >(
+                    hBuf,
+                    extentSrc - offsetSrc,
+                    offsetSrc
+                ),
+                numBytes
+            );
+
+        }
+            break;
+        case cuplaMemcpyDeviceToHost:
+        {
+            auto& host(
+                cupla::manager::Device<
+                    cupla::AccHost
+                >::get().current()
+            );
+            cupla::DeviceBufWrapper< 3u > dBuf(
+                const_cast<uint8_t *>(
+                    static_cast<const uint8_t *>(p->srcPtr.ptr)
+                ),
+                device,
+                extentSrc,
+                srcPitch
+            );
+            cupla::HostBufWrapper< 3u > hBuf(
+                static_cast<uint8_t *>(
+                    p->dstPtr.ptr
+                ),
+                host,
+                extentDst,
+                dstPitch
+            );
+
+            cupla::HostViewWrapper< 3u > hView(
+                hBuf,
+                extentDst - offsetDst,
+                offsetDst
+            );
+
+            ::alpaka::mem::view::copy(
+                streamObject,
+                hView,
+                cupla::DeviceViewWrapper< 3u >(
+                    dBuf,
+                    extentSrc - offsetSrc,
+                    offsetSrc
+                ),
+                numBytes
+            );
+
+        }
+            break;
+        case cuplaMemcpyDeviceToDevice:
+        {
+            cupla::DeviceBufWrapper< 3u > dSrcBuf(
+                const_cast<uint8_t *>(
+                    static_cast<const uint8_t *>(p->srcPtr.ptr)
+                ),
+                device,
+                extentSrc,
+                srcPitch
+            );
+            cupla::DeviceBufWrapper< 3u > dDestBuf(
+                static_cast<uint8_t *>(
+                    p->dstPtr.ptr
+                ),
+                device,
+                extentDst,
+                dstPitch
+            );
+
+            cupla::DeviceViewWrapper< 3u > dView(
+                dDestBuf,
+                extentDst - offsetDst,
+                offsetDst
+            );
+
+            ::alpaka::mem::view::copy(
+                streamObject,
+                dView,
+                cupla::DeviceViewWrapper< 3u >(
+                    dSrcBuf,
+                    extentSrc - offsetSrc,
+                    offsetSrc
+                ),
+                numBytes
+            );
+
+        }
+        break;
+        case cuplaMemcpyHostToHost:
+        {
+            auto& hostStreamObject(
+                cupla::manager::Stream<
+                    cupla::AccHost,
+                    cupla::AccHostStream
+                >::get().stream( stream )
+            );
+
+            auto& host(
+                cupla::manager::Device<
+                    cupla::AccHost
+                >::get().current()
+            );
+            cupla::HostBufWrapper< 3u > hSrcBuf(
+                const_cast<uint8_t *>(
+                    static_cast<const uint8_t *>(p->srcPtr.ptr)
+                ),
+                host,
+                extentSrc,
+                srcPitch
+            );
+            cupla::HostBufWrapper< 3u > hDestBuf(
+                static_cast<uint8_t *>(
+                    p->dstPtr.ptr
+                ),
+                host,
+                extentDst,
+                dstPitch
+            );
+
+            cupla::HostViewWrapper< 3u > hView(
+                hDestBuf,
+                extentDst - offsetDst,
+                offsetDst
+            );
+            ::alpaka::mem::view::copy(
+                hostStreamObject,
+                hView,
+                cupla::HostViewWrapper< 3u >(
+                    hSrcBuf,
+                    extentSrc - offsetSrc,
+                    offsetSrc
+                ),
+                numBytes
+            );
+
+        }
+        break;
+    }
+    return cuplaSuccess;
+}
+
+cuplaError_t
+cuplaMemcpy3D(
+    const cupla::Memcpy3DParms * const p
+)
+{
+    cuplaDeviceSynchronize();
+
+    cuplaMemcpy3DAsync( p, 0 );
 
     auto& streamObject(
         cupla::manager::Stream<
