@@ -8,7 +8,7 @@ Requirements
   - *Debian/Ubuntu:* `sudo apt-get install cmake file cmake-curses-gui`
   - *Arch Linux:* `sudo pacman --sync cmake`
 
-- **cupla** 
+- **cupla**
   - `git@github.com:ComputationalRadiationPhysics/cupla.git`
   - `export CUPLA_ROOT=<cupla_SRC_CODE_DIR>`
   - example:
@@ -19,7 +19,7 @@ Requirements
     - `git submodule update`
     - `export CUPLA_ROOT=$HOME/src/cupla`
 
-compile a example
+compile an example
 -----------------
 
 - create build directory `mkdir -p buildCuplaExample`
@@ -33,4 +33,4 @@ compile a example
           `CUPLA_KERNEL_OPTI` and `CUPLA_KERNEL_ELEM`, because the `blockSize` must be dim3(1,1,1))
           see [TuningGuide.md](doc/TuningGuide.md)
 - `make -j`
-- `./matMul -wA=320 -wB=300 -hA=320 -hB=320`
+- `./matrixMul -wA=320 -wB=320 -hA=320 -hB=320` (parameters must be a multiple of 32!)
