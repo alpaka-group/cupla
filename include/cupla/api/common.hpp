@@ -38,3 +38,11 @@ cuplaGetErrorString(cuplaError_t);
  */
 cuplaError_t
 cuplaGetLastError();
+
+
+/** not supported
+ *
+ * @return always cuplaSuccess
+ */
+cuplaError_t
+cuplaPeekAtLastError();
