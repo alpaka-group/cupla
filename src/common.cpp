@@ -39,3 +39,9 @@ cuplaGetLastError()
 {
     return cuplaSuccess;
 }
+
+cuplaError_t
+cuplaPeekAtLastError()
+{
+    return cuplaSuccess;
+}
