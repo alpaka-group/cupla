@@ -87,5 +87,12 @@
 // atomic functions
 #define atomicAdd(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Add>(acc, ppPointer, ppValue)
 #define atomicExch(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Exch>(acc, ppPointer, ppValue)
+#define atomicSub(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Sub>(acc, ppPointer, ppValue)
+#define atomicMin(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Min>(acc, ppPointer, ppValue)
+#define atomicMax(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Max>(acc, ppPointer, ppValue)
+#define atomicInc(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Inc>(acc, ppPointer, ppValue)
+#define atomicDec(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Dec>(acc, ppPointer, ppValue)
+#define atomicExch(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Exch>(acc, ppPointer, ppValue)
+#define atomicCAS(ppPointer,ppCompare,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Cas>(acc, ppPointer, ppCompare, ppValue)
 
 #define uint3 ::cupla::uint3
