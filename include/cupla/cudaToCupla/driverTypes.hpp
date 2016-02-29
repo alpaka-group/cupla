@@ -86,5 +86,6 @@
 
 // atomic functions
 #define atomicAdd(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Add>(acc, ppPointer, ppValue)
+#define atomicExch(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Exch>(acc, ppPointer, ppValue)
 
 #define uint3 ::cupla::uint3
