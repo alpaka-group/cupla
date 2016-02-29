@@ -1,0 +1,33 @@
+language:
+    - cpp
+
+################################################################################
+#
+################################################################################
+os:
+    - linux
+
+sudo: required
+dist: trusty
+
+################################################################################
+#
+################################################################################
+compiler:
+    - gcc
+
+env:
+  global:
+    - CXXFLAGS="-Werror"
+    - BUILD=~/buildTmp
+    
+script:
+  - cd $BUILD/matrixMul
+  - cmake $TRAVIS_BUILD_DIR/example/matrixMul -DALPAKA_ACC_CPU_B_SEQ_T_THREADS_ENABLE=ON
+  - make
+  - ls -la
+  
+before_script:
+  - mkdir -p $BUILD/matrixMul
+ 
+  
