@@ -59,6 +59,7 @@
 
 #define cudaDeviceSynchronize(...) cuplaDeviceSynchronize(__VA_ARGS__)
 
+#define cudaPeekAtLastError(...) cuplaPeekAtLastError(__VA_ARGS__)
 #define cudaGetLastError(...) cuplaGetLastError(__VA_ARGS__)
 
 #define cudaMemset(...) cuplaMemset(__VA_ARGS__)

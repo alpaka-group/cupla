@@ -1,5 +1,5 @@
 /**
- * Copyright 2015-2016 Rene Widera
+ * Copyright 2015-2016 Rene Widera, Maximilian Knespel
  *
  * This file is part of cupla.
  *
@@ -86,5 +86,39 @@
 
 // atomic functions
 #define atomicAdd(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Add>(acc, ppPointer, ppValue)
+#define atomicSub(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Sub>(acc, ppPointer, ppValue)
+#define atomicMin(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Min>(acc, ppPointer, ppValue)
+#define atomicMax(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Max>(acc, ppPointer, ppValue)
+#define atomicInc(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Inc>(acc, ppPointer, ppValue)
+#define atomicDec(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Dec>(acc, ppPointer, ppValue)
+#define atomicExch(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Exch>(acc, ppPointer, ppValue)
+#define atomicCAS(ppPointer,ppCompare,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Cas>(acc, ppPointer, ppCompare, ppValue)
 
 #define uint3 ::cupla::uint3
+
+// recast functions
+/* defining these as inling functions will result in multiple declaration
+ * errors when using a CUDA accelerator with alpaka.
+ * Note that there may be no spaces between the macro function name and
+ * the argument parentheses. */
+namespace cupla {
+
+    template< class A, class B >
+    ALPAKA_FN_HOST_ACC inline
+    B __A_as_B( A const & x )
+    {
+        static_assert( sizeof(A) == sizeof(B), "reinterpretation assumes data types of same size!" );
+        union ba { B b; A a; };
+        ba tmp;
+        tmp.a = x;
+        return tmp.b;
+    }
+
+} // namespace cupla
+
+#ifndef ALPAKA_ACC_GPU_CUDA_ENABLED
+#   define __int_as_float        (cupla::__A_as_B< int      , float     >)
+#   define __float_as_int        (cupla::__A_as_B< float    , int       >)
+#   define __longlong_as_double  (cupla::__A_as_B< long long, double    >)
+#   define __double_as_longlong  (cupla::__A_as_B< double   , long long >)
+#endif
