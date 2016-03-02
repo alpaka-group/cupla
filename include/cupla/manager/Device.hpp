@@ -69,6 +69,7 @@ namespace manager
             }
             else
             {
+                using Pltf = ::alpaka::pltf::Pltf< DeviceType >;
                 /* device id is not in the list
                  *
                  * select device with idx
@@ -77,11 +78,9 @@ namespace manager
                  */
                 std::unique_ptr< DeviceType > dev(
                     new DeviceType(
-                        ::alpaka::dev::DevMan<
-                            DeviceType
-                        >::getDevByIdx(
-                            idx
-                        )
+                        alpaka::pltf::getDevByIdx<
+                            Pltf
+                        >( idx )
                     )
                 );
                 m_map.insert(
@@ -135,7 +134,8 @@ namespace manager
         count()
         -> int
         {
-            return ::alpaka::dev::DevMan< DeviceType >::getDevCount( );
+            using Pltf = ::alpaka::pltf::Pltf< DeviceType >;
+            return ::alpaka::pltf::getDevCount< Pltf >( );
         }
 
     protected:
