@@ -9,11 +9,11 @@ Requirements
   - *Arch Linux:* `sudo pacman --sync cmake`
 
 - **cupla**
-  - `git@github.com:ComputationalRadiationPhysics/cupla.git`
+  - https://github.com/ComputationalRadiationPhysics/cupla
   - `export CUPLA_ROOT=<cupla_SRC_CODE_DIR>`
   - example:
     - `mkdir -p $HOME/src`
-    - `git clone git@github.com:ComputationalRadiationPhysics/cupla.git $HOME/src/cupla`
+    - `git clone git://github.com/ComputationalRadiationPhysics/cupla.git $HOME/src/cupla`
     - `cd $HOME/src/cupla`
     - `git submodule init`
     - `git submodule update`
