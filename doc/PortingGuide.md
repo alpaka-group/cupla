@@ -130,8 +130,12 @@ sharedMem( foo, int );
 sharedMem( fooCArray, cupla::Array< int, 32 > );
 sharedMem( fooCArray, cupla::Array< cupla::Array< int, 4 >, 32 > );
 
-// extern shared memory (size was defined during the host side kernel call)
-sharedMemExtern( fooPtr, float * );
+/* extern shared memory (size was defined during the host side kernel call)
+ *
+ * The type of extern shared memory is always a plain pointer of the given type.
+ * In this example the type of `fooPtr` is `float*`
+ */
+sharedMemExtern( fooPtr, float );
 
 int bar = fooCArray2D[ threadIdx.x ][ 0 ];
 // ...
