@@ -1,6 +1,8 @@
 **cupla** - C++ User interface for the Platform independent Library Alpaka
 ==========================================================================
 
+[![Dev](https://travis-ci.org/ComputationalRadiationPhysics/cupla.svg?branch=dev)](https://travis-ci.org/ComputationalRadiationPhysics/cupla)
+
 Cupla is a simple user interface for the platform independent parallel kernel
 acceleration library
 [alpaka](https://github.com/ComputationalRadiationPhysics/alpaka).
