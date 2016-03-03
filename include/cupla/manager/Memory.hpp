@@ -103,6 +103,9 @@ namespace manager
         free( void * ptr)
         -> bool
         {
+            if( ptr == nullptr)
+                return true;
+
             auto& device = Device< DeviceType >::get();
             const auto deviceId = device.id();
 
