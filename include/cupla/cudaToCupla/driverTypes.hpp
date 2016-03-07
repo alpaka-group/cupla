@@ -41,8 +41,8 @@
 #define cudaPos cupla::Pos
 #define cudaArray cupla::cuplaArray;
 #define cudaPitchedPtr cupla::PitchedPtr
-#define cudaMemcpy3DParms cupla::Memcpy3DParms
 
+#define cudaMemcpy3DParms cupla::Memcpy3DParms
 
 #ifdef cudaEventDisableTiming
 #undef cudaEventDisableTiming
@@ -84,8 +84,6 @@
   static_cast<uint3>(                                                \
       ::alpaka::workdiv::getWorkDiv<::alpaka::Thread, ::alpaka::Elems>(acc))
 
-#define uint3 ::cupla::uint3
-
 // atomic functions
 #define atomicAdd(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Add>(acc, ppPointer, ppValue)
 #define atomicSub(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Sub>(acc, ppPointer, ppValue)
@@ -95,6 +93,8 @@
 #define atomicDec(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Dec>(acc, ppPointer, ppValue)
 #define atomicExch(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Exch>(acc, ppPointer, ppValue)
 #define atomicCAS(ppPointer,ppCompare,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Cas>(acc, ppPointer, ppCompare, ppValue)
+
+#define uint3 ::cupla::uint3
 
 // recast functions
 /* defining these as inling functions will result in multiple declaration
