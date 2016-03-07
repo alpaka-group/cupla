@@ -109,10 +109,7 @@ namespace cupla {
     B A_as_B( A const & x )
     {
         static_assert( sizeof(A) == sizeof(B), "reinterpretation assumes data types of same size!" );
-        union ba { B b; A a; };
-        ba tmp;
-        tmp.a = x;
-        return tmp.b;
+        return reinterpret_cast< B const & >( x );
     }
 
 
