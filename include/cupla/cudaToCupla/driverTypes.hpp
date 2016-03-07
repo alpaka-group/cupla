@@ -38,7 +38,11 @@
 
 #define dim3 cupla::dim3
 #define cudaExtent cupla::Extent
+#define cudaPos cupla::Pos
+#define cudaArray cupla::cuplaArray;
 #define cudaPitchedPtr cupla::PitchedPtr
+#define cudaMemcpy3DParms cupla::Memcpy3DParms
+
 
 #ifdef cudaEventDisableTiming
 #undef cudaEventDisableTiming
@@ -53,7 +57,7 @@
       ::alpaka::block::shared::st::allocVar<__VA_ARGS__, __COUNTER__>(acc)
 
 #define sharedMemExtern(ppName, ...)                                           \
-    __VA_ARGS__ *ppName =                                                      \
+    __VA_ARGS__* ppName =                                                      \
         ::alpaka::block::shared::dyn::getMem<__VA_ARGS__>(acc)
 
 #define cudaMemcpyKind cuplaMemcpyKind
@@ -64,21 +68,23 @@
 
 // index renaming
 #define blockIdx                                                               \
-  static_cast<cupla::uint3>(                                                \
+  static_cast<uint3>(                                                \
       ::alpaka::idx::getIdx<::alpaka::Grid, ::alpaka::Blocks>(acc))
 #define threadIdx                                                              \
-  static_cast<cupla::uint3>(                                                \
+  static_cast<uint3>(                                                \
       ::alpaka::idx::getIdx<::alpaka::Block, ::alpaka::Threads>(acc))
 
 #define gridDim                                                                \
-  static_cast<cupla::uint3>(                                                \
+  static_cast<uint3>(                                                \
       ::alpaka::workdiv::getWorkDiv<::alpaka::Grid, ::alpaka::Blocks>(acc))
 #define blockDim                                                               \
-  static_cast<cupla::uint3>(                                                \
+  static_cast<uint3>(                                                \
       ::alpaka::workdiv::getWorkDiv<::alpaka::Block, ::alpaka::Threads>(acc))
 #define elemDim                                                               \
-  static_cast<cupla::uint3>(                                                \
+  static_cast<uint3>(                                                \
       ::alpaka::workdiv::getWorkDiv<::alpaka::Thread, ::alpaka::Elems>(acc))
+
+#define uint3 ::cupla::uint3
 
 // atomic functions
 #define atomicAdd(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Add>(acc, ppPointer, ppValue)
@@ -98,10 +104,9 @@
 namespace cupla {
 
 
-    /* no matter how ALPAKA_FN_HOST_ACC is defined, we want to inline this */
     template< class A, class B >
-    ALPAKA_FN_NO_INLINE_HOST_ACC inline
-    B __A_as_B( A const & x )
+    ALPAKA_FN_HOST_ACC
+    B A_as_B( A const & x )
     {
         static_assert( sizeof(A) == sizeof(B), "reinterpretation assumes data types of same size!" );
         union ba { B b; A a; };
@@ -114,8 +119,8 @@ namespace cupla {
 } // namespace cupla
 
 #ifndef ALPAKA_ACC_GPU_CUDA_ENABLED
-#   define __int_as_float( cupla::__A_as_B< int, float > )
-#   define __float_as_int( cupla::__A_as_B< float, int > )
-#   define __longlong_as_double( cupla::__A_as_B< long long, double > )
-#   define __double_as_longlong( cupla::__A_as_B< double, long long > )
+#   define __int_as_float(...) cupla::A_as_B< int, float >( __VA_ARGS__ )
+#   define __float_as_int(...) cupla::A_as_B< float, int >( __VA_ARGS__ )
+#   define __longlong_as_double(...) cupla::A_as_B< long long, double >( __VA_ARGS__ )
+#   define __double_as_longlong(...) cupla::A_as_B< double, long long >( __VA_ARGS__ )
 #endif

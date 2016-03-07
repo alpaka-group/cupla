@@ -141,12 +141,12 @@ Porting Step by Step
   // ...
   ```
 
-- use `ALPAKA_FN_ACC_CUDA_ONLY` in device function definitions and add an `acc` parameter. Note that to be exact the `acc` parameter is only necessary when `alpaka` functions like `blockIdx` or `atomicMax`, ... are used.
+- use `ALPAKA_FN_ACC` in device function definitions and add an `acc` parameter. Note that to be exact the `acc` parameter is only necessary when `alpaka` functions like `blockIdx` or `atomicMax`, ... are used.
 
   **CUDA**
 
       template< typename T_Elem >
-      __device__ inline int deviceFunction( T_Elem x )
+      __device__ int deviceFunction( T_Elem x )
       {
           // ...
       }
@@ -154,7 +154,7 @@ Porting Step by Step
   **cupla**
 
       template< typename T_Acc, typename T_Elem >
-      ALPAKA_FN_ACC_CUDA_ONLY inline int deviceFunction( T_Acc const & acc, T_Elem x )
+      ALPAKA_FN_ACC int deviceFunction( T_Acc const & acc, T_Elem x )
       {
           // ...
       }
