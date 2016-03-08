@@ -1,5 +1,5 @@
 /**
- * Copyright 2015-2016 Rene Widera
+ * Copyright 2015-2016 Rene Widera, Maximilian Knespel
  *
  * This file is part of cupla.
  *
@@ -86,6 +86,31 @@
 
 // atomic functions
 #define atomicAdd(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Add>(acc, ppPointer, ppValue)
+#define atomicSub(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Sub>(acc, ppPointer, ppValue)
+#define atomicMin(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Min>(acc, ppPointer, ppValue)
+#define atomicMax(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Max>(acc, ppPointer, ppValue)
+#define atomicInc(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Inc>(acc, ppPointer, ppValue)
+#define atomicDec(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Dec>(acc, ppPointer, ppValue)
 #define atomicExch(ppPointer,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Exch>(acc, ppPointer, ppValue)
+#define atomicCAS(ppPointer,ppCompare,ppValue) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Cas>(acc, ppPointer, ppCompare, ppValue)
 
 #define uint3 ::cupla::uint3
+
+// recast functions
+namespace cupla {
+
+    template< typename A, typename B >
+    ALPAKA_FN_HOST_ACC
+    B A_as_B( A const & x )
+    {
+        static_assert( sizeof(A) == sizeof(B), "reinterpretation assumes data types of same size!" );
+        return reinterpret_cast< B const & >( x );
+    }
+
+} // namespace cupla
+#ifndef ALPAKA_ACC_GPU_CUDA_ENABLED
+#   define __int_as_float(...) cupla::A_as_B< int, float >( __VA_ARGS__ )
+#   define __float_as_int(...) cupla::A_as_B< float, int >( __VA_ARGS__ )
+#   define __longlong_as_double(...) cupla::A_as_B< long long, double >( __VA_ARGS__ )
+#   define __double_as_longlong(...) cupla::A_as_B< double, long long >( __VA_ARGS__ )
+#endif
