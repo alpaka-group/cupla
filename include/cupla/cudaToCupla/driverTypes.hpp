@@ -97,14 +97,9 @@
 #define uint3 ::cupla::uint3
 
 // recast functions
-/* defining these as inling functions will result in multiple declaration
- * errors when using a CUDA accelerator with alpaka.
- * Note that there may be no spaces between the macro function name and
- * the argument parentheses. */
 namespace cupla {
 
-
-    template< class A, class B >
+    template< typename A, typename B >
     ALPAKA_FN_HOST_ACC
     B A_as_B( A const & x )
     {
@@ -112,9 +107,7 @@ namespace cupla {
         return reinterpret_cast< B const & >( x );
     }
 
-
 } // namespace cupla
-
 #ifndef ALPAKA_ACC_GPU_CUDA_ENABLED
 #   define __int_as_float(...) cupla::A_as_B< int, float >( __VA_ARGS__ )
 #   define __float_as_int(...) cupla::A_as_B< float, int >( __VA_ARGS__ )
