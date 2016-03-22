@@ -69,7 +69,7 @@ struct KernelHelper
 {
     static cuplaStream_t
     getStream(
-        size_t sharedMemSize = 0,
+        size_t /*sharedMemSize*/ = 0,
         cuplaStream_t stream = 0
     )
     {
@@ -79,7 +79,7 @@ struct KernelHelper
     static size_t
     getSharedMemSize(
         size_t sharedMemSize = 0,
-        cuplaStream_t stream = 0
+        cuplaStream_t /*stream*/ = 0
     )
     {
         return sharedMemSize;
