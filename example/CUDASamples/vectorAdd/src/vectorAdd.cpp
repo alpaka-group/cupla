@@ -20,7 +20,7 @@
 #include <stdio.h>
 
 // For the CUDA runtime routines (prefixed with "cuda_")
-#include <cuda_runtime.h>
+#include <cuda_to_cupla.hpp>
 
 /**
  * CUDA Kernel Device code
@@ -28,8 +28,10 @@
  * Computes the vector addition of A and B into C. The 3 vectors have the same
  * number of elements numElements.
  */
-__global__ void
-vectorAdd(const float *A, const float *B, float *C, int numElements)
+struct vectorAdd{
+template< typename T_Acc>
+ALPAKA_FN_HOST_ACC
+void operator()(T_Acc const& acc, const float *A, const float *B, float *C, const int numElements) const
 {
     int i = blockDim.x * blockIdx.x + threadIdx.x;
 
@@ -38,7 +40,7 @@ vectorAdd(const float *A, const float *B, float *C, int numElements)
         C[i] = A[i] + B[i];
     }
 }
-
+};
 /**
  * Host main routine
  */
@@ -129,7 +131,7 @@ main(void)
     int threadsPerBlock = 256;
     int blocksPerGrid =(numElements + threadsPerBlock - 1) / threadsPerBlock;
     printf("CUDA kernel launch with %d blocks of %d threads\n", blocksPerGrid, threadsPerBlock);
-    vectorAdd<<<blocksPerGrid, threadsPerBlock>>>(d_A, d_B, d_C, numElements);
+    CUPLA_KERNEL(vectorAdd)(blocksPerGrid, threadsPerBlock,0,0)(d_A, d_B, d_C, numElements);
     err = cudaGetLastError();
 
     if (err != cudaSuccess)
