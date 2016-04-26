@@ -25,11 +25,10 @@
 #include <alpaka/alpaka.hpp>
 
 
-#include "cupla/datatypes/Array.hpp"
 #include "cupla/datatypes/dim3.hpp"
 #include "cupla/datatypes/uint.hpp"
-#include "cupla/datatypes/Extent.hpp"
-#include "cupla/datatypes/PitchedPtr.hpp"
+#include "cupla/c/datatypes/cuplaExtent.hpp"
+#include "cupla/c/datatypes/cuplaPitchedPtr.hpp"
 
 #include "cupla/types.hpp"
 #include "cupla_driver_types.hpp"
@@ -58,26 +57,26 @@ cuplaMallocPitch(
 
 cuplaError_t
 cuplaMalloc3D(
-    cupla::PitchedPtr * pitchedDevPtr,
-    cupla::Extent const extent
+    cuplaPitchedPtr * pitchedDevPtr,
+    cuplaExtent const extent
 );
 
 
-cupla::Extent
+cuplaExtent
 make_cuplaExtent(
     size_t const w,
     size_t const h,
     size_t const d
 );
 
-cupla::Pos
+cuplaPos
 make_cuplaPos(
     size_t const x,
     size_t const y,
     size_t const z
 );
 
-cupla::PitchedPtr
+cuplaPitchedPtr
 make_cuplaPitchedPtr(
     void * const d,
     size_t const p,
@@ -148,11 +147,11 @@ cuplaMemcpy2DAsync(
 
 cuplaError_t
 cuplaMemcpy3DAsync(
-    const cupla::Memcpy3DParms * const p,
+    const cuplaMemcpy3DParms * const p,
     cuplaStream_t stream = 0
 );
 
 cuplaError_t
 cuplaMemcpy3D(
-    const cupla::Memcpy3DParms * const p
+    const cuplaMemcpy3DParms * const p
 );

@@ -23,30 +23,28 @@
 #pragma once
 
 #include "cupla/types.hpp"
-#include "cupla/datatypes/PitchedPtr.hpp"
-#include "cupla/datatypes/Pos.hpp"
-#include "cupla/datatypes/Extent.hpp"
+#include "cupla/datatypes/uint.hpp"
 
-namespace cupla
+
+struct cuplaPitchedPtr
 {
+    cupla::MemSizeType pitch, xsize, ysize;
+    void * ptr;
 
-    struct cuplaArray
-    {
-    };
+    ALPAKA_FN_HOST_ACC
+    cuplaPitchedPtr() = default;
 
-    struct Memcpy3DParms
-    {
-        cuplaArray* dstArray;
-        Pos dstPos;
-        PitchedPtr dstPtr;
-        Extent extent;
-        cuplaMemcpyKind kind;
-        cuplaArray * srcArray;
-        Pos srcPos;
-        PitchedPtr srcPtr;
+    ALPAKA_FN_HOST_ACC
+    cuplaPitchedPtr(
+        void * const d,
+        cupla::MemSizeType const p,
+        cupla::MemSizeType const xsz,
+        cupla::MemSizeType const ysz
+    ) :
+        ptr( d ),
+        pitch( p ),
+        xsize( xsz ),
+        ysize( ysz )
+    {}
 
-        ALPAKA_FN_HOST_ACC
-        Memcpy3DParms() = default;
-    };
-
-} //namespace cupla
+};
