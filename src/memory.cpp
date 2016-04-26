@@ -77,8 +77,8 @@ cuplaMallocPitch(
 
 cuplaError_t
 cuplaMalloc3D(
-    cupla::PitchedPtr * const pitchedDevPtr,
-    cupla::Extent const extent
+    cuplaPitchedPtr * const pitchedDevPtr,
+    cuplaExtent const extent
 )
 {
 
@@ -98,27 +98,27 @@ cuplaMalloc3D(
     return cuplaSuccess;
 }
 
-cupla::Extent
+cuplaExtent
 make_cuplaExtent(
     size_t const w,
     size_t const h,
     size_t const d
 )
 {
-    return cupla::Extent( w, h, d );
+    return cuplaExtent( w, h, d );
 }
 
-cupla::Pos
+cuplaPos
 make_cuplaPos(
     size_t const x,
     size_t const y,
     size_t const z
 )
 {
-    return cupla::Pos( x, y, z );
+    return cuplaPos( x, y, z );
 }
 
-cupla::PitchedPtr
+cuplaPitchedPtr
 make_cuplaPitchedPtr(
     void * const d,
     size_t const p,
@@ -126,7 +126,7 @@ make_cuplaPitchedPtr(
     size_t const ysz
 )
 {
-    return cupla::PitchedPtr( d, p, xsz, ysz );
+    return cuplaPitchedPtr( d, p, xsz, ysz );
 }
 
 cuplaError_t
@@ -674,7 +674,7 @@ cuplaMemcpy2D(
 
 cuplaError_t
 cuplaMemcpy3DAsync(
-    const cupla::Memcpy3DParms * const p,
+    const cuplaMemcpy3DParms * const p,
     cuplaStream_t stream
 )
 {
@@ -932,7 +932,7 @@ cuplaMemcpy3DAsync(
 
 cuplaError_t
 cuplaMemcpy3D(
-    const cupla::Memcpy3DParms * const p
+    const cuplaMemcpy3DParms * const p
 )
 {
     cuplaDeviceSynchronize();

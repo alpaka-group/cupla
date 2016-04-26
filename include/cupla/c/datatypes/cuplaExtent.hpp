@@ -24,62 +24,58 @@
 
 #include "cupla/types.hpp"
 
-namespace cupla
-{
+struct cuplaExtent{
+    cupla::MemSizeType width, height, depth;
 
-    struct Pos{
-        size_t x, y, z;
+    ALPAKA_FN_HOST_ACC
+    cuplaExtent() = default;
 
-        ALPAKA_FN_HOST_ACC
-        Pos() = default;
+    ALPAKA_FN_HOST_ACC
+    cuplaExtent(
+        cupla::MemSizeType const w,
+        cupla::MemSizeType const h,
+        cupla::MemSizeType const d
+    ) :
+        width( w ),
+        height( h ),
+        depth( d )
+    {}
 
-        ALPAKA_FN_HOST_ACC
-        Pos(
-            size_t const x_in,
-            size_t const y_in,
-            size_t const z_in
-        ) :
-            x( x_in ),
-            y( y_in ),
-            z( z_in )
-        {}
-
-        template<
-          typename TDim,
-          typename TSize,
-          typename = typename std::enable_if<
-              (TDim::value == 3u)
-          >::type
-        >
-        ALPAKA_FN_HOST_ACC
-        Pos(
-            ::alpaka::Vec<
-                TDim,
-                TSize
-            > const &vec
-        )
-        {
-            for( uint32_t i(0); i < 3u; ++i ) {
-                // alpaka vectors are z,y,x.
-                ( &this->x )[ i ] = vec[ ( 3u - 1u ) - i ];
-            }
+    template<
+      typename TDim,
+      typename TSize,
+      typename = typename std::enable_if<
+          (TDim::value == 3u)
+      >::type
+    >
+    ALPAKA_FN_HOST_ACC
+    cuplaExtent(
+        ::alpaka::Vec<
+            TDim,
+            TSize
+        > const &vec
+    )
+    {
+        for( uint32_t i(0); i < 3u; ++i ) {
+            // alpaka vectors are z,y,x.
+            ( &this->width )[ i ] = vec[ ( 3u - 1u ) - i ];
         }
+    }
 
-        ALPAKA_FN_HOST_ACC
-        operator ::alpaka::Vec<
+    ALPAKA_FN_HOST_ACC
+    operator ::alpaka::Vec<
+        cupla::AlpakaDim< 3u >,
+        cupla::MemSizeType
+    >(void) const
+    {
+        ::alpaka::Vec<
             cupla::AlpakaDim< 3u >,
-            MemSizeType
-        >(void) const
-        {
-            ::alpaka::Vec<
-                cupla::AlpakaDim< 3u >,
-                MemSizeType
-            > vec( x, y, z );
-            return vec;
-        }
-    };
+            cupla::MemSizeType
+        > vec( depth, height, width );
+        return vec;
+    }
+};
 
-} //namespace cupla
 
 
 namespace alpaka
@@ -92,7 +88,7 @@ namespace traits
     //! dimension get trait specialization
     template<>
     struct DimType<
-        cupla::Pos
+        cuplaExtent
     >{
       using type = ::alpaka::dim::DimInt<3u>;
     };
@@ -108,7 +104,7 @@ namespace traits
     //! element type trait specialization
     template<>
     struct ElemType<
-        cupla::Pos
+        cuplaExtent
     >{
         using type = cupla::MemSizeType;
     };
@@ -127,7 +123,7 @@ namespace traits
     >
     struct GetExtent<
         T_Idx,
-        cupla::Pos,
+        cuplaExtent,
         typename std::enable_if<
             (3u > T_Idx::value)
         >::type
@@ -135,21 +131,21 @@ namespace traits
 
         ALPAKA_FN_HOST_ACC
         static auto
-        getExtent( cupla::Pos const & extents )
+        getExtent( cuplaExtent const & extents )
         -> cupla::MemSizeType {
-        return (&extents.x)[(3u - 1u) - T_Idx::value];
+        return (&extents.width)[(3u - 1u) - T_Idx::value];
       }
     };
 
     //! extent set trait specialization
     template<
         typename T_Idx,
-        typename T_Pos
+        typename T_Extent
     >
     struct SetExtent<
         T_Idx,
-        cupla::Pos,
-        T_Pos,
+        cuplaExtent,
+        T_Extent,
         typename std::enable_if<
             (3u > T_Idx::value)
         >::type
@@ -157,12 +153,12 @@ namespace traits
         ALPAKA_FN_HOST_ACC
         static auto
         setExtent(
-            cupla::Pos &extents,
-            T_Pos const &extent
+            cuplaExtent &extents,
+            T_Extent const &extent
         )
         -> void
         {
-            (&extents.x)[(3u - 1u) - T_Idx::value] = extent;
+            (&extents.width)[(3u - 1u) - T_Idx::value] = extent;
         }
     };
 } // namespace traits
@@ -179,16 +175,16 @@ namespace traits
     >
     struct GetOffset<
         T_Idx,
-        cupla::Pos,
+        cuplaExtent,
         typename std::enable_if<
             (3u > T_Idx::value)
         >::type
     >{
         ALPAKA_FN_HOST_ACC
         static auto
-        getOffset( cupla::Pos const & offsets )
+        getOffset( cuplaExtent const & offsets )
         -> cupla::MemSizeType{
-            return (&offsets.x)[(3u - 1u) - T_Idx::value];
+            return (&offsets.width)[(3u - 1u) - T_Idx::value];
         }
     };
 
@@ -200,7 +196,7 @@ namespace traits
     >
     struct SetOffset<
         T_Idx,
-        cupla::Pos,
+        cuplaExtent,
         T_Offset,
         typename std::enable_if<
             (3u > T_Idx::value)
@@ -209,7 +205,7 @@ namespace traits
         ALPAKA_FN_HOST_ACC
         static auto
         setOffset(
-            cupla::Pos &offsets,
+            cuplaExtent &offsets,
             T_Offset const &offset
         )
         -> void {
@@ -227,7 +223,7 @@ namespace traits
     //! size type trait specialization.
     template<>
     struct SizeType<
-        cupla::Pos
+        cuplaExtent
     >{
         using type = cupla::MemSizeType;
     };

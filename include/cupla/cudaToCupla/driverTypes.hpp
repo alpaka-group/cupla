@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include "cupla/datatypes/Array.hpp"
+
 #define __syncthreads(...) ::alpaka::block::sync::syncBlockThreads(acc)
 
 #define cudaSuccess cuplaSuccess
@@ -37,12 +39,12 @@
 #define cudaStream_t cuplaStream_t
 
 #define dim3 cupla::dim3
-#define cudaExtent cupla::Extent
-#define cudaPos cupla::Pos
-#define cudaArray cupla::cuplaArray;
-#define cudaPitchedPtr cupla::PitchedPtr
+#define cudaExtent cuplaExtent
+#define cudaPos cuplaPos
+#define cudaArray cuplaArray;
+#define cudaPitchedPtr cuplaPitchedPtr
 
-#define cudaMemcpy3DParms cupla::Memcpy3DParms
+#define cudaMemcpy3DParms cuplaMemcpy3DParms
 
 #ifdef cudaEventDisableTiming
 #undef cudaEventDisableTiming
