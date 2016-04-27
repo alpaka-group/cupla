@@ -36,11 +36,13 @@ template< typename T_Acc>
 ALPAKA_FN_HOST_ACC
 void operator()(T_Acc const& acc, const float *A, const float *B, float *C, const int numElements) const
 {
-    int i = blockDim.x * blockIdx.x + threadIdx.x;
+    int i = blockDim.x * blockIdx.x* elemDim.x + threadIdx.x;
 
     if (i < numElements)
     {
-        C[i] = A[i] + B[i];
+        for (int j = 0; j <elemDim.x; ++j) {
+            C[i+j] = A[i+j] + B[i+j];
+        }
     }
 }
 };
@@ -274,6 +276,7 @@ benchmarkTest(int first, int last, int stepSize)
             std::chrono::high_resolution_clock::now();
 
         CUPLA_KERNEL(vectorAdd)(blocksPerGrid, threadsPerBlock, 0, 0)(d_A, d_B, d_C, numElements);
+        cudaDeviceSynchronize();
 
         std::chrono::high_resolution_clock::time_point end =
                 std::chrono::high_resolution_clock::now();
