@@ -18,10 +18,13 @@
  */
 
 #include <stdio.h>
-
+#include <iostream> //std:cout
 // For the CUDA runtime routines (prefixed with "cuda_")
 #include <cuda_to_cupla.hpp>
-
+//Timer for test purpose
+#include <chrono>
+#include <boost/lexical_cast.hpp>
+#include <vector>
 /**
  * CUDA Kernel Device code
  *
@@ -41,11 +44,13 @@ void operator()(T_Acc const& acc, const float *A, const float *B, float *C, cons
     }
 }
 };
+
+void benchmarkTest(int first, int last , int stepSize);
 /**
  * Host main routine
  */
 int
-main(void)
+main(int argc, char *argv[])
 {
     // Error code to check return values for CUDA calls
     cudaError_t err = cudaSuccess;
@@ -206,8 +211,79 @@ main(void)
         fprintf(stderr, "Failed to deinitialize the device! error=%s\n", cudaGetErrorString(err));
         exit(EXIT_FAILURE);
     }
-
     printf("Done\n");
+
+    using boost::lexical_cast;
+    using boost::bad_lexical_cast;
+    std::vector<int> args;
+    while (*++argv){
+        try{
+            args.push_back(lexical_cast<int>(*argv));
+        }
+        catch( const bad_lexical_cast &){
+            args.push_back(0);
+        }
+    }
+    //run benchmartest
+    int first = 50000;
+    int last = 100000;
+    int stepSize= 50000;
+    if (args.size() >1){
+        first=args[0];
+        last=args[1];
+    }
+    if (args.size()>2){
+        stepSize=args[2];
+    }
+    benchmarkTest(first, last, stepSize);
     return 0;
+}
+
+void
+benchmarkTest(int first, int last, int stepSize)
+{
+
+    for (int numElements = first; numElements <=last ; numElements+= stepSize) {
+        std::cout <<"N= " <<numElements << "; ";
+        size_t size = numElements * sizeof(float);
+        //alloc host memory
+        float *h_A = (float *)malloc(size);
+        float *h_B = (float *)malloc(size);
+        //init
+        for (int i = 0; i < numElements; ++i) {
+            h_A[i] = rand()/(float)RAND_MAX;
+            h_B[i] = rand()/(float)RAND_MAX;
+        }
+        //alloc device memory
+        float *d_A = NULL;
+        cudaMalloc((void **) &d_A, size);
+        float *d_B = NULL;
+        cudaMalloc((void **) &d_B, size);
+        float *d_C = NULL;
+        cudaMalloc((void **) &d_C, size);
+
+        // copy host device
+        cudaMemcpy(d_A, h_A, size, cudaMemcpyHostToDevice);
+        cudaMemcpy(d_B, h_B, size, cudaMemcpyHostToDevice);
+
+        int threadsPerBlock=246;
+        int blocksPerGrid= (numElements+threadsPerBlock-1)/threadsPerBlock;
+
+        //Run Kernel
+        std::chrono::high_resolution_clock::time_point start =
+            std::chrono::high_resolution_clock::now();
+
+        CUPLA_KERNEL(vectorAdd)(blocksPerGrid, threadsPerBlock, 0, 0)(d_A, d_B, d_C, numElements);
+
+        std::chrono::high_resolution_clock::time_point end =
+                std::chrono::high_resolution_clock::now();
+
+        std::cout << "Time: "<< std::chrono::duration_cast<std::chrono::milliseconds>
+                                        (end-start).count() <<"ms"<<std::endl;
+        //Free Device memory
+        cudaFree(d_A);
+        cudaFree(d_B);
+        cudaFree(d_C);
+    }
 }
 
