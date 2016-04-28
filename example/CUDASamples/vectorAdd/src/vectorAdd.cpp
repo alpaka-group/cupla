@@ -31,20 +31,18 @@
  * Computes the vector addition of A and B into C. The 3 vectors have the same
  * number of elements numElements.
  */
-struct vectorAdd{
-template< typename T_Acc>
-ALPAKA_FN_HOST_ACC
-void operator()(T_Acc const& acc, const float *A, const float *B, float *C, const int numElements) const
-{
-    int i = blockDim.x * blockIdx.x* elemDim.x + threadIdx.x;
-
-    if (i < numElements)
-    {
-        for (int j = 0; j <elemDim.x; ++j) {
-            C[i+j] = A[i+j] + B[i+j];
+struct vectorAdd {
+    template<typename T_Acc>
+    ALPAKA_FN_HOST_ACC
+    void operator()(T_Acc const &acc, const float *A, const float *B, float *C, const int numElements) const {
+        int begin = blockDim.x * blockIdx.x * elemDim.x + threadIdx.x;
+        if (begin < numElements) {
+            int end = (begin + elemDim.x < numElements) ? begin+elemDim.x : numElements;
+            for (int i=begin; i <end; ++i) {
+                C[i] = A[i] + B[i];
+            }
         }
     }
-}
 };
 
 void benchmarkTest(int first, int last , int stepSize);
@@ -138,7 +136,7 @@ main(int argc, char *argv[])
     int threadsPerBlock = 256;
     int blocksPerGrid =(numElements + threadsPerBlock - 1) / threadsPerBlock;
     printf("CUDA kernel launch with %d blocks of %d threads\n", blocksPerGrid, threadsPerBlock);
-    CUPLA_KERNEL(vectorAdd)(blocksPerGrid, threadsPerBlock,0,0)(d_A, d_B, d_C, numElements);
+    CUPLA_KERNEL_OPTI(vectorAdd)(blocksPerGrid, threadsPerBlock,0,0)(d_A, d_B, d_C, numElements);
     err = cudaGetLastError();
 
     if (err != cudaSuccess)
@@ -186,7 +184,6 @@ main(int argc, char *argv[])
         fprintf(stderr, "Failed to free device vector B (error code %s)!\n", cudaGetErrorString(err));
         exit(EXIT_FAILURE);
     }
-
     err = cudaFree(d_C);
 
     if (err != cudaSuccess)
@@ -238,6 +235,7 @@ main(int argc, char *argv[])
         stepSize=args[2];
     }
     benchmarkTest(first, last, stepSize);
+    cudaDeviceReset();
     return 0;
 }
 
@@ -268,14 +266,14 @@ benchmarkTest(int first, int last, int stepSize)
         cudaMemcpy(d_A, h_A, size, cudaMemcpyHostToDevice);
         cudaMemcpy(d_B, h_B, size, cudaMemcpyHostToDevice);
 
-        int threadsPerBlock=246;
+        int threadsPerBlock=1024;
         int blocksPerGrid= (numElements+threadsPerBlock-1)/threadsPerBlock;
 
         //Run Kernel
         std::chrono::high_resolution_clock::time_point start =
             std::chrono::high_resolution_clock::now();
 
-        CUPLA_KERNEL(vectorAdd)(blocksPerGrid, threadsPerBlock, 0, 0)(d_A, d_B, d_C, numElements);
+        CUPLA_KERNEL_OPTI(vectorAdd)(blocksPerGrid, threadsPerBlock, 0, 0)(d_A, d_B, d_C, numElements);
         cudaDeviceSynchronize();
 
         std::chrono::high_resolution_clock::time_point end =
