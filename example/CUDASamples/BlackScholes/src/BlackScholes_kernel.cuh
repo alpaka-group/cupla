@@ -11,10 +11,25 @@
 
 
 
+#include <cuda_to_cupla.hpp>
+#include <stdio.h>
+#ifndef __CUDACC__
+struct float2{
+    float x;
+    float y;
+    float2(float x, float y) : y(y), x(x) { }
+};
+float2 make_float2(float x, float y){
+    return float2(x,y);
+}
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 // Polynomial approximation of cumulative normal distribution function
 ///////////////////////////////////////////////////////////////////////////////
-__device__ inline float cndGPU(float d)
+template<typename T_Acc>
+ALPAKA_FN_ACC
+float cndGPU(T_Acc const & acc, float d)
 {
     const float       A1 = 0.31938153f;
     const float       A2 = -0.356563782f;
@@ -25,11 +40,8 @@ __device__ inline float cndGPU(float d)
 
     float
     K = __fdividef(1.0f, (1.0f + 0.2316419f * fabsf(d)));
-
-    float
-    cnd = RSQRT2PI * __expf(- 0.5f * d * d) *
+    float cnd = RSQRT2PI * __expf(- 0.5f * d * d) *
           (K * (A1 + K * (A2 + K * (A3 + K * (A4 + K * A5)))));
-
     if (d > 0)
         cnd = 1.0f - cnd;
 
@@ -40,7 +52,9 @@ __device__ inline float cndGPU(float d)
 ///////////////////////////////////////////////////////////////////////////////
 // Black-Scholes formula for both call and put
 ///////////////////////////////////////////////////////////////////////////////
-__device__ inline void BlackScholesBodyGPU(
+template<typename T_Acc>
+ALPAKA_FN_ACC void BlackScholesBodyGPU(
+    T_Acc const & acc,
     float &CallResult,
     float &PutResult,
     float S, //Stock price
@@ -52,13 +66,13 @@ __device__ inline void BlackScholesBodyGPU(
 {
     float sqrtT, expRT;
     float d1, d2, CNDD1, CNDD2;
-
     sqrtT = __fdividef(1.0F, rsqrtf(T));
     d1 = __fdividef(__logf(S / X) + (R + 0.5f * V * V) * T, V * sqrtT);
+
     d2 = d1 - V * sqrtT;
 
-    CNDD1 = cndGPU(d1);
-    CNDD2 = cndGPU(d2);
+    CNDD1 = cndGPU(acc, d1);
+    CNDD2 = cndGPU(acc, d2);
 
     //Calculate Call and Put simultaneously
     expRT = __expf(- R * T);
@@ -70,49 +84,55 @@ __device__ inline void BlackScholesBodyGPU(
 ////////////////////////////////////////////////////////////////////////////////
 //Process an array of optN options on GPU
 ////////////////////////////////////////////////////////////////////////////////
-__launch_bounds__(128)
-__global__ void BlackScholesGPU(
-    float2 * __restrict d_CallResult,
-    float2 * __restrict d_PutResult,
-    float2 * __restrict d_StockPrice,
-    float2 * __restrict d_OptionStrike,
-    float2 * __restrict d_OptionYears,
-    float Riskfree,
-    float Volatility,
-    int optN
-)
-{
-    ////Thread index
-    //const int      tid = blockDim.x * blockIdx.x + threadIdx.x;
-    ////Total number of threads in execution grid
-    //const int THREAD_N = blockDim.x * gridDim.x;
-
-    const int opt = blockDim.x * blockIdx.x + threadIdx.x;
-
-     // Calculating 2 options per thread to increase ILP (instruction level parallelism)
-    if (opt < (optN / 2))
+//__launch_bounds__(128)
+struct BlackScholesGPU {
+    template< typename T_Acc>
+    ALPAKA_FN_HOST_ACC
+    void operator()(
+            T_Acc const & acc,
+            float2 *__restrict d_CallResult,
+            float2 *__restrict d_PutResult,
+            float2 *__restrict d_StockPrice,
+            float2 *__restrict d_OptionStrike,
+            float2 *__restrict d_OptionYears,
+            float Riskfree,
+            float Volatility,
+            int optN
+    ) const
     {
-        float callResult1, callResult2;
-        float putResult1, putResult2;
-        BlackScholesBodyGPU(
-            callResult1,
-            putResult1,
-            d_StockPrice[opt].x,
-            d_OptionStrike[opt].x,
-            d_OptionYears[opt].x,
-            Riskfree,
-            Volatility
-        );
-        BlackScholesBodyGPU(
-            callResult2,
-            putResult2,
-            d_StockPrice[opt].y,
-            d_OptionStrike[opt].y,
-            d_OptionYears[opt].y,
-            Riskfree,
-            Volatility
-        );
-        d_CallResult[opt] = make_float2(callResult1, callResult2);
-        d_PutResult[opt] = make_float2(putResult1, putResult2);
-	 }
-}
+        ////Thread index
+        //const int      tid = blockDim.x * blockIdx.x + threadIdx.x;
+        ////Total number of threads in execution grid
+        //const int THREAD_N = blockDim.x * gridDim.x;
+
+        const int opt = blockDim.x * blockIdx.x + threadIdx.x;
+
+        // Calculating 2 options per thread to increase ILP (instruction level parallelism)
+        if (opt < (optN / 2)) {
+            float callResult1, callResult2;
+            float putResult1, putResult2;
+            BlackScholesBodyGPU(
+                    acc,
+                    callResult1,
+                    putResult1,
+                    d_StockPrice[opt].x,
+                    d_OptionStrike[opt].x,
+                    d_OptionYears[opt].x,
+                    Riskfree,
+                    Volatility
+            );
+            BlackScholesBodyGPU(
+                    acc,
+                    callResult2,
+                    putResult2,
+                    d_StockPrice[opt].y,
+                    d_OptionStrike[opt].y,
+                    d_OptionYears[opt].y,
+                    Riskfree,
+                    Volatility
+            );
+            d_CallResult[opt] = make_float2(callResult1, callResult2);
+            d_PutResult[opt] = make_float2(putResult1, putResult2);
+        }
+    }
+};

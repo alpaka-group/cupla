@@ -15,6 +15,7 @@
  * See supplied whitepaper for more explanations.
  */
 
+#include <cuda_to_cupla.hpp>
 
 #include <helper_functions.h>   // helper functions for string parsing
 #include <helper_cuda.h>        // helper functions CUDA error checking and initialization
@@ -52,10 +53,10 @@ float RandFloat(float low, float high)
 // Data configuration
 ////////////////////////////////////////////////////////////////////////////////
 const int OPT_N = 4000000;
-const int  NUM_ITERATIONS = 512;
+const int  NUM_ITERATIONS = 500;
 
 
-const int          OPT_SZ = OPT_N * sizeof(float);
+size_t OPT_SZ = OPT_N * sizeof(float);
 const float      RISKFREE = 0.02f;
 const float    VOLATILITY = 0.30f;
 
@@ -98,7 +99,7 @@ int main(int argc, char **argv)
     StopWatchInterface *hTimer = NULL;
     int i;
 
-    findCudaDevice(argc, (const char **)argv);
+    //findCudaDevice(argc, (const char **)argv);
 
     sdkCreateTimer(&hTimer);
 
@@ -147,7 +148,7 @@ int main(int argc, char **argv)
 
     for (i = 0; i < NUM_ITERATIONS; i++)
     {
-        BlackScholesGPU<<<DIV_UP((OPT_N/2), 128), 128/*480, 128*/>>>(
+        CUPLA_KERNEL(BlackScholesGPU)(DIV_UP((OPT_N/2), 128), 128/*480, 128*/,0,0)(
             (float2 *)d_CallResult,
             (float2 *)d_PutResult,
             (float2 *)d_StockPrice,
@@ -157,7 +158,7 @@ int main(int argc, char **argv)
             VOLATILITY,
             OPT_N
         );
-        getLastCudaError("BlackScholesGPU() execution failed\n");
+        //getLastCudaError("BlackScholesGPU() execution failed\n");
     }
 
     checkCudaErrors(cudaDeviceSynchronize());

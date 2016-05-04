@@ -84,3 +84,4 @@
 #define __expf(a) alpaka::math::exp(acc,a)
 #define __logf(a) alpaka::math::log(acc,a)
 #define rsqrtf(a) alpaka::math::rsqrt(acc,a)
+
