@@ -1,5 +1,5 @@
 #
-# Copyright 2016 Rene Widera, Benjamin Worpitz
+# Copyright 2016 Rene Widera, Benjamin Worpitz, Vincent Ridder
 #
 # This file is part of cupla.
 #
