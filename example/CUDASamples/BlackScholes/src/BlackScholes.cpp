@@ -148,7 +148,7 @@ int main(int argc, char **argv)
 
     for (i = 0; i < NUM_ITERATIONS; i++)
     {
-        CUPLA_KERNEL(BlackScholesGPU)(DIV_UP((OPT_N/2), 128), 128/*480, 128*/,0,0)(
+        CUPLA_KERNEL_OPTI(BlackScholesGPU)(DIV_UP((OPT_N/2), 128), 128/*480, 128*/,0,0)(
             (float2 *)d_CallResult,
             (float2 *)d_PutResult,
             (float2 *)d_StockPrice,

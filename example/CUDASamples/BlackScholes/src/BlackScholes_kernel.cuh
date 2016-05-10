@@ -105,34 +105,37 @@ struct BlackScholesGPU {
         ////Total number of threads in execution grid
         //const int THREAD_N = blockDim.x * gridDim.x;
 
-        const int opt = blockDim.x * blockIdx.x + threadIdx.x;
+        const int opt_begin = blockDim.x * blockIdx.x *elemDim.x + threadIdx.x;
 
         // Calculating 2 options per thread to increase ILP (instruction level parallelism)
-        if (opt < (optN / 2)) {
-            float callResult1, callResult2;
-            float putResult1, putResult2;
-            BlackScholesBodyGPU(
-                    acc,
-                    callResult1,
-                    putResult1,
-                    d_StockPrice[opt].x,
-                    d_OptionStrike[opt].x,
-                    d_OptionYears[opt].x,
-                    Riskfree,
-                    Volatility
-            );
-            BlackScholesBodyGPU(
-                    acc,
-                    callResult2,
-                    putResult2,
-                    d_StockPrice[opt].y,
-                    d_OptionStrike[opt].y,
-                    d_OptionYears[opt].y,
-                    Riskfree,
-                    Volatility
-            );
-            d_CallResult[opt] = make_float2(callResult1, callResult2);
-            d_PutResult[opt] = make_float2(putResult1, putResult2);
+        if (opt_begin < (optN / 2)) {
+            const int opt_end = (opt_begin + elemDim.x < optN / 2) ? opt_begin + elemDim.x : optN / 2;
+            for (int opt = opt_begin; opt < opt_end; opt++) {
+                float callResult1, callResult2;
+                float putResult1, putResult2;
+                BlackScholesBodyGPU(
+                        acc,
+                        callResult1,
+                        putResult1,
+                        d_StockPrice[opt].x,
+                        d_OptionStrike[opt].x,
+                        d_OptionYears[opt].x,
+                        Riskfree,
+                        Volatility
+                );
+                BlackScholesBodyGPU(
+                        acc,
+                        callResult2,
+                        putResult2,
+                        d_StockPrice[opt].y,
+                        d_OptionStrike[opt].y,
+                        d_OptionYears[opt].y,
+                        Riskfree,
+                        Volatility
+                );
+                d_CallResult[opt] = make_float2(callResult1, callResult2);
+                d_PutResult[opt] = make_float2(putResult1, putResult2);
+            }
         }
     }
 };
