@@ -105,7 +105,7 @@ struct BlackScholesGPU {
         ////Total number of threads in execution grid
         //const int THREAD_N = blockDim.x * gridDim.x;
 
-        const int opt_begin = blockDim.x * blockIdx.x *elemDim.x + threadIdx.x;
+        const int opt_begin = blockDim.x * blockIdx.x *elemDim.x + threadIdx.x* elemDim.x;
 
         // Calculating 2 options per thread to increase ILP (instruction level parallelism)
         if (opt_begin < (optN / 2)) {
