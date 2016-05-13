@@ -35,7 +35,7 @@ struct vectorAdd {
     template<typename T_Acc>
     ALPAKA_FN_HOST_ACC
     void operator()(T_Acc const &acc, const float *A, const float *B, float *C, const int numElements) const {
-        int begin = blockDim.x * blockIdx.x * elemDim.x + threadIdx.x;
+        int begin = blockDim.x * blockIdx.x * elemDim.x + threadIdx.x*elemDim.x;
         if (begin < numElements) {
             int end = (begin + elemDim.x < numElements) ? begin+elemDim.x : numElements;
             for (int i=begin; i <end; ++i) {
