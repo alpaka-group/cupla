@@ -77,8 +77,9 @@
 #define make_cudaPos(...) make_cuplaPos(__VA_ARGS__)
 
 #define make_cudaPitchedPtr(...) make_cuplaPitchedPtr(__VA_ARGS__)
+
 //math
-#define __fdividef(a,b) a/b
+#define __fdividef(a,b) ((a)/(b))
 #define fabsf(a) alpaka::math::abs(acc,a)
 #define __expf(a) alpaka::math::exp(acc,a)
 #define __logf(a) alpaka::math::log(acc,a)
