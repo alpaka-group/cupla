@@ -8,7 +8,7 @@ interface for the platform independent parallel kernel
 acceleration library
 [**alpaka**](https://github.com/ComputationalRadiationPhysics/alpaka).
 It follows a similar concept as the
-[Nvidia CUDA (TM) API](https://developer.nvidia.com/cuda-zone) by
+[NVIDIA® CUDA® API](https://developer.nvidia.com/cuda-zone) by
 providing a software layer to manage accelerator devices.
 **alpaka** is used as backend for **cupla**.
 
@@ -61,3 +61,10 @@ Authors
 
 - Axel Huebl
 - Dr. Michael Bussmann
+
+
+Trademarks Disclaimer
+---------------------
+
+All product names and trademarks are the property of their respective owners.
+CUDA® is a trademark of the NVIDIA Corporation.
