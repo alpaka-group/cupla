@@ -1,22 +1,23 @@
 **cupla** - C++ User interface for the Platform independent Library Alpaka
 ==========================================================================
 
-[![Dev](https://travis-ci.org/ComputationalRadiationPhysics/cupla.svg?branch=dev)](https://travis-ci.org/ComputationalRadiationPhysics/cupla)
+[![Build Status dev](https://img.shields.io/travis/ComputationalRadiationPhysics/cupla/dev.svg?label=dev)](https://travis-ci.org/ComputationalRadiationPhysics/cupla/branches)
 
-Cupla is a simple user interface for the platform independent parallel kernel
+**cupla** [[qχɑpˈlɑʔ]](https://en.wiktionary.org/wiki/Qapla%27) is a simple user
+interface for the platform independent parallel kernel
 acceleration library
-[alpaka](https://github.com/ComputationalRadiationPhysics/alpaka).
+[**alpaka**](https://github.com/ComputationalRadiationPhysics/alpaka).
 It follows a similar concept as the
-[Nvidia CUDA (TM) API](https://developer.nvidia.com/cuda-zone) by
+[NVIDIA® CUDA® API](https://developer.nvidia.com/cuda-zone) by
 providing a software layer to manage accelerator devices.
-alpaka is used as backend for cupla.
+**alpaka** is used as backend for **cupla**.
 
-Please keep in mind that a first, "find & replace" port from
-**CUDA to cupla(x86)** will result in rather bad performance. To get decent
-performance on x86 systems you just need to add the alpaka element level to
-your kernels.
+Please keep in mind that a first, ["find & replace"](doc/PortingGuide.md) port
+from **CUDA to cupla(x86)** will result in rather bad performance. In order to
+reach decent performance on x86 systems you just need to add the **alpaka**
+[element level](doc/TuningGuide.md) to your kernels.
 
-(Read: add some *tiling* to your CUDA kernels by letting the same thread
+(*Read as:* add some *tiling* to your CUDA kernels by letting the same thread
 compute a fixed number of elements (N=4..16) instead of just computing one
 *element* per thread. Also, make the number of elements in your tiling a
 *compile-time constant* and your CUDA code (N=1) will just stay with the
@@ -37,7 +38,7 @@ Dependencies
 
 - **cmake 3.3.0**
 - **alpaka** 
-  - is loaded as `git submodule` within cupla (see [INSTALL.md](INSTALL.md))
+  - is loaded as `git submodule` within **cupla** (see [INSTALL.md](INSTALL.md))
   - for more information please read [README.md](https://github.com/ComputationalRadiationPhysics/alpaka/blob/master/README.md)
 
 Usage
@@ -60,3 +61,10 @@ Authors
 
 - Axel Huebl
 - Dr. Michael Bussmann
+
+
+Trademarks Disclaimer
+---------------------
+
+All product names and trademarks are the property of their respective owners.
+CUDA® is a trademark of the NVIDIA Corporation.
