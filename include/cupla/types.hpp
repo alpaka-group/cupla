@@ -56,15 +56,37 @@
         ALPAKA_ACC_CPU_B_OMP2_T_SEQ_ENABLED  +                                 \
         ALPAKA_ACC_GPU_CUDA_ENABLED +                                          \
         ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED                                     \
-    )
+)
 
-#if( CUPLA_NUM_SELECTED_DEVICES > 1 )
-    #error "please select only one accelerator"
-#endif
 
 #if( CUPLA_NUM_SELECTED_DEVICES == 0 )
     #error "there is no accelerator selected, please run `ccmake .` and select one"
 #endif
+
+#if( CUPLA_NUM_SELECTED_DEVICES > 2  )
+    #error "please select at most two accelerators"
+#endif
+
+// count accelerators where the thread count must be one
+#define CUPLA_NUM_SELECTED_THREAD_SEQ_DEVICES (                                \
+        ALPAKA_ACC_CPU_B_OMP2_T_SEQ_ENABLED +                                  \
+        ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED                                     \
+)
+
+#define CUPLA_NUM_SELECTED_THREAD_PARALLEL_DEVICES (                           \
+        ALPAKA_ACC_CPU_B_SEQ_T_OMP2_ENABLED +                                  \
+        ALPAKA_ACC_CPU_B_SEQ_T_THREADS_ENABLED +                               \
+        ALPAKA_ACC_GPU_CUDA_ENABLED                                            \
+)
+
+#if( CUPLA_NUM_SELECTED_THREAD_SEQ_DEVICES > 1 )
+    #error "it is only alowed to select one thread sequential Alpaka accelerator"
+#endif
+
+#if( CUPLA_NUM_SELECTED_THREAD_PARALLEL_DEVICES > 1 )
+    #error "it is only alowed to select one thread parallelized Alpaka accelerator"
+#endif
+
 
 namespace cupla {
 
@@ -112,11 +134,18 @@ namespace cupla {
     >;
 #endif
 
-#ifdef ALPAKA_ACC_CPU_B_OMP2_T_SEQ_ENABLED
-    using Acc = ::alpaka::acc::AccCpuOmp2Blocks<
-        KernelDim,
-        IdxType
-    >;
+#if (ALPAKA_ACC_CPU_B_OMP2_T_SEQ_ENABLED == 1)
+    #if (CUPLA_NUM_SELECTED_DEVICES == 1)
+        using Acc = ::alpaka::acc::AccCpuOmp2Blocks<
+            KernelDim,
+            IdxType
+        >;
+    #else
+        using AccThreadSeq = ::alpaka::acc::AccCpuOmp2Blocks<
+            KernelDim,
+            IdxType
+        >;
+    #endif
 #endif
 
 #ifdef ALPAKA_ACC_CPU_B_SEQ_T_THREADS_ENABLED
@@ -127,10 +156,17 @@ namespace cupla {
 #endif
 
 #ifdef ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED
-    using Acc = ::alpaka::acc::AccCpuSerial<
-        KernelDim,
-        IdxType
-    >;
+    #if (CUPLA_NUM_SELECTED_DEVICES == 1)
+        using Acc = ::alpaka::acc::AccCpuSerial<
+            KernelDim,
+            IdxType
+        >;
+    #else
+        using AccThreadSeq = ::alpaka::acc::AccCpuSerial<
+            KernelDim,
+            IdxType
+        >;
+    #endif
 #endif
 
 #endif
@@ -143,6 +179,15 @@ namespace cupla {
         KernelDim,
         IdxType
     >;
+#endif
+
+#if (CUPLA_NUM_SELECTED_DEVICES == 1)
+    /** is an Alpaka accelerator which limits the thread count per block to one
+     *
+     * if only one accelerator is selected than it can be a accelerator without
+     * thread restrictions
+     */
+    using AccThreadSeq = Acc;
 #endif
 
     template<
