@@ -38,6 +38,7 @@ before_install:
   - mkdir -p $HOME/matrixMul
   - mkdir -p $HOME/asyncAPI
   - mkdir -p $HOME/asyncAPI_tuned
+  - mkdir -p $HOME/vectorAdd
   - export CMAKE_FLAGS="-DALPAKA_ACC_"$STRATEGY"_ENABLE=ON"
   - if [ "$COMPILER" == "gcc" ]; then
         echo "Using g++-4.9 and sequential OpenMP2 threads ...";
@@ -141,6 +142,17 @@ script:
   - if [ $STRATEGY == "CPU_B_OMP2_T_SEQ" ] ||
        [ $STRATEGY == "CPU_B_SEQ_T_SEQ" ]; then
       ./asyncAPI_tuned;
+    fi
+  #############################################################################
+  # Example: vectorAdd (added elements layer)                                 #
+  #############################################################################
+  - cd $HOME/vectorAdd
+  - cmake $TRAVIS_BUILD_DIR/example/CUDASamples/vectorAdd/ $CMAKE_FLAGS
+  - make
+  - if [ $STRATEGY == "CPU_B_OMP2_T_SEQ" ] ||
+       [ $STRATEGY == "CPU_B_SEQ_T_SEQ" ]; then
+      # test with 50000 and 100000 elements per vector
+      ./vectorAdd 100000;
     fi
   #############################################################################
   # Test: (To do: add tests in $TRAVIS_BUILD_DIR/test/                        #
