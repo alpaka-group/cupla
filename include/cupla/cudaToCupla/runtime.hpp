@@ -78,11 +78,13 @@
 
 #define make_cudaPitchedPtr(...) make_cuplaPitchedPtr(__VA_ARGS__)
 
-//math
+/** define math intrinsics
+ *
+ * to avoid negative performance impact intrinsic function redefinitions
+ * are disabled in CUDA
+ */
 #if !defined(__CUDA_ARCH__)
 #define __fdividef(a,b) ((a)/(b))
-#define fabsf(a) alpaka::math::abs(acc,a)
 #define __expf(a) alpaka::math::exp(acc,a)
 #define __logf(a) alpaka::math::log(acc,a)
-#define rsqrtf(a) alpaka::math::rsqrt(acc,a)
 #endif
