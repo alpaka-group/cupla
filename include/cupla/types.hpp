@@ -125,7 +125,11 @@ namespace cupla {
     defined(ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED)
 
     using AccDev = ::alpaka::dev::DevCpu;
-    using AccStream = ::alpaka::stream::StreamCpuAsync;
+#   if (CUPLA_STREAM_ASYNC_ENABLED == 1)
+        using AccStream = ::alpaka::stream::StreamCpuAsync;
+#   else
+        using AccStream = ::alpaka::stream::StreamCpuSync;
+#   endif
 
 #ifdef ALPAKA_ACC_CPU_B_SEQ_T_OMP2_ENABLED
     using Acc = ::alpaka::acc::AccCpuOmp2Threads<
@@ -174,7 +178,11 @@ namespace cupla {
 
 #ifdef ALPAKA_ACC_GPU_CUDA_ENABLED
     using AccDev = ::alpaka::dev::DevCudaRt;
-    using AccStream = ::alpaka::stream::StreamCudaRtAsync;
+#   if (CUPLA_STREAM_ASYNC_ENABLED == 1)
+        using AccStream = ::alpaka::stream::StreamCudaRtAsync;
+#   else
+        using AccStream = ::alpaka::stream::StreamCudaRtSync;
+#   endif
     using Acc = ::alpaka::acc::AccGpuCudaRt<
         KernelDim,
         IdxType
