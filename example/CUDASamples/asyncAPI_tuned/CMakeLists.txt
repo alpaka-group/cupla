@@ -60,18 +60,14 @@ append_recursive_files_add_to_src_group("${_SOURCE_DIR}" "" "cpp" _FILES_SOURCE_
 
 set(_INCLUDE_DIRECTORIES_PRIVATE ${_INCLUDE_DIR})
 
-include_directories(
-    ${_INCLUDE_DIRECTORIES_PRIVATE}
-    ${cupla_INCLUDE_DIRS})
-add_definitions(
-    ${cupla_DEFINITIONS})
+include_directories(${_INCLUDE_DIRECTORIES_PRIVATE})
+
 # Always add all files to the target executable build call to add them to the build project.
-alpaka_add_executable(
+cupla_add_executable(
     "asyncAPI_tuned"
-    ${_FILES_SOURCE_CXX}
-    ${cupla_SOURCE_FILES})
+    ${_FILES_SOURCE_CXX})
 
 # Set the link libraries for this library (adds libs, include directories, defines and compile options).
 target_link_libraries(
     "asyncAPI_tuned"
-    PUBLIC ${_cupla_LINK_LIBRARIES_PUBLIC})
+    PUBLIC ${cupla_LIBRARIES})
