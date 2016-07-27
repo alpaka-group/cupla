@@ -143,6 +143,14 @@ endif()
 ################################################################################
 # cupla.
 ################################################################################
+
+OPTION(CUPLA_STREAM_ASYNC_ENABLE "Enable asynchron streams" ON)
+if(CUPLA_STREAM_ASYNC_ENABLE)
+    list(APPEND _cupla_COMPILE_DEFINITIONS_PUBLIC "CUPLA_STREAM_ASYNC_ENABLED=1")
+else()
+    list(APPEND _cupla_COMPILE_DEFINITIONS_PUBLIC "CUPLA_STREAM_ASYNC_ENABLED=0")
+endif()
+
 set(_cupla_INCLUDE_DIR "${_cupla_ROOT_DIR}/include")
 list(APPEND _cupla_INCLUDE_DIRECTORIES_PUBLIC ${_cupla_INCLUDE_DIR})
 set(_cupla_SUFFIXED_INCLUDE_DIR "${_cupla_INCLUDE_DIR}")
