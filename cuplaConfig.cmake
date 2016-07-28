@@ -55,6 +55,7 @@ unset(_cupla_LINK_LIBRARIES_PUBLIC)
 unset(_cupla_FILES_HEADER)
 unset(_cupla_FILES_SOURCE)
 unset(_cupla_FILES_OTHER)
+unset(_cupla_ADD_EXECUTABLE_FILE)
 
 ################################################################################
 # Directory of this file.
@@ -63,6 +64,10 @@ set(_cupla_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
 
 # Normalize the path (e.g. remove ../)
 get_filename_component(_cupla_ROOT_DIR "${_cupla_ROOT_DIR}" ABSOLUTE)
+
+# Add cupla_ADD_EXECUTABLE function.
+set(_cupla_ADD_EXECUTABLE_FILE "${_cupla_ROOT_DIR}/cmake/addExecutable.cmake")
+include("${_cupla_ADD_EXECUTABLE_FILE}")
 
 ################################################################################
 # Set found to true initially and set it on false if a required dependency is missing.
@@ -283,6 +288,7 @@ if(NOT _cupla_FOUND)
     unset(_cupla_FILES_SOURCE)
     unset(_cupla_FILES_OTHER)
     unset(_cupla_VERSION)
+    unset(_cupla_ADD_EXECUTABLE_FILE)
 else()
     # Make internal variables advanced options in the GUI.
     MARK_AS_ADVANCED(
@@ -298,7 +304,9 @@ else()
         _cupla_FILES_HEADER
         _cupla_FILES_SOURCE
         _cupla_FILES_OTHER
-        _cupla_VERSION)
+        _cupla_VERSION
+        _cupla_ADD_EXECUTABLE_FILE
+    )
 endif()
 
 ###############################################################################
