@@ -26,18 +26,26 @@
 #include "cupla/manager/Stream.hpp"
 #include "cupla/manager/Event.hpp"
 #include "cupla/api/device.hpp"
+#include <stdexcept>
 
 cuplaError_t
 cuplaGetDeviceCount( int * count)
 {
     *count = cupla::manager::Device< cupla::AccDev >::get().count();
-    return cuplaSuccess;        
+    return cuplaSuccess;
 }
 
 cuplaError_t
 cuplaSetDevice( int idx)
 {
-    cupla::manager::Device< cupla::AccDev >::get().device( idx );
+    try
+    {
+      cupla::manager::Device< cupla::AccDev >::get().device( idx );
+    }
+    catch(const std::system_error& e)
+    {
+      return static_cast<cuplaError_t>( e.code().value() );
+    }
     return cuplaSuccess;
 }
 
@@ -50,45 +58,45 @@ cuplaGetDevice( int * deviceId )
 
 cuplaError_t
 cuplaDeviceReset( )
-{   
+{
     // wait that all work on the device is finished
     cuplaDeviceSynchronize( );
-    
+
     // delete all events on the current device
-    cupla::manager::Event< 
-        cupla::AccDev, 
-        cupla::AccStream 
+    cupla::manager::Event<
+        cupla::AccDev,
+        cupla::AccStream
     >::get().reset( );
-    
+
     // delete all memory on the current device
     cupla::manager::Memory<
         cupla::AccDev,
         cupla::AlpakaDim<1u>
     >::get().reset( );
-    
+
     cupla::manager::Memory<
         cupla::AccDev,
         cupla::AlpakaDim<2u>
     >::get().reset( );
-    
+
     cupla::manager::Memory<
         cupla::AccDev,
         cupla::AlpakaDim<3u>
     >::get().reset( );
-    
+
     // delete all streams on the current device
-    cupla::manager::Stream< 
-        cupla::AccDev, 
-        cupla::AccStream 
+    cupla::manager::Stream<
+        cupla::AccDev,
+        cupla::AccStream
     >::get().reset( );
-        
+
     cupla::manager::Device< cupla::AccDev >::get( ).reset( );
     return cuplaSuccess;
 }
 
 cuplaError_t
 cuplaDeviceSynchronize( )
-{   
+{
     ::alpaka::wait::wait(
         cupla::manager::Device< cupla::AccDev >::get( ).current( )
     );
@@ -101,10 +109,10 @@ cuplaMemGetInfo(
     size_t * total
 )
 {
-    auto& device( 
-        cupla::manager::Device< 
-            cupla::AccDev 
-        >::get().current() 
+    auto& device(
+        cupla::manager::Device<
+            cupla::AccDev
+        >::get().current()
     );
     *total = ::alpaka::dev::getMemBytes( device );
     *free = ::alpaka::dev::getFreeMemBytes( device );

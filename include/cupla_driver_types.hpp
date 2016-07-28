@@ -89,9 +89,11 @@ namespace std
     template< >
     struct is_error_code_enum< cuplaError > : public true_type{};
 
-    inline error_code make_error_code( const cuplaError result )
-    {
-        return error_code( static_cast<int>(result), CuplaErrorCode() );
-    }
-
 } // namespace std
+
+inline std::error_code make_error_code( const cuplaError result )
+{
+    return std::error_code( static_cast<int>(result), CuplaErrorCode() );
+}
+
+
