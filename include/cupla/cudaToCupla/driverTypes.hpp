@@ -30,6 +30,8 @@
 #define cudaErrorMemoryAllocation cuplaErrorMemoryAllocation
 #define cudaErrorInitializationError cuplaErrorInitializationError
 #define cudaErrorNotReady cuplaErrorNotReady
+#define cudaErrorDeviceAlreadyInUse cuplaErrorDeviceAlreadyInUse
+#define cuplaErrorInvalidDevice cuplaErrorInvalidDevice
 
 #define cudaError_t cuplaError_t
 #define cudaError cuplaError
