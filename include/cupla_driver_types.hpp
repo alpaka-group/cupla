@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <system_error>
+
 // emulated that cuda runtime is loaded
 #ifndef __DRIVER_TYPES_H__
 # define __DRIVER_TYPES_H__
@@ -40,7 +42,9 @@ enum cuplaError
     cuplaSuccess = 0,
     cuplaErrorMemoryAllocation = 2,
     cuplaErrorInitializationError = 3,
-    cuplaErrorNotReady = 34
+    cuplaErrorInvalidDevice = 8,
+    cuplaErrorNotReady = 34,
+    cuplaErrorDeviceAlreadyInUse = 54
 };
 
 enum EventProp
@@ -55,3 +59,39 @@ using cuplaStream_t = void*;
 
 using cuplaEvent_t = void*;
 
+
+/** error category for `cuplaError` */
+struct CuplaErrorCode : public std::error_category
+{
+    virtual const char *name() const noexcept override { return "cuplaError"; }
+    virtual std::string message(int ev) const override {
+        switch(ev)
+        {
+            case cuplaSuccess:
+                return "cuplaSuccess";
+            case cuplaErrorMemoryAllocation:
+                return "cuplaErrorMemoryAllocation";
+            case cuplaErrorInitializationError:
+                return "cuplaErrorInitializationError";
+            case cuplaErrorNotReady:
+                return "cuplaErrorNotReady";
+            case cuplaErrorDeviceAlreadyInUse:
+                return "cuplaErrorDeviceAlreadyInUse";
+            default:
+                return "not defined cuplaError";
+        };
+    }
+};
+
+namespace std
+{
+
+    template< >
+    struct is_error_code_enum< cuplaError > : public true_type{};
+
+    inline error_code make_error_code( const cuplaError result )
+    {
+        return error_code( static_cast<int>(result), CuplaErrorCode() );
+    }
+
+} // namespace std
