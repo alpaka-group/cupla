@@ -23,8 +23,11 @@
 #pragma once
 
 #include "cupla/types.hpp"
+#include "cupla_driver_types.hpp"
 #include <map>
 #include <memory>
+#include <sstream>
+#include <stdexcept>
 
 namespace cupla
 {
@@ -70,19 +73,41 @@ namespace manager
             else
             {
                 using Pltf = ::alpaka::pltf::Pltf< DeviceType >;
-                /* device id is not in the list
-                 *
-                 * select device with idx
-                 *
-                 * @todo check if device is available
-                 */
-                std::unique_ptr< DeviceType > dev(
-                    new DeviceType(
-                        alpaka::pltf::getDevByIdx<
-                            Pltf
-                        >( idx )
-                    )
-                );
+
+                const int numDevices = count();
+                if( idx >= numDevices )
+                {
+                    std::stringstream err;
+                    err << "Unable to return device " << idx << ". There are only " << numDevices << " devices!";
+                    throw std::system_error(
+                        cuplaErrorInvalidDevice,
+                        err.str()
+                    );
+                }
+
+                std::unique_ptr< DeviceType > dev;
+
+                try
+                {
+                    /* device id is not in the list
+                     *
+                     * select device with idx
+                     */
+                    dev.reset(
+                        new DeviceType(
+                            alpaka::pltf::getDevByIdx<
+                                Pltf
+                            >( idx )
+                        )
+                    );
+                }
+                catch( const std::runtime_error& e )
+                {
+                    throw std::system_error(
+                        cuplaErrorDeviceAlreadyInUse,
+                        e.what()
+                    );
+                }
                 m_map.insert(
                     std::make_pair( idx, std::move( dev ) )
                 );
