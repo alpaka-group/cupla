@@ -35,7 +35,7 @@ cuplaMalloc(
 )
 {
 
-    const ::alpaka::Vec<
+    const ::alpaka::vec::Vec<
         cupla::AlpakaDim<1u>,
         cupla::MemSizeType
     > extent( size );
@@ -58,7 +58,7 @@ cuplaMallocPitch(
     size_t const height
 )
 {
-    const ::alpaka::Vec<
+    const ::alpaka::vec::Vec<
         cupla::AlpakaDim< 2u >,
         cupla::MemSizeType
     > extent( height, width );
@@ -135,7 +135,7 @@ cuplaMallocHost(
     size_t size
 )
 {
-    const ::alpaka::Vec<
+    const ::alpaka::vec::Vec<
         cupla::AlpakaDim<1u>,
         cupla::MemSizeType
     > extent( size );
@@ -207,7 +207,7 @@ cuplaError_t cuplaMemcpyAsync(
     cuplaStream_t stream
 )
 {
-    const ::alpaka::Vec<
+    const ::alpaka::vec::Vec<
         cupla::AlpakaDim<1u>,
         cupla::MemSizeType
     > numBytes(count);
@@ -407,7 +407,7 @@ cuplaMemsetAsync(
         >::get().stream( stream )
     );
 
-    ::alpaka::Vec<
+    ::alpaka::vec::Vec<
         cupla::AlpakaDim<1u>,
         cupla::MemSizeType
     > const
@@ -469,17 +469,17 @@ cuplaMemcpy2DAsync(
     cuplaStream_t const stream
 )
 {
-    const ::alpaka::Vec<
+    const ::alpaka::vec::Vec<
         cupla::AlpakaDim<2u>,
         cupla::MemSizeType
     > numBytes( height, width );
 
-    const ::alpaka::Vec<
+    const ::alpaka::vec::Vec<
         cupla::AlpakaDim<2u>,
         cupla::MemSizeType
     > dstPitch( dPitch * height , dPitch );
 
-    const ::alpaka::Vec<
+    const ::alpaka::vec::Vec<
         cupla::AlpakaDim<2u>,
         cupla::MemSizeType
     > srcPitch( sPitch * height , sPitch );
@@ -678,12 +678,12 @@ cuplaMemcpy3DAsync(
     cuplaStream_t stream
 )
 {
-    const ::alpaka::Vec<
+    const ::alpaka::vec::Vec<
         cupla::AlpakaDim<3u>,
         cupla::MemSizeType
     > numBytes( p->extent );
 
-    const ::alpaka::Vec<
+    const ::alpaka::vec::Vec<
         cupla::AlpakaDim<3u>,
         cupla::MemSizeType
     > extentSrc(
@@ -692,7 +692,7 @@ cuplaMemcpy3DAsync(
         p->srcPtr.xsize
     );
 
-    const ::alpaka::Vec<
+    const ::alpaka::vec::Vec<
         cupla::AlpakaDim<3u>,
         cupla::MemSizeType
     > extentDst(
@@ -701,7 +701,7 @@ cuplaMemcpy3DAsync(
         p->dstPtr.xsize
     );
 
-    const ::alpaka::Vec<
+    const ::alpaka::vec::Vec<
         cupla::AlpakaDim<3u>,
         cupla::MemSizeType
     > offsetSrc(
@@ -710,7 +710,7 @@ cuplaMemcpy3DAsync(
         p->srcPos.x
     );
 
-    const ::alpaka::Vec<
+    const ::alpaka::vec::Vec<
         cupla::AlpakaDim<3u>,
         cupla::MemSizeType
     > offsetDst(
@@ -719,7 +719,7 @@ cuplaMemcpy3DAsync(
         p->dstPos.x
     );
 
-    const ::alpaka::Vec<
+    const ::alpaka::vec::Vec<
         cupla::AlpakaDim<3u>,
         cupla::MemSizeType
     > dstPitch(
@@ -728,7 +728,7 @@ cuplaMemcpy3DAsync(
         p->dstPtr.pitch
     );
 
-    const ::alpaka::Vec<
+    const ::alpaka::vec::Vec<
         cupla::AlpakaDim<3u>,
         cupla::MemSizeType
     > srcPitch(

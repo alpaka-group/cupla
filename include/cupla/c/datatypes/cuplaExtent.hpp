@@ -50,7 +50,7 @@ struct cuplaExtent{
     >
     ALPAKA_FN_HOST_ACC
     cuplaExtent(
-        ::alpaka::Vec<
+        ::alpaka::vec::Vec<
             TDim,
             TSize
         > const &vec
@@ -63,12 +63,12 @@ struct cuplaExtent{
     }
 
     ALPAKA_FN_HOST_ACC
-    operator ::alpaka::Vec<
+    operator ::alpaka::vec::Vec<
         cupla::AlpakaDim< 3u >,
         cupla::MemSizeType
     >(void) const
     {
-        ::alpaka::Vec<
+        ::alpaka::vec::Vec<
             cupla::AlpakaDim< 3u >,
             cupla::MemSizeType
         > vec( depth, height, width );
