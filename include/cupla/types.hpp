@@ -103,7 +103,7 @@ namespace cupla {
 
     using KernelDim = AlpakaDim< Dimensions >;
 
-    using IdxVec3 = ::alpaka::Vec<
+    using IdxVec3 = ::alpaka::vec::Vec<
         KernelDim,
         IdxType
     >;
@@ -111,7 +111,7 @@ namespace cupla {
     template<
         uint32_t T_dim
     >
-    using MemVec = ::alpaka::Vec<
+    using MemVec = ::alpaka::vec::Vec<
         AlpakaDim< T_dim >,
         MemSizeType
     >;

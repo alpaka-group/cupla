@@ -42,7 +42,7 @@ namespace cupla
         >
         ALPAKA_FN_HOST_ACC
         uint3(
-          ::alpaka::Vec<
+          ::alpaka::vec::Vec<
               TDim,
               TSize
           > const &vec
@@ -54,12 +54,12 @@ namespace cupla
         }
 
         ALPAKA_FN_HOST_ACC
-        operator ::alpaka::Vec<
+        operator ::alpaka::vec::Vec<
             cupla::AlpakaDim< 3u >,
             IdxType
         >(void) const
         {
-            ::alpaka::Vec<
+            ::alpaka::vec::Vec<
                 cupla::AlpakaDim< 3u >,
                 IdxType
             > vec(z, y, x);
