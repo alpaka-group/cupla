@@ -96,16 +96,34 @@ OPTION(ALPAKA_ACC_CPU_B_SEQ_T_OMP2_ENABLE "Enable the OpenMP 2.0 CPU block threa
 OPTION(ALPAKA_ACC_CPU_BT_OMP4_ENABLE "Enable the OpenMP 4.0 CPU block and block thread accelerator" OFF)
 OPTION(ALPAKA_ACC_GPU_CUDA_ENABLE "Enable the CUDA GPU accelerator" OFF)
 
-if("$ENV{ALPAKA_ROOT}" STREQUAL "")
+
+set(cupla_ALPAKA_PROVIDER "intern" CACHE STRING "Select which alpaka is used")
+set_property(CACHE cupla_ALPAKA_PROVIDER PROPERTY STRINGS "intern;extern")
+mark_as_advanced(cupla_ALPAKA_PROVIDER)
+
+if(${cupla_ALPAKA_PROVIDER} STREQUAL "intern")
     if(NOT EXISTS "${_cupla_ROOT_DIR}/alpaka/Findalpaka.cmake")
         # Init the sub molules
         execute_process (COMMAND git submodule init WORKING_DIRECTORY ${_cupla_ROOT_DIR})
         # Update the sub modules
         execute_process (COMMAND git submodule update WORKING_DIRECTORY ${_cupla_ROOT_DIR})
     endif()
-endif()
 
-find_package(alpaka HINTS $ENV{ALPAKA_ROOT} "${_cupla_ROOT_DIR}/alpaka")
+    find_package(alpaka 
+        PATHS "${_cupla_ROOT_DIR}/alpaka"
+        NO_DEFAULT_PATH 
+        NO_CMAKE_ENVIRONMENT_PATH 
+        NO_CMAKE_PATH
+        NO_SYSTEM_ENVIRONMENT_PATH
+        NO_CMAKE_PACKAGE_REGISTRY
+        NO_CMAKE_BUILDS_PATH
+        NO_CMAKE_SYSTEM_PATH
+        NO_CMAKE_SYSTEM_PACKAGE_REGISTRY
+        NO_CMAKE_FIND_ROOT_PATH   
+    )
+else()
+    find_package(alpaka HINTS $ENV{ALPAKA_ROOT})
+endif()
 
 if(NOT alpaka_FOUND)
     message(WARNING "Required cupla dependency alpaka could not be found!")
