@@ -18,6 +18,11 @@ Requirements
     - `git submodule init`
     - `git submodule update`
     - `export CUPLA_ROOT=$HOME/src/cupla`
+  - use cupla without the submodule alpaka: 
+    Set the advanced CMake variable `cupla_ALPAKA_PROVIDER` to `extern` and
+    set environment variable `ALPAKA_ROOT` or extend `CMAKE_PREFIX_PATH` with the
+    path to alpaka.
+      
 
 compile an example
 -----------------
