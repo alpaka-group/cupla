@@ -53,6 +53,17 @@ namespace cupla
             }
         }
 
+#if( ALPAKA_ACC_GPU_CUDA_ENABLED == 1 )
+        ALPAKA_FN_HOST_ACC
+        uint3(
+          ::uint3 const & vec
+        ){
+            for (uint32_t i(0); i < 3u; ++i) {
+                (&(this->x))[i] = (&(vec.x))[i];
+            }
+        }
+#endif
+
         ALPAKA_FN_HOST_ACC
         operator ::alpaka::vec::Vec<
             cupla::AlpakaDim< 3u >,
