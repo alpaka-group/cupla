@@ -66,11 +66,12 @@ install:
   # CMAKE                                                                     #
   #############################################################################
   - export PATH=$CMAKE_ROOT/bin:$PATH
-  - CMAKE_33_FOUND=$(cmake --version | grep " 3\.3\." >/dev/null && { echo 0; } || { echo 1; })
-  - if [ $CMAKE_33_FOUND -ne 0 ]; then
+  - CMAKE_39_FOUND=$(cmake --version | grep " 3\.9\." >/dev/null && { echo 0; } || { echo 1; })
+  - if [ $CMAKE_39_FOUND -ne 0 ]; then
       mkdir -p $CMAKE_ROOT &&
       cd $CMAKE_ROOT &&
-      travis_retry wget --no-check-certificate https://cmake.org/files/v3.9/cmake-3.9.4-Linux-x86_64.tar.gz &&
+      rm -rf $CMAKE_ROOT/* &&
+      travis_retry wget --no-check-certificate http://cmake.org/files/v3.9/cmake-3.9.4-Linux-x86_64.tar.gz &&
       tar -xzf cmake-3.9.4-Linux-x86_64.tar.gz &&
       mv cmake-3.9.4-Linux-x86_64/* . &&
       rm -rf cmake-3.9.4-Linux-x86_64.tar.gz cmake-3.9.4-Linux-x86_64 &&
@@ -89,7 +90,7 @@ install:
   - if [ $BOOST_FOUND -ne 0 ]; then
       mkdir -p $ BOOST_ROOT &&
       cd $BOOST_ROOT &&
-      travis_retry wget --no-check-certificate -O boost.tar.bz2 https://sourceforge.net/projects/boost/files/boost/1.62.0/boost_1_62_0.tar.bz2/download &&
+      travis_retry wget --no-check-certificate -O boost.tar.bz2 http://sourceforge.net/projects/boost/files/boost/1.62.0/boost_1_62_0.tar.bz2/download &&
       tar -xjf boost.tar.bz2 &&
       cd boost_1_62_0 &&
       ./bootstrap.sh --with-libraries=atomic,chrono,context,date_time,system,thread --prefix=$BOOST_ROOT &&
