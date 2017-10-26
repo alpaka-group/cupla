@@ -4,7 +4,7 @@ cupla Install Guide
 Requirements
 ------------
 
-- **cmake**  3.3.0 or higher
+- **cmake**  3.7.0 or higher
   - *Debian/Ubuntu:* `sudo apt-get install cmake file cmake-curses-gui`
   - *Arch Linux:* `sudo pacman --sync cmake`
 
