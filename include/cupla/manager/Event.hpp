@@ -148,8 +148,9 @@ namespace detail
                     flags
                 )
             );
+
             cuplaEvent_t eventId = reinterpret_cast< cuplaEvent_t >(
-                m_mapVector[ device.id() ].size()
+                m_id++
             );
             m_mapVector[ device.id() ].insert(
                 std::make_pair( eventId, std::move( eventPtr ) )
@@ -213,6 +214,8 @@ namespace detail
             const auto deviceId = device.id();
 
             m_mapVector[ deviceId ].clear( );
+            // reset id to allow that this instance can be reused
+            m_id = 0u;
 
             // @todo: check if clear creates errors
             return true;
@@ -223,6 +226,9 @@ namespace detail
         Event() :  m_mapVector( Device< DeviceType >::get().count() )
         {
         }
+
+        //! unique if for the next stream
+        size_t m_id = 0u;
 
     };
 
