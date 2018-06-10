@@ -3,7 +3,7 @@ Changelog
 
 0.1.0 "Worf"
 ------------
-**Date:** 2018-06-08
+**Date:** 2018-06-10
 
 Worf: Peace between the Worlds
 
