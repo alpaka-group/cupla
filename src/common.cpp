@@ -38,9 +38,10 @@ cuplaGetLastError()
 {
 #if (ALPAKA_ACC_GPU_CUDA_ENABLED == 1)
     // reset the last cuda error
-    cudaGetLastError();
-#endif
+    return (cuplaError_t)cudaGetLastError();
+#else
     return cuplaSuccess;
+#endif
 }
 
 cuplaError_t
