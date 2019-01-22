@@ -47,5 +47,9 @@ cuplaGetLastError()
 cuplaError_t
 cuplaPeekAtLastError()
 {
+#if (ALPAKA_ACC_GPU_CUDA_ENABLED == 1)
+    return (cuplaError_t)cudaPeekAtLastError();
+#else
     return cuplaSuccess;
+#endif
 }
