@@ -28,9 +28,9 @@
 
 
 const char *
-cuplaGetErrorString(cuplaError_t)
+cuplaGetErrorString(cuplaError_t e)
 {
-    return "cuplaGetErrorString is currently not supported\n";
+    return CuplaErrorCode::message_cstr(e);
 }
 
 cuplaError_t
