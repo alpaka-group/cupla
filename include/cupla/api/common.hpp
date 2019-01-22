@@ -31,9 +31,12 @@ const char *
 cuplaGetErrorString(cuplaError_t);
 
 
-/** not supported
+/** returns the last error from a runtime call.
  *
- * @return always cuplaSuccess
+ * This call reset the error code to cuplaSuccess
+ * @warning If a non CUDA Alpaka backend is used this function will return always cuplaSuccess
+ *
+ * @return cuplaSuccess if there was no error else the corresponding error type
  */
 cuplaError_t
 cuplaGetLastError();
