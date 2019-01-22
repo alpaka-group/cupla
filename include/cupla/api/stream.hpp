@@ -46,3 +46,6 @@ cuplaStreamWaitEvent(
     cuplaEvent_t event,
     unsigned int flags
 );
+
+cuplaError_t
+cuplaStreamQuery( cuplaStream_t stream );
