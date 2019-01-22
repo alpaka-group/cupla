@@ -42,9 +42,12 @@ cuplaError_t
 cuplaGetLastError();
 
 
-/** not supported
+/** returns the last error from a runtime call.
  *
- * @return always cuplaSuccess
+ * This call does not reset the error code.
+ * @warning If a non CUDA Alpaka backend is used this function will return always cuplaSuccess
+ *
+ * @return cuplaSuccess if there was no error else the corresponding error type
  */
 cuplaError_t
 cuplaPeekAtLastError();
