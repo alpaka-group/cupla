@@ -49,9 +49,9 @@
 #   define ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED 1
 #endif
 
-#ifdef ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLE
-#   undef ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLE
-#   define ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLE 1
+#ifdef ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLED
+#   undef ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLED
+#   define ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLED 1
 #endif
 
 #define CUPLA_NUM_SELECTED_DEVICES (                                           \
@@ -60,7 +60,7 @@
         ALPAKA_ACC_CPU_B_OMP2_T_SEQ_ENABLED  +                                 \
         ALPAKA_ACC_GPU_CUDA_ENABLED +                                          \
         ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED +                                   \
-        ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLE                                      \
+        ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLED                                     \
 )
 
 
@@ -76,7 +76,7 @@
 #define CUPLA_NUM_SELECTED_THREAD_SEQ_DEVICES (                                \
         ALPAKA_ACC_CPU_B_OMP2_T_SEQ_ENABLED +                                  \
         ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED +                                   \
-        ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLE                                      \
+        ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLED                                     \
 )
 
 #define CUPLA_NUM_SELECTED_THREAD_PARALLEL_DEVICES (                           \
@@ -129,7 +129,7 @@ namespace cupla {
     defined(ALPAKA_ACC_CPU_B_SEQ_T_THREADS_ENABLED) ||                         \
     defined(ALPAKA_ACC_CPU_B_OMP2_T_SEQ_ENABLED) ||                            \
     defined(ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED) ||                             \
-    defined(ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLE)
+    defined(ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLED)
 
     using AccDev = ::alpaka::dev::DevCpu;
 #   if (CUPLA_STREAM_ASYNC_ENABLED == 1)
@@ -180,7 +180,7 @@ namespace cupla {
     #endif
 #endif
 
-#if (ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLE == 1)
+#if (ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLED == 1)
     #if (CUPLA_NUM_SELECTED_DEVICES == 1)
         using Acc = ::alpaka::acc::AccCpuTbbBlocks<
             KernelDim,
