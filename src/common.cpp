@@ -28,9 +28,9 @@
 
 
 const char *
-cuplaGetErrorString(cuplaError_t)
+cuplaGetErrorString(cuplaError_t e)
 {
-    return "cuplaGetErrorString is currently not supported\n";
+    return CuplaErrorCode::message_cstr(e);
 }
 
 cuplaError_t
@@ -38,13 +38,18 @@ cuplaGetLastError()
 {
 #if (ALPAKA_ACC_GPU_CUDA_ENABLED == 1)
     // reset the last cuda error
-    cudaGetLastError();
-#endif
+    return (cuplaError_t)cudaGetLastError();
+#else
     return cuplaSuccess;
+#endif
 }
 
 cuplaError_t
 cuplaPeekAtLastError()
 {
+#if (ALPAKA_ACC_GPU_CUDA_ENABLED == 1)
+    return (cuplaError_t)cudaPeekAtLastError();
+#else
     return cuplaSuccess;
+#endif
 }

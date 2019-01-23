@@ -62,8 +62,13 @@ using cuplaEvent_t = void*;
 /** error category for `cuplaError` */
 struct CuplaErrorCode : public std::error_category
 {
-    virtual const char *name() const noexcept override { return "cuplaError"; }
-    virtual std::string message(int ev) const override {
+    char const * name() const noexcept override { return "cuplaError"; }
+    std::string message(int ev) const override
+	{
+        return message_cstr( ev );
+    }
+	static char const * message_cstr(int ev)
+	{
         switch(ev)
         {
             case cuplaSuccess:

@@ -87,3 +87,17 @@ cuplaStreamWaitEvent(
     ::alpaka::wait::wait(streamObject,eventObject);
     return cuplaSuccess;
 }
+
+cuplaError_t
+cuplaStreamQuery( cuplaStream_t stream )
+{
+    auto& streamObject = cupla::manager::Stream<
+        cupla::AccDev,
+        cupla::AccStream
+    >::get().stream( stream );
+
+    if( alpaka::stream::empty( streamObject ) )
+        return cuplaSuccess;
+    else
+        return cuplaErrorNotReady;
+};
