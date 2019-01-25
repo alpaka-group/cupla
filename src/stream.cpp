@@ -96,7 +96,7 @@ cuplaStreamQuery( cuplaStream_t stream )
         cupla::AccStream
     >::get().stream( stream );
 
-    if( alpaka::stream::empty( streamObject ) )
+    if( alpaka::queue::empty( streamObject ) )
         return cuplaSuccess;
     else
         return cuplaErrorNotReady;
