@@ -145,7 +145,7 @@ namespace traits
         template<
             typename... TArgs
         >
-        ALPAKA_FN_HOST
+        ALPAKA_FN_HOST_ACC
         static auto
         getBlockSharedMemDynSizeBytes(
             ::cupla::CuplaKernel< T_UserKernel > const & userKernel,
