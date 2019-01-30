@@ -51,7 +51,7 @@ namespace cupla
             }
         }
 
-#if( ALPAKA_ACC_GPU_CUDA_ENABLED == 1 )
+#if( ALPAKA_ACC_GPU_CUDA_ENABLED == 1 || ALPAKA_ACC_GPU_HIP_ENABLED == 1 )
         ALPAKA_FN_HOST_ACC
         uint3(
           ::uint3 const & vec
