@@ -54,13 +54,19 @@
 #   define ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLED 1
 #endif
 
+#ifdef ALPAKA_ACC_GPU_HIP_ENABLED
+#   undef ALPAKA_ACC_GPU_HIP_ENABLED
+#   define ALPAKA_ACC_GPU_HIP_ENABLED 1
+#endif
+
 #define CUPLA_NUM_SELECTED_DEVICES (                                           \
         ALPAKA_ACC_CPU_B_SEQ_T_OMP2_ENABLED +                                  \
         ALPAKA_ACC_CPU_B_SEQ_T_THREADS_ENABLED +                               \
         ALPAKA_ACC_CPU_B_OMP2_T_SEQ_ENABLED  +                                 \
         ALPAKA_ACC_GPU_CUDA_ENABLED +                                          \
         ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED +                                   \
-        ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLED                                     \
+        ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLED +                                   \
+        ALPAKA_ACC_GPU_HIP_ENABLED                                             \
 )
 
 
@@ -82,7 +88,8 @@
 #define CUPLA_NUM_SELECTED_THREAD_PARALLEL_DEVICES (                           \
         ALPAKA_ACC_CPU_B_SEQ_T_OMP2_ENABLED +                                  \
         ALPAKA_ACC_CPU_B_SEQ_T_THREADS_ENABLED +                               \
-        ALPAKA_ACC_GPU_CUDA_ENABLED                                            \
+        ALPAKA_ACC_GPU_CUDA_ENABLED +                                          \
+        ALPAKA_ACC_GPU_HIP_ENABLED                                             \
 )
 
 #if( CUPLA_NUM_SELECTED_THREAD_SEQ_DEVICES > 1 )
@@ -205,6 +212,19 @@ namespace cupla {
         using AccStream = ::alpaka::queue::QueueCudaRtSync;
 #   endif
     using Acc = ::alpaka::acc::AccGpuCudaRt<
+        KernelDim,
+        IdxType
+    >;
+#endif
+
+#ifdef ALPAKA_ACC_GPU_HIP_ENABLED
+    using AccDev = ::alpaka::dev::DevHipRt;
+#   if (CUPLA_STREAM_ASYNC_ENABLED == 1)
+        using AccStream = ::alpaka::queue::QueueHipRtAsync;
+#   else
+        using AccStream = ::alpaka::queue::QueueHipRtSync;
+#   endif
+    using Acc = ::alpaka::acc::AccGpuHipRt<
         KernelDim,
         IdxType
     >;

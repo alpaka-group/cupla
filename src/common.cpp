@@ -36,9 +36,11 @@ cuplaGetErrorString(cuplaError_t e)
 cuplaError_t
 cuplaGetLastError()
 {
-#if (ALPAKA_ACC_GPU_CUDA_ENABLED == 1)
+#if( ALPAKA_ACC_GPU_CUDA_ENABLED == 1 )
     // reset the last cuda error
     return (cuplaError_t)cudaGetLastError();
+#elif( ALPAKA_ACC_GPU_HIP_ENABLED == 1 )
+    return (cuplaError_t)hipGetLastError();
 #else
     return cuplaSuccess;
 #endif
@@ -47,8 +49,10 @@ cuplaGetLastError()
 cuplaError_t
 cuplaPeekAtLastError()
 {
-#if (ALPAKA_ACC_GPU_CUDA_ENABLED == 1)
+#if( ALPAKA_ACC_GPU_CUDA_ENABLED == 1 )
     return (cuplaError_t)cudaPeekAtLastError();
+#elif( ALPAKA_ACC_GPU_HIP_ENABLED == 1 )
+    return (cuplaError_t)hipPeekAtLastError();
 #else
     return cuplaSuccess;
 #endif
