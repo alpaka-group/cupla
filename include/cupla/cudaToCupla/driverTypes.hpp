@@ -47,6 +47,14 @@
 
 #define cudaMemcpy3DParms cuplaMemcpy3DParms
 
+#ifdef cudaEventBlockingSync
+#undef cudaEventBlockingSync
+#endif
+/* cudaEventBlockingSync is a define in CUDA, hence we must remove
+ * the old definition with the cupla enum
+ */
+#define cudaEventBlockingSync cuplaEventBlockingSync 
+
 #ifdef cudaEventDisableTiming
 #undef cudaEventDisableTiming
 #endif

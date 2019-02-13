@@ -61,7 +61,8 @@ namespace detail
             hasTimer( !( flags & cuplaEventDisableTiming ) ),
             event(
                 new AlpakaEvent(
-                    Device< T_DeviceType >::get().current()
+                    Device< T_DeviceType >::get().current(),
+                    !(flags & cuplaEventBlockingSync)
                 )
             )
         {

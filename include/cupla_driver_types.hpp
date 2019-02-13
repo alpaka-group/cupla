@@ -48,6 +48,7 @@ enum cuplaError
 
 enum EventProp
 {
+    cuplaEventBlockingSync = 1,
     cuplaEventDisableTiming = 2
 };
 
