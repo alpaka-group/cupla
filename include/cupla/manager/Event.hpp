@@ -62,6 +62,10 @@ namespace detail
             event(
                 new AlpakaEvent(
                     Device< T_DeviceType >::get().current()
+                    // The alpaka interfaces for this constructor are different depending on the backend.
+#if( ALPAKA_ACC_GPU_HIP_ENABLED == 1 || ALPAKA_ACC_GPU_CUDA_ENABLED == 1 )
+                    ,!(flags & cuplaEventBlockingSync)
+#endif
                 )
             )
         {
