@@ -27,8 +27,8 @@
 
 struct cuplaPitchedPtr
 {
-    cupla::MemSizeType pitch, xsize, ysize;
     void * ptr;
+    cupla::MemSizeType pitch, xsize, ysize;
 
     cuplaPitchedPtr() = default;
 
