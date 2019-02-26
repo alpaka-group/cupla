@@ -119,7 +119,7 @@ namespace cupla{
             static_cast<IdxVec3>(blockSize),
             static_cast<IdxVec3>(elemPerThread)
         );
-        auto const exec(::alpaka::kernel::createTaskExec<T_Acc>(workDiv, kernel, args...));
+        auto const exec(::alpaka::kernel::createTaskKernel<T_Acc>(workDiv, kernel, args...));
         ::alpaka::queue::enqueue(stream, exec);
     }
 
