@@ -219,6 +219,16 @@ if(NOT TARGET cupla)
     # Even if there are no sources CMAKE has to know the language.
     set_target_properties("cupla" PROPERTIES LINKER_LANGUAGE CXX)
 
+    # properties
+    target_compile_features("cupla"
+        PUBLIC cxx_std_11
+        )
+    set_target_properties("cupla" PROPERTIES
+        CXX_EXTENSIONS OFF
+        CXX_STANDARD_REQUIRED ON
+        )
+
+
     # Compile options.
     message(STATUS "_cupla_COMPILE_OPTIONS_PUBLIC: ${_cupla_COMPILE_OPTIONS_PUBLIC}")
     list(
