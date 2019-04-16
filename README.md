@@ -37,8 +37,8 @@ Dependencies
 ------------
 
 - **cmake 3.11.0**
-- **alpaka** 
-  - is loaded as `git submodule` within **cupla** (see [INSTALL.md](INSTALL.md))
+- **Alpaka**
+  - is loaded as `git subtree` within **cupla** (see [INSTALL.md](INSTALL.md))
   - for more information please read [README.md](https://github.com/ComputationalRadiationPhysics/alpaka/blob/master/README.md)
 
 Usage
@@ -56,6 +56,7 @@ Authors
 ### Maintainers and core developers
 
 - Rene Widera
+- Matthias Werner
 
 ### Former Members, Contributions and Thanks
 
