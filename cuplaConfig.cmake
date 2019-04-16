@@ -122,17 +122,17 @@ if(${cupla_ALPAKA_PROVIDER} STREQUAL "intern")
         execute_process (COMMAND git submodule update WORKING_DIRECTORY ${_cupla_ROOT_DIR})
     endif()
 
-    find_package(alpaka 
+    find_package(alpaka
         PATHS "${_cupla_ROOT_DIR}/alpaka"
-        NO_DEFAULT_PATH 
-        NO_CMAKE_ENVIRONMENT_PATH 
+        NO_DEFAULT_PATH
+        NO_CMAKE_ENVIRONMENT_PATH
         NO_CMAKE_PATH
         NO_SYSTEM_ENVIRONMENT_PATH
         NO_CMAKE_PACKAGE_REGISTRY
         NO_CMAKE_BUILDS_PATH
         NO_CMAKE_SYSTEM_PATH
         NO_CMAKE_SYSTEM_PACKAGE_REGISTRY
-        NO_CMAKE_FIND_ROOT_PATH   
+        NO_CMAKE_FIND_ROOT_PATH
     )
 else()
     find_package(alpaka HINTS $ENV{ALPAKA_ROOT})
@@ -142,6 +142,7 @@ if(NOT alpaka_FOUND)
     message(WARNING "Required cupla dependency alpaka could not be found!")
         set(_cupla_FOUND FALSE)
 else()
+    # TODO: use imported targets instead of chain of variables
     list(APPEND _cupla_COMPILE_OPTIONS_PUBLIC ${alpaka_COMPILE_OPTIONS})
     list(APPEND _cupla_COMPILE_DEFINITIONS_PUBLIC ${alpaka_COMPILE_DEFINITIONS})
     list(APPEND _cupla_INCLUDE_DIRECTORIES_PUBLIC ${alpaka_INCLUDE_DIRS})
@@ -180,7 +181,7 @@ endif()
 # cupla.
 ################################################################################
 
-OPTION(CUPLA_STREAM_ASYNC_ENABLE "Enable asynchron streams" ON)
+option(CUPLA_STREAM_ASYNC_ENABLE "Enable asynchronous streams" ON)
 if(CUPLA_STREAM_ASYNC_ENABLE)
     list(APPEND _cupla_COMPILE_DEFINITIONS_PUBLIC "CUPLA_STREAM_ASYNC_ENABLED=1")
 else()
@@ -233,12 +234,12 @@ if(NOT TARGET cupla)
     message(STATUS "_cupla_COMPILE_OPTIONS_PUBLIC: ${_cupla_COMPILE_OPTIONS_PUBLIC}")
     list(
         LENGTH
-        _cupla_COMPILE_optionS_PUBLIC
-        _cupla_COMPILE_optionS_PUBLIC_LENGTH)
-    if("${_cupla_COMPILE_optionS_PUBLIC_LENGTH}")
-        TARGET_COMPILE_optionS(
+        _cupla_COMPILE_OPTIONS_PUBLIC
+        _cupla_COMPILE_OPTIONS_PUBLIC_LENGTH)
+    if("${_cupla_COMPILE_OPTIONS_PUBLIC_LENGTH}")
+        TARGET_COMPILE_OPTIONS(
             "cupla"
-            PUBLIC ${_cupla_COMPILE_optionS_PUBLIC})
+            PUBLIC ${_cupla_COMPILE_OPTIONS_PUBLIC})
     endif()
 
     # Compile definitions.
@@ -356,8 +357,8 @@ endif()
 
 # Handles the REQUIRED, QUIET and version-related arguments for find_package.
 # NOTE: We do not check for cupla_LIBRARIES and cupla_DEFINITIONS because they can be empty.
-INCLUDE(FindPackageHandleStandardArgs)
-find_package_HANDLE_STANDARD_ARGS(
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(
     "cupla"
     FOUND_VAR cupla_FOUND
     REQUIRED_VARS cupla_INCLUDE_DIR
