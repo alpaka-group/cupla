@@ -72,5 +72,21 @@ namespace traits
     };
 #endif
 
+#ifdef ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLED
+    template<
+        typename T_KernelDim,
+        typename T_IndexType
+    >
+    struct IsThreadSeqAcc<
+        ::alpaka::acc::AccCpuTbbBlocks<
+            T_KernelDim,
+            T_IndexType
+        >
+    >
+    {
+        static constexpr bool value = true;
+    };
+#endif
+
 }  // namespace traits
 } // namespace cupla
