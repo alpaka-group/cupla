@@ -21,9 +21,12 @@
 
 #pragma once
 
+#include "cupla/namespace.hpp"
 #include "cupla/types.hpp"
 
 namespace cupla
+{
+inline namespace CUPLA_ACCELERATOR_NAMESPACE
 {
 
     struct uint3{
@@ -76,7 +79,8 @@ namespace cupla
         }
     };
 
-} //namespace cupla
+} // namespace CUPLA_ACCELERATOR_NAMESPACE
+} // namespace cupla
 
 
 namespace alpaka

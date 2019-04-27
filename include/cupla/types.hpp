@@ -24,6 +24,8 @@
 #include <alpaka/alpaka.hpp>
 #include <cstdint>
 
+#include "cupla/namespace.hpp"
+
 #ifdef ALPAKA_ACC_CPU_B_SEQ_T_OMP2_ENABLED
 #   undef ALPAKA_ACC_CPU_B_SEQ_T_OMP2_ENABLED
 #   define ALPAKA_ACC_CPU_B_SEQ_T_OMP2_ENABLED 1
@@ -100,9 +102,10 @@
     #error "it is only alowed to select one thread parallelized Alpaka accelerator"
 #endif
 
-
-namespace cupla {
-
+namespace cupla
+{
+inline namespace CUPLA_ACCELERATOR_NAMESPACE
+{
 
     using MemSizeType = size_t;
     using IdxType = unsigned int;
@@ -302,5 +305,6 @@ namespace cupla {
             AlpakaDim< T_dim >,
             MemSizeType
         >;
-} // namepsace cupla
 
+} // namespace CUPLA_ACCELERATOR_NAMESPACE
+} // namepsace cupla

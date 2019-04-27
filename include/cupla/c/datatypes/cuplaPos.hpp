@@ -21,7 +21,11 @@
 
 #pragma once
 
+#include "cupla/namespace.hpp"
 #include "cupla/types.hpp"
+
+inline namespace CUPLA_ACCELERATOR_NAMESPACE
+{
 
 struct cuplaPos{
     size_t x, y, z;
@@ -74,7 +78,7 @@ struct cuplaPos{
     }
 };
 
-
+} //namespace CUPLA_ACCELERATOR_NAMESPACE
 
 namespace alpaka
 {

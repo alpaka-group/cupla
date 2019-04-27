@@ -23,9 +23,12 @@
 
 #include <alpaka/alpaka.hpp>
 
+#include "cupla/namespace.hpp"
 #include "cupla/types.hpp"
 #include "cupla_driver_types.hpp"
 
+inline namespace CUPLA_ACCELERATOR_NAMESPACE
+{
 
 const char *
 cuplaGetErrorString(cuplaError_t);
@@ -51,3 +54,5 @@ cuplaGetLastError();
  */
 cuplaError_t
 cuplaPeekAtLastError();
+
+} //namespace CUPLA_ACCELERATOR_NAMESPACE

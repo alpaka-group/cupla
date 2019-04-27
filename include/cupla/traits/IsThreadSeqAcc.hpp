@@ -21,9 +21,12 @@
 
 #pragma once
 
+#include "cupla/namespace.hpp"
 #include "cupla/types.hpp"
 
 namespace cupla
+{
+inline namespace CUPLA_ACCELERATOR_NAMESPACE
 {
 namespace traits
 {
@@ -88,5 +91,6 @@ namespace traits
     };
 #endif
 
-}  // namespace traits
+} // namespace traits
+} // namespace CUPLA_ACCELERATOR_NAMESPACE
 } // namespace cupla
