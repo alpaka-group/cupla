@@ -18,7 +18,6 @@
  *
  */
 
-
 #pragma once
 
 #include <alpaka/alpaka.hpp>
@@ -26,12 +25,20 @@
 #include "cupla/namespace.hpp"
 #include "cupla/types.hpp"
 #include "cupla_driver_types.hpp"
+#include "cupla_runtime.hpp"
+#include "cupla/manager/Device.hpp"
+#include "cupla/manager/Event.hpp"
+#include "cupla/manager/Memory.hpp"
+#include "cupla/manager/Stream.hpp"
 
 inline namespace CUPLA_ACCELERATOR_NAMESPACE
 {
 
-const char *
-cuplaGetErrorString(cuplaError_t);
+inline const char *
+cuplaGetErrorString(cuplaError_t e)
+{
+    return CuplaErrorCode::message_cstr(e);
+}
 
 
 /** returns the last error from a runtime call.
@@ -41,8 +48,18 @@ cuplaGetErrorString(cuplaError_t);
  *
  * @return cuplaSuccess if there was no error else the corresponding error type
  */
-cuplaError_t
-cuplaGetLastError();
+inline cuplaError_t
+cuplaGetLastError()
+{
+#if( ALPAKA_ACC_GPU_CUDA_ENABLED == 1 )
+    // reset the last cuda error
+    return (cuplaError_t)cudaGetLastError();
+#elif( ALPAKA_ACC_GPU_HIP_ENABLED == 1 )
+    return (cuplaError_t)hipGetLastError();
+#else
+    return cuplaSuccess;
+#endif
+}
 
 
 /** returns the last error from a runtime call.
@@ -52,7 +69,16 @@ cuplaGetLastError();
  *
  * @return cuplaSuccess if there was no error else the corresponding error type
  */
-cuplaError_t
-cuplaPeekAtLastError();
+inline cuplaError_t
+cuplaPeekAtLastError()
+{
+#if( ALPAKA_ACC_GPU_CUDA_ENABLED == 1 )
+    return (cuplaError_t)cudaPeekAtLastError();
+#elif( ALPAKA_ACC_GPU_HIP_ENABLED == 1 )
+    return (cuplaError_t)hipPeekAtLastError();
+#else
+    return cuplaSuccess;
+#endif
+}
 
-} //namespace CUPLA_ACCELERATOR_NAMESPACE
+} // namespace CUPLA_ACCELERATOR_NAMESPACE

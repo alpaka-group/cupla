@@ -18,7 +18,6 @@
  *
  */
 
-
 #pragma once
 
 #include <alpaka/alpaka.hpp>
@@ -26,31 +25,88 @@
 #include "cupla/namespace.hpp"
 #include "cupla/types.hpp"
 #include "cupla_driver_types.hpp"
+#include "cupla_runtime.hpp"
+#include "cupla/manager/Memory.hpp"
+#include "cupla/manager/Device.hpp"
+#include "cupla/manager/Stream.hpp"
+#include "cupla/manager/Event.hpp"
 
 inline namespace CUPLA_ACCELERATOR_NAMESPACE
 {
 
-cuplaError_t
+inline cuplaError_t
 cuplaStreamCreate(
     cuplaStream_t * stream
-);
+)
+{
+    *stream = cupla::manager::Stream<
+        cupla::AccDev,
+        cupla::AccStream
+    >::get().create();
 
-cuplaError_t
-cuplaStreamDestroy( cuplaStream_t stream );
+    return cuplaSuccess;
+};
 
-cuplaError_t
+inline cuplaError_t
+cuplaStreamDestroy( cuplaStream_t stream )
+{
+    if(
+        cupla::manager::Stream<
+            cupla::AccDev,
+            cupla::AccStream
+        >::get().destroy( stream )
+    )
+        return cuplaSuccess;
+    else
+        return cuplaErrorInitializationError;
+};
+
+inline cuplaError_t
 cuplaStreamSynchronize(
     cuplaStream_t stream
-);
+)
+{
+    auto& streamObject = cupla::manager::Stream<
+        cupla::AccDev,
+        cupla::AccStream
+    >::get().stream( stream );
+    ::alpaka::wait::wait( streamObject );
+    return cuplaSuccess;
+}
 
-cuplaError_t
+inline cuplaError_t
 cuplaStreamWaitEvent(
     cuplaStream_t stream,
     cuplaEvent_t event,
-    unsigned int flags
-);
+    unsigned int
+)
+{
+    auto& streamObject = cupla::manager::Stream<
+        cupla::AccDev,
+        cupla::AccStream
+    >::get().stream( stream );
 
-cuplaError_t
-cuplaStreamQuery( cuplaStream_t stream );
+    auto& eventObject = *cupla::manager::Event<
+        cupla::AccDev,
+        cupla::AccStream
+    >::get().event( event );
 
-} //namespace CUPLA_ACCELERATOR_NAMESPACE
+    ::alpaka::wait::wait(streamObject,eventObject);
+    return cuplaSuccess;
+}
+
+inline cuplaError_t
+cuplaStreamQuery( cuplaStream_t stream )
+{
+    auto& streamObject = cupla::manager::Stream<
+        cupla::AccDev,
+        cupla::AccStream
+    >::get().stream( stream );
+
+    if( alpaka::queue::empty( streamObject ) )
+        return cuplaSuccess;
+    else
+        return cuplaErrorNotReady;
+};
+
+} // namespace CUPLA_ACCELERATOR_NAMESPACE
