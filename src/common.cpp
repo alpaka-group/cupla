@@ -19,6 +19,7 @@
  */
 
 
+#include "cupla/namespace.hpp"
 #include "cupla_runtime.hpp"
 #include "cupla/manager/Memory.hpp"
 #include "cupla/manager/Device.hpp"
@@ -26,6 +27,8 @@
 #include "cupla/manager/Event.hpp"
 #include "cupla/api/common.hpp"
 
+inline namespace CUPLA_ACCELERATOR_NAMESPACE
+{
 
 const char *
 cuplaGetErrorString(cuplaError_t e)
@@ -57,3 +60,5 @@ cuplaPeekAtLastError()
     return cuplaSuccess;
 #endif
 }
+
+} //namespace CUPLA_ACCELERATOR_NAMESPACE

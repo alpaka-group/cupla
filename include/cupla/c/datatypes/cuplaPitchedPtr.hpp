@@ -21,9 +21,12 @@
 
 #pragma once
 
+#include "cupla/namespace.hpp"
 #include "cupla/types.hpp"
 #include "cupla/datatypes/uint.hpp"
 
+inline namespace CUPLA_ACCELERATOR_NAMESPACE
+{
 
 struct cuplaPitchedPtr
 {
@@ -46,3 +49,5 @@ struct cuplaPitchedPtr
     {}
 
 };
+
+} //namespace CUPLA_ACCELERATOR_NAMESPACE

@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "cupla/namespace.hpp"
 #include "cupla/types.hpp"
 
 #include "cupla/datatypes/dim3.hpp"
@@ -31,8 +32,10 @@
 
 #include <utility>
 
-
-namespace cupla{
+namespace cupla
+{
+inline namespace CUPLA_ACCELERATOR_NAMESPACE
+{
 
     /** get block and elements extents
      *
@@ -123,6 +126,7 @@ namespace cupla{
         ::alpaka::queue::enqueue(stream, exec);
     }
 
+} // namespace CUPLA_ACCELERATOR_NAMESPACE
 } // namespace cupla
 
 
