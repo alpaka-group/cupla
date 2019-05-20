@@ -109,18 +109,11 @@ OPTION(ALPAKA_ACC_CPU_BT_OMP4_ENABLE "Enable the OpenMP 4.0 CPU block and block 
 OPTION(ALPAKA_ACC_GPU_CUDA_ENABLE "Enable the CUDA GPU accelerator" OFF)
 OPTION(ALPAKA_ACC_GPU_HIP_ENABLE "Enable the HIP back-end (all other back-ends must be disabled)" OFF)
 
-
 set(cupla_ALPAKA_PROVIDER "intern" CACHE STRING "Select which alpaka is used")
 set_property(CACHE cupla_ALPAKA_PROVIDER PROPERTY STRINGS "intern;extern")
 mark_as_advanced(cupla_ALPAKA_PROVIDER)
 
 if(${cupla_ALPAKA_PROVIDER} STREQUAL "intern")
-    if(NOT EXISTS "${_cupla_ROOT_DIR}/alpaka/Findalpaka.cmake")
-        # Init the sub molules
-        execute_process (COMMAND git submodule init WORKING_DIRECTORY ${_cupla_ROOT_DIR})
-        # Update the sub modules
-        execute_process (COMMAND git submodule update WORKING_DIRECTORY ${_cupla_ROOT_DIR})
-    endif()
 
     find_package(alpaka
         PATHS "${_cupla_ROOT_DIR}/alpaka"
@@ -140,7 +133,7 @@ endif()
 
 if(NOT alpaka_FOUND)
     message(WARNING "Required cupla dependency alpaka could not be found!")
-        set(_cupla_FOUND FALSE)
+    set(_cupla_FOUND FALSE)
 else()
     # TODO: use imported targets instead of chain of variables
     list(APPEND _cupla_COMPILE_OPTIONS_PUBLIC ${alpaka_COMPILE_OPTIONS})

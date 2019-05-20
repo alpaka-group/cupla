@@ -16,22 +16,19 @@ Requirements
     - `mkdir -p $HOME/src`
     - `git clone git://github.com/ComputationalRadiationPhysics/cupla.git $HOME/src/cupla`
     - `cd $HOME/src/cupla`
-    - `git submodule init`
-    - `git submodule update`
     - `export CUPLA_ROOT=$HOME/src/cupla`
-  - use cupla without the submodule alpaka: 
-    Set the advanced CMake variable `cupla_ALPAKA_PROVIDER` to `extern` and
+  - use a different Alpaka installation:
     set environment variable `ALPAKA_ROOT` or extend `CMAKE_PREFIX_PATH` with the
-    path to alpaka.
-      
+    path to Alpaka.
 
-compile an example
------------------
+
+Compile an example
+------------------
 
 - create build directory `mkdir -p buildCuplaExample`
 - `cd buildCuplaExample`
 - `cmake $CUPLA_ROOT/example/CUDASamples/matrixMul -D<ACC_TYPE>=ON`
-    - list of supported ACC_TYPES
+    - list of supported `ACC_TYPE`s
         - `ALPAKA_ACC_CPU_B_SEQ_T_OMP2_ENABLE`
         - `ALPAKA_ACC_CPU_B_SEQ_T_THREADS_ENABLE`
         - `ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLE`
@@ -41,3 +38,28 @@ compile an example
           see [TuningGuide.md](doc/TuningGuide.md)
 - `make -j`
 - `./matrixMul -wA=320 -wB=320 -hA=320 -hB=320` (parameters must be a multiple of 32!)
+
+
+How to update Alpaka as git subtree?
+------------------------------------
+
+```zsh
+## add subtree (not needed, already cloned with git)
+# git subtree add --prefix alpaka https://github.com/ComputationalRadiationPhysics/alpaka.git develop --squash
+## Update
+git subtree pull --prefix alpaka https://github.com/ComputationalRadiationPhysics/alpaka.git develop --squash
+```
+
+**How to commit local changes to Alpaka upstream?**
+
+If your local Alpaka version contains changes you want to contribute back upstream via fork, then you can use `git subtree push`:
+
+``` zsh
+# Add your fork of Alpaka to git remotes
+git remote add alpaka-fork git@github.com:YOUR_NAME/alpaka.git
+# Push your changes to your fork
+git subtree push --prefix=alpaka alpaka-fork
+```
+Then check your github page of your fork to open a pull request upstream.
+
+More information can be found in this [git subtree guide](https://www.atlassian.com/blog/git/alternatives-to-git-submodule-git-subtree).
