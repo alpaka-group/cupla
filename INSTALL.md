@@ -17,9 +17,9 @@ Requirements
     - `git clone git://github.com/ComputationalRadiationPhysics/cupla.git $HOME/src/cupla`
     - `cd $HOME/src/cupla`
     - `export CUPLA_ROOT=$HOME/src/cupla`
-  - use a different Alpaka installation:
+  - use a different alpaka installation:
     set environment variable `ALPAKA_ROOT` or extend `CMAKE_PREFIX_PATH` with the
-    path to Alpaka.
+    path to alpaka.
 
 
 Compile an example
@@ -40,23 +40,24 @@ Compile an example
 - `./matrixMul -wA=320 -wB=320 -hA=320 -hB=320` (parameters must be a multiple of 32!)
 
 
-How to update Alpaka as git subtree?
+How to update alpaka as git subtree?
 ------------------------------------
 
 ```zsh
-## add subtree (not needed, already cloned with git)
-# git subtree add --prefix alpaka https://github.com/ComputationalRadiationPhysics/alpaka.git develop --squash
-## Update
-git subtree pull --prefix alpaka https://github.com/ComputationalRadiationPhysics/alpaka.git develop --squash
+# git author is generic to not mess up contribution statistics
+GIT_AUTHOR_NAME="Third Party" GIT_AUTHOR_EMAIL="crp-git@hzdr.de" \
+ git subtree pull --prefix alpaka \
+ https://github.com/ComputationalRadiationPhysics/alpaka.git develop --squash
 ```
 
-**How to commit local changes to Alpaka upstream?**
+**How to commit local changes to alpaka upstream?**
 
-If your local Alpaka version contains changes you want to contribute back upstream via fork, then you can use `git subtree push`:
+If your local alpaka version contains changes you want to contribute back upstream via fork, then you can use `git subtree push`:
 
-``` zsh
-# Add your fork of Alpaka to git remotes
+```zsh
+# Add your fork of alpaka to git remotes
 git remote add alpaka-fork git@github.com:YOUR_NAME/alpaka.git
+
 # Push your changes to your fork
 git subtree push --prefix=alpaka alpaka-fork
 ```
