@@ -31,6 +31,12 @@ inline namespace CUPLA_ACCELERATOR_NAMESPACE
 {
 
 const char *
+cuplaGetErrorName(cuplaError_t e)
+{
+    return CuplaErrorCode::message_cstr(e);
+}
+
+const char *
 cuplaGetErrorString(cuplaError_t e)
 {
     return CuplaErrorCode::message_cstr(e);
