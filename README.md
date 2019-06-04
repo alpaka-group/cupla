@@ -48,6 +48,7 @@ Usage
 - Checkout the [tuning guide](doc/TuningGuide.md) for a step further to performance
   portable code.
 
+[cupla can be used as a header-only library and without the CMake build system](doc/ConfigurationHeader.md)
 
 Authors
 -------
