@@ -80,6 +80,10 @@ get_filename_component(_cupla_ROOT_DIR "${_cupla_ROOT_DIR}" ABSOLUTE)
 set(_cupla_ADD_EXECUTABLE_FILE "${_cupla_ROOT_DIR}/cmake/addExecutable.cmake")
 include("${_cupla_ADD_EXECUTABLE_FILE}")
 
+# Add cupla_ADD_LIBRARY function.
+set(_cupla_ADD_LIBRARY_FILE "${_cupla_ROOT_DIR}/cmake/addLibrary.cmake")
+include("${_cupla_ADD_LIBRARY_FILE}")
+
 ################################################################################
 # Set found to true initially and set it on false if a required dependency is missing.
 ################################################################################
