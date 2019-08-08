@@ -27,13 +27,15 @@ namespace alpaka
 {
     namespace queue
     {
-        class QueueCpuAsync;
+        class QueueCpuNonBlocking;
+        class QueueCpuBlocking;
 
         namespace cpu
         {
             namespace detail
             {
-                class QueueCpuAsyncImpl;
+                class QueueCpuNonBlockingImpl;
+                class QueueCpuBlockingImpl;
             }
         }
     }
@@ -60,7 +62,38 @@ namespace alpaka
                 //! The CPU device implementation.
                 class DevCpuImpl
                 {
-                    friend queue::QueueCpuAsync;                   // queue::QueueCpuAsync::QueueCpuAsync calls RegisterAsyncQueue.
+                private:
+                    // queue::QueueCpuNonBlocking::QueueCpuNonBlocking calls RegisterNonBlockingQueue.
+                    friend queue::QueueCpuNonBlocking;
+                    // queue::QueueCpuBlocking::QueueCpuNonBlocking calls RegisterBlockingQueue.
+                    friend queue::QueueCpuBlocking;
+
+                    //-----------------------------------------------------------------------------
+                    template< typename TQueue>
+                    ALPAKA_FN_HOST auto GetAllQueueImpls(
+                        std::vector<std::weak_ptr<TQueue>> & queues) const
+                    -> std::vector<std::shared_ptr<TQueue>>
+                    {
+                        std::vector<std::shared_ptr<TQueue>> vspQueues;
+
+                        std::lock_guard<std::mutex> lk(m_Mutex);
+
+                        for(auto it = queues.begin(); it != queues.end();)
+                        {
+                            auto spQueue(it->lock());
+                            if(spQueue)
+                            {
+                                vspQueues.emplace_back(std::move(spQueue));
+                                ++it;
+                            }
+                            else
+                            {
+                                it = queues.erase(it);
+                            }
+                        }
+                        return vspQueues;
+                    }
+
                 public:
                     //-----------------------------------------------------------------------------
                     DevCpuImpl() = default;
@@ -75,35 +108,25 @@ namespace alpaka
                     //-----------------------------------------------------------------------------
                     ~DevCpuImpl() = default;
 
-                    //-----------------------------------------------------------------------------
-                    ALPAKA_FN_HOST auto GetAllAsyncQueueImpls() const
-                    -> std::vector<std::shared_ptr<queue::cpu::detail::QueueCpuAsyncImpl>>
+                    ALPAKA_FN_HOST auto GetAllNonBlockingQueueImpls() const
+                    -> std::vector<std::shared_ptr<queue::cpu::detail::QueueCpuNonBlockingImpl>>
                     {
-                        std::vector<std::shared_ptr<queue::cpu::detail::QueueCpuAsyncImpl>> vspQueues;
+                        return GetAllQueueImpls<
+                            queue::cpu::detail::QueueCpuNonBlockingImpl>(m_queuesNonBlocking);
+                    }
 
-                        std::lock_guard<std::mutex> lk(m_Mutex);
-
-                        for(auto it = m_queues.begin(); it != m_queues.end();)
-                        {
-                            auto spQueue(it->lock());
-                            if(spQueue)
-                            {
-                                vspQueues.emplace_back(std::move(spQueue));
-                                ++it;
-                            }
-                            else
-                            {
-                                it = m_queues.erase(it);
-                            }
-                        }
-                        return vspQueues;
+                    ALPAKA_FN_HOST auto GetAllBlockingQueueImpls() const
+                    -> std::vector<std::shared_ptr<queue::cpu::detail::QueueCpuBlockingImpl>>
+                    {
+                        return GetAllQueueImpls<
+                            queue::cpu::detail::QueueCpuBlockingImpl>(m_queuesBlocking);
                     }
 
                 private:
                     //-----------------------------------------------------------------------------
                     //! Registers the given queue on this device.
                     //! NOTE: Every queue has to be registered for correct functionality of device wait operations!
-                    ALPAKA_FN_HOST auto RegisterAsyncQueue(std::shared_ptr<queue::cpu::detail::QueueCpuAsyncImpl> spQueueImpl)
+                    ALPAKA_FN_HOST auto RegisterNonBlockingQueue(std::shared_ptr<queue::cpu::detail::QueueCpuNonBlockingImpl> spQueueImpl)
                     -> void
                     {
                         std::lock_guard<std::mutex> lk(m_Mutex);
@@ -111,12 +134,24 @@ namespace alpaka
                         // Register this queue on the device.
                         // NOTE: We have to store the plain pointer next to the weak pointer.
                         // This is necessary to find the entry on unregistering because the weak pointer will already be invalid at that point.
-                        m_queues.push_back(spQueueImpl);
+                        m_queuesNonBlocking.push_back(spQueueImpl);
+                    }
+
+                    ALPAKA_FN_HOST auto RegisterBlockingQueue(std::shared_ptr<queue::cpu::detail::QueueCpuBlockingImpl> spQueueImpl)
+                    -> void
+                    {
+                        std::lock_guard<std::mutex> lk(m_Mutex);
+
+                        // Register this queue on the device.
+                        // NOTE: We have to store the plain pointer next to the weak pointer.
+                        // This is necessary to find the entry on unregistering because the weak pointer will already be invalid at that point.
+                        m_queuesBlocking.push_back(spQueueImpl);
                     }
 
                 private:
                     std::mutex mutable m_Mutex;
-                    std::vector<std::weak_ptr<queue::cpu::detail::QueueCpuAsyncImpl>> mutable m_queues;
+                    std::vector<std::weak_ptr<queue::cpu::detail::QueueCpuNonBlockingImpl>> mutable m_queuesNonBlocking;
+                    std::vector<std::weak_ptr<queue::cpu::detail::QueueCpuBlockingImpl>> mutable m_queuesBlocking;
                 };
             }
         }

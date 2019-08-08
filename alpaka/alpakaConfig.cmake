@@ -11,7 +11,7 @@
 ################################################################################
 # Required cmake version.
 
-CMAKE_MINIMUM_REQUIRED(VERSION 3.11.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.11.4)
 
 ################################################################################
 # CMake policies
@@ -100,7 +100,7 @@ IF(ALPAKA_ACC_GPU_HIP_ENABLE AND NOT ALPAKA_ACC_GPU_HIP_ONLY_MODE)
     SET(ALPAKA_ACC_GPU_HIP_ENABLE OFF CACHE BOOL "" FORCE)
 ENDIF()
 
-IF(ALPAKA_ACC_GPU_HIP_ENABLE AND HIP_PLATFORM MATCHES "hcc")
+IF(ALPAKA_ACC_GPU_HIP_ENABLE AND ALPAKA_HIP_PLATFORM MATCHES "hcc")
     MESSAGE(WARNING
         "The HIP back-end is currently experimental, especially for HCC. "
         "In alpaka HIP(HCC) has a few workarounds and does not support 3D memory and constant memory. "
@@ -420,6 +420,7 @@ IF(ALPAKA_ACC_GPU_CUDA_ENABLE)
             OPTION(ALPAKA_CUDA_KEEP_FILES "Keep all intermediate files that are generated during internal compilation steps (folder: nvcc_tmp)" OFF)
             OPTION(ALPAKA_CUDA_NVCC_EXPT_EXTENDED_LAMBDA "Enable experimental, extended host-device lambdas in NVCC" ON)
             OPTION(ALPAKA_CUDA_NVCC_EXPT_RELAXED_CONSTEXPR "Enable experimental, relaxed constexpr in NVCC" ON)
+            OPTION(ALPAKA_CUDA_NVCC_SEPARABLE_COMPILATION "Enable separable compilation in NVCC" OFF)
 
             IF(ALPAKA_CUDA_COMPILER MATCHES "clang")
                 IF(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -534,8 +535,8 @@ IF(ALPAKA_ACC_GPU_CUDA_ENABLE)
                             MESSAGE(FATAL_ERROR "NVCC 10.0 does not support clang 7+. Please use clang 4, 5 or 6!")
                         ENDIF()
                     ELSEIF(CUDA_VERSION VERSION_EQUAL 10.1)
-                        IF(CMAKE_CXX_COMPILER_VERSION GREATER_EQUAL 8.0)
-                            MESSAGE(FATAL_ERROR "NVCC 10.1 does not support clang 8+. Please use clang 4, 5, 6 or 7!")
+                        IF(CMAKE_CXX_COMPILER_VERSION GREATER_EQUAL 9.0)
+                            MESSAGE(FATAL_ERROR "NVCC 10.1 does not support clang 9+. Please use clang 4, 5, 6, 7 or 8!")
                         ENDIF()
                     ENDIF()
                 ENDIF()
@@ -565,6 +566,10 @@ IF(ALPAKA_ACC_GPU_CUDA_ENABLE)
 
                 SET(CUDA_PROPAGATE_HOST_FLAGS ON)
 
+                IF(ALPAKA_CUDA_NVCC_SEPARABLE_COMPILATION)
+                    SET(CUDA_SEPARABLE_COMPILATION ON)
+                ENDIF()
+
                 # nvcc sets no linux/__linux macros on OpenPOWER linux
                 # nvidia bug id: 2448610
                 IF(CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -587,8 +592,10 @@ IF(ALPAKA_ACC_GPU_CUDA_ENABLE)
 
                 FOREACH(_CUDA_ARCH_ELEM ${ALPAKA_CUDA_ARCH})
                     # set flags to create device code for the given architecture
-                    SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}
-                        "--generate-code arch=compute_${_CUDA_ARCH_ELEM},code=sm_${_CUDA_ARCH_ELEM} --generate-code arch=compute_${_CUDA_ARCH_ELEM},code=compute_${_CUDA_ARCH_ELEM}")
+                    LIST(APPEND CUDA_NVCC_FLAGS
+                        --generate-code arch=compute_${_CUDA_ARCH_ELEM},code=sm_${_CUDA_ARCH_ELEM}
+                        --generate-code arch=compute_${_CUDA_ARCH_ELEM},code=compute_${_CUDA_ARCH_ELEM}
+                    )
                 ENDFOREACH()
 
                 IF(NOT MSVC)
@@ -628,7 +635,7 @@ IF(ALPAKA_ACC_GPU_CUDA_ENABLE)
                 ENDIF()
                 # avoids warnings on host-device signatured, default constructors/destructors
                 IF(CUDA_VERSION GREATER_EQUAL 9.0)
-                    LIST(APPEND CUDA_NVCC_FLAGS "-Xcudafe --diag_suppress=esa_on_defaulted_function_ignored")
+                    LIST(APPEND CUDA_NVCC_FLAGS -Xcudafe --diag_suppress=esa_on_defaulted_function_ignored)
                 ENDIF()
 
                 IF(ALPAKA_CUDA_KEEP_FILES)
@@ -657,14 +664,18 @@ ENDIF()
 IF(ALPAKA_ACC_GPU_HIP_ENABLE)
 
     IF(NOT DEFINED ALPAKA_HIP_VERSION)
-        SET(ALPAKA_HIP_VERSION 1.5.1)
+        SET(ALPAKA_HIP_VERSION 1.5)
     ENDIF()
 
-    IF(ALPAKA_HIP_VERSION VERSION_LESS 1.5.1)
-        MESSAGE(WARNING "HIP < 1.5.1 is not supported!")
+    IF(ALPAKA_HIP_VERSION VERSION_LESS 1.5)
+        MESSAGE(WARNING "HIP < 1.5 is not supported!")
         SET(_ALPAKA_FOUND FALSE)
 
     ELSE()
+        # must set this for HIP package (note that you also need certain env vars)
+        SET(HIP_PLATFORM "${ALPAKA_HIP_PLATFORM}" CACHE STRING "")
+        SET(HIP_RUNTIME "${ALPAKA_HIP_PLATFORM}" CACHE STRING "")
+
         FIND_PACKAGE(HIP "${ALPAKA_HIP_VERSION}")
         IF(NOT HIP_FOUND)
             MESSAGE(WARNING "Optional alpaka dependency HIP could not be found! HIP back-end disabled!")
@@ -672,6 +683,9 @@ IF(ALPAKA_ACC_GPU_HIP_ENABLE)
 
         ELSE()
             SET(ALPAKA_HIP_VERSION "${HIP_VERSION}")
+            IF(ALPAKA_HIP_VERSION VERSION_LESS 1.5.19211)
+                MESSAGE(STATUS "HIP < 1.5.19211 untested!")
+            ENDIF()
             SET(ALPAKA_HIP_COMPILER "hipcc" CACHE STRING "HIP compiler")
             SET_PROPERTY(CACHE ALPAKA_HIP_COMPILER PROPERTY STRINGS "hipcc")
 
@@ -682,7 +696,7 @@ IF(ALPAKA_ACC_GPU_HIP_ENABLE)
 
             SET(HIP_HIPCC_FLAGS)
 
-            IF(HIP_PLATFORM MATCHES "nvcc")
+            IF(ALPAKA_HIP_PLATFORM MATCHES "nvcc")
                 FIND_PACKAGE(CUDA)
                 IF(NOT CUDA_FOUND)
                     MESSAGE(WARNING "Could not found CUDA while HIP platform is set to nvcc. Compiling might fail.")
@@ -719,8 +733,10 @@ IF(ALPAKA_ACC_GPU_HIP_ENABLE)
 
                 FOREACH(_HIP_ARCH_ELEM ${ALPAKA_CUDA_ARCH})
                     # set flags to create device code for the given architecture
-                    SET(HIP_NVCC_FLAGS ${HIP_NVCC_FLAGS}
-                        "--generate-code arch=compute_${_HIP_ARCH_ELEM},code=sm_${_HIP_ARCH_ELEM} --generate-code arch=compute_${_HIP_ARCH_ELEM},code=compute_${_HIP_ARCH_ELEM}")
+                    LIST(APPEND CUDA_NVCC_FLAGS
+                        --generate-code arch=compute_${_HIP_ARCH_ELEM},code=sm_${_HIP_ARCH_ELEM}
+                        --generate-code arch=compute_${_HIP_ARCH_ELEM},code=compute_${_HIP_ARCH_ELEM}
+                    )
                 ENDFOREACH()
                 # for CUDA cmake adds automatically compiler flags as nvcc does not do this,
                 # but for HIP we have to do this here
@@ -757,27 +773,29 @@ IF(ALPAKA_ACC_GPU_HIP_ENABLE)
                 ENDIF()
 
                 # random numbers library ( HIP(NVCC) ) /hiprand
+                # HIP_ROOT_DIR is set by FindHIP.cmake
                 FIND_PATH(HIP_RAND_INC
-                    hiprand_kernel.h
-                    PATHS "${HIP_ROOT_DIR}/hiprand" "${HIP_ROOT_DIR}" "hiprand"
+                    NAMES "hiprand_kernel.h"
+                    PATHS "${HIP_ROOT_DIR}/hiprand" "${HIP_ROOT_DIR}/include" "hiprand"
                     PATHS "/opt/rocm/rocrand/hiprand"
-                    ENV HIP_PATH
-                    PATH_SUFFIXES "include")
+                    PATH_SUFFIXES "include" "hiprand")
                 FIND_LIBRARY(HIP_RAND_LIBRARY
-                    hiprand-d
-                    hiprand
+                    NAMES "hiprand-d" "hiprand"
                     PATHS "${HIP_ROOT_DIR}/hiprand" "${HIP_ROOT_DIR}" "hiprand"
                     PATHS "/opt/rocm/rocrand/hiprand"
                     ENV HIP_PATH
                     PATH_SUFFIXES "lib" "lib64")
-                IF(NOT HIP_RAND_INC OR NOT HIP_RAND_LIBRARY)
-                    MESSAGE(FATAL_ERROR "Could not find hipRAND library")
+                IF(NOT HIP_RAND_INC)
+                    MESSAGE(FATAL_ERROR "Could not find hipRAND include (also searched in: HIP_ROOT_DIR=${HIP_ROOT_DIR}).")
+                ENDIF()
+                IF(NOT HIP_RAND_LIBRARY)
+                    MESSAGE(FATAL_ERROR "Could not find hipRAND library (also searched in: HIP_ROOT_DIR=${HIP_ROOT_DIR}).")
                 ENDIF()
                 LIST(APPEND _ALPAKA_INCLUDE_DIRECTORIES_PUBLIC "${HIP_RAND_INC}")
                 LIST(APPEND _ALPAKA_LINK_LIBRARIES_PUBLIC "${HIP_RAND_LIBRARY}")
             ENDIF() # nvcc
 
-            IF(HIP_PLATFORM MATCHES "hcc")
+            IF(ALPAKA_HIP_PLATFORM MATCHES "hcc")
 
                 # random numbers library ( HIP(HCC) ) /rocrand
                 FIND_PATH(ROC_RAND_INC
@@ -865,12 +883,14 @@ ELSE()
         LIST(APPEND _ALPAKA_LINK_LIBRARIES_PUBLIC "general;rt")
     ENDIF()
 
-    # GNU
-    IF(CMAKE_COMPILER_IS_GNUCXX)
-        LIST(APPEND _ALPAKA_COMPILE_OPTIONS_PUBLIC "-ftemplate-depth-512")
-    # Clang or AppleClang
-    ELSEIF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        LIST(APPEND _ALPAKA_COMPILE_OPTIONS_PUBLIC "-ftemplate-depth=512")
+    # Clang<4.0 or AppleClang<9.0
+    #   https://bugs.llvm.org/show_bug.cgi?id=18417
+    #   https://github.com/llvm/llvm-project/commit/e55b4737c026ea2e0b44829e4115d208577a67b2
+    IF(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang" AND
+        CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1) OR
+       ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND
+        CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.0))
+        LIST(APPEND _ALPAKA_COMPILE_OPTIONS_PUBLIC "-ftemplate-depth=1024")
     ENDIF()
 ENDIF()
 
@@ -953,9 +973,9 @@ IF(ALPAKA_ACC_GPU_HIP_ENABLE)
         LIST(REMOVE_ITEM _ALPAKA_LINK_FLAGS_PUBLIC "${OpenMP_CXX_FLAGS}")
         LIST(APPEND _ALPAKA_LINK_FLAGS_PUBLIC "-Xcompiler ${OpenMP_CXX_FLAGS}")
     ENDIF()
-    IF(HIP_PLATFORM MATCHES "hcc")
+    IF(ALPAKA_HIP_PLATFORM MATCHES "hcc")
         # GFX600, GFX601, GFX700, GFX701, GFX702, GFX703, GFX704, GFX801, GFX802, GFX803, GFX810, GFX900, GFX902
-        SET(_ALPAKA_LINK_LIBRARIES_PUBLIC "${_ALPAKA_LINK_LIBRARIES_PUBLIC}" "--amdgpu-target=gfx701 --amdgpu-target=gfx803 --amdgpu-target=gfx900 --amdgpu-target=gfx906")
+        SET(_ALPAKA_LINK_LIBRARIES_PUBLIC "${_ALPAKA_LINK_LIBRARIES_PUBLIC}" "--amdgpu-target=gfx803 --amdgpu-target=gfx900 --amdgpu-target=gfx906")
     ENDIF()
 ENDIF()
 

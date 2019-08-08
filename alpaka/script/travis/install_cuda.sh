@@ -14,13 +14,13 @@ source ./script/travis/travis_retry.sh
 
 source ./script/travis/set.sh
 
-: ${ALPAKA_CUDA_VERSION?"ALPAKA_CUDA_VERSION must be specified"}
+: "${ALPAKA_CUDA_VERSION?'ALPAKA_CUDA_VERSION must be specified'}"
 
 if [ "$TRAVIS_OS_NAME" = "linux" ]
 then
-    : ${ALPAKA_CI_DOCKER_BASE_IMAGE_NAME?"ALPAKA_CI_DOCKER_BASE_IMAGE_NAME must be specified"}
-    : ${ALPAKA_CI_CUDA_DIR?"ALPAKA_CI_CUDA_DIR must be specified"}
-    : ${ALPAKA_CUDA_COMPILER?"ALPAKA_CUDA_COMPILER must be specified"}
+    : "${ALPAKA_CI_DOCKER_BASE_IMAGE_NAME?'ALPAKA_CI_DOCKER_BASE_IMAGE_NAME must be specified'}"
+    : "${ALPAKA_CI_CUDA_DIR?'ALPAKA_CI_CUDA_DIR must be specified'}"
+    : "${ALPAKA_CUDA_COMPILER?'ALPAKA_CUDA_COMPILER must be specified'}"
 
     # Ubuntu 18.04 requires some extra keys for verification
     if [[ "${ALPAKA_CI_DOCKER_BASE_IMAGE_NAME}" == *"18.04"* ]]
@@ -58,12 +58,12 @@ then
     elif [ "${ALPAKA_CUDA_VERSION}" == "10.1" ]
     then
         ALPAKA_CUDA_PKG_DEB_NAME=cuda-repo-ubuntu1804-10-1-local
-        ALPAKA_CUDA_PKG_FILE_NAME="${ALPAKA_CUDA_PKG_DEB_NAME}"-10.1.105-418.39_1.0-1_amd64.deb
+        ALPAKA_CUDA_PKG_FILE_NAME="${ALPAKA_CUDA_PKG_DEB_NAME}"-10.1.168-418.67_1.0-1_amd64.deb
         ALPAKA_CUDA_PKG_FILE_PATH=https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/${ALPAKA_CUDA_PKG_FILE_NAME}
     else
         echo CUDA versions other than 8.0, 9.0, 9.1, 9.2, 10.0 and 10.1 are not currently supported on linux!
     fi
-    if [ -z "$(ls -A "${ALPAKA_CI_CUDA_DIR}")" ]
+    if [ -z "$(ls -A ${ALPAKA_CI_CUDA_DIR})" ]
     then
         mkdir -p "${ALPAKA_CI_CUDA_DIR}"
         travis_retry wget --no-verbose -O "${ALPAKA_CI_CUDA_DIR}"/"${ALPAKA_CUDA_PKG_FILE_NAME}" "${ALPAKA_CUDA_PKG_FILE_PATH}"
@@ -88,14 +88,13 @@ then
     sudo dpkg --purge "${ALPAKA_CUDA_PKG_DEB_NAME}"
 elif [ "$TRAVIS_OS_NAME" = "windows" ]
 then
-    # https://github.com/JuliaGPU/CUDAapi.jl/blob/master/.appveyor.ps1
     if [ "${ALPAKA_CUDA_VERSION}" == "10.0" ]
     then
         ALPAKA_CUDA_PKG_FILE_NAME=cuda_10.0.130_411.31_win10
         ALPAKA_CUDA_PKG_FILE_PATH=https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/${ALPAKA_CUDA_PKG_FILE_NAME}
     elif [ "${ALPAKA_CUDA_VERSION}" == "10.1" ]
     then
-        ALPAKA_CUDA_PKG_FILE_NAME=cuda_10.1.105_418.96_win10.exe
+        ALPAKA_CUDA_PKG_FILE_NAME=cuda_10.1.168_425.25_win10.exe
         ALPAKA_CUDA_PKG_FILE_PATH=https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/${ALPAKA_CUDA_PKG_FILE_NAME}
     else
         echo CUDA versions other than 10.0 and 10.1 are not currently supported on Windows!
