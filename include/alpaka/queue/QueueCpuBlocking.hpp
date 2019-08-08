@@ -1,4 +1,4 @@
-/* Copyright 2019 Benjamin Worpitz, Matthias Werner
+/* Copyright 2019 Axel Huebl, Benjamin Worpitz, Matthias Werner
  *
  * This file is part of Alpaka.
  *
@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <alpaka/core/Unused.hpp>
 #include <alpaka/dev/DevCpu.hpp>
 
 #include <alpaka/dev/Traits.hpp>
@@ -17,12 +18,8 @@
 #include <alpaka/queue/Traits.hpp>
 #include <alpaka/wait/Traits.hpp>
 
-#include <alpaka/core/ConcurrentExecPool.hpp>
-
-#include <type_traits>
-#include <thread>
+#include <atomic>
 #include <mutex>
-#include <future>
 
 namespace alpaka
 {
@@ -42,82 +39,71 @@ namespace alpaka
             {
                 //#############################################################################
                 //! The CPU device queue implementation.
-                class QueueCpuAsyncImpl final
+                class QueueCpuBlockingImpl final
                 {
-                private:
-                    //#############################################################################
-                    using ThreadPool = alpaka::core::detail::ConcurrentExecPool<
-                        std::size_t,
-                        std::thread,                // The concurrent execution type.
-                        std::promise,               // The promise type.
-                        void,                       // The type yielding the current concurrent execution.
-                        std::mutex,                 // The mutex type to use. Only required if TisYielding is true.
-                        std::condition_variable,    // The condition variable type to use. Only required if TisYielding is true.
-                        false>;                     // If the threads should yield.
-
                 public:
                     //-----------------------------------------------------------------------------
-                    QueueCpuAsyncImpl(
-                        dev::DevCpu const & dev) :
+                    QueueCpuBlockingImpl(
+                        dev::DevCpu const & dev) noexcept :
                             m_dev(dev),
-                            m_workerThread(1u)
+                            m_bCurrentlyExecutingTask(false)
                     {}
                     //-----------------------------------------------------------------------------
-                    QueueCpuAsyncImpl(QueueCpuAsyncImpl const &) = delete;
+                    QueueCpuBlockingImpl(QueueCpuBlockingImpl const &) = delete;
                     //-----------------------------------------------------------------------------
-                    QueueCpuAsyncImpl(QueueCpuAsyncImpl &&) = delete;
+                    QueueCpuBlockingImpl(QueueCpuBlockingImpl &&) = delete;
                     //-----------------------------------------------------------------------------
-                    auto operator=(QueueCpuAsyncImpl const &) -> QueueCpuAsyncImpl & = delete;
+                    auto operator=(QueueCpuBlockingImpl const &) -> QueueCpuBlockingImpl & = delete;
                     //-----------------------------------------------------------------------------
-                    auto operator=(QueueCpuAsyncImpl &&) -> QueueCpuAsyncImpl & = delete;
+                    auto operator=(QueueCpuBlockingImpl &&) -> QueueCpuBlockingImpl & = delete;
                     //-----------------------------------------------------------------------------
-                    ~QueueCpuAsyncImpl() = default;
+                    ~QueueCpuBlockingImpl() = default;
 
                 public:
                     dev::DevCpu const m_dev;            //!< The device this queue is bound to.
-
-                    ThreadPool m_workerThread;
+                    std::mutex mutable m_mutex;
+                    std::atomic<bool> m_bCurrentlyExecutingTask;
                 };
             }
         }
 
         //#############################################################################
         //! The CPU device queue.
-        class QueueCpuAsync final
+        class QueueCpuBlocking final
         {
         public:
             //-----------------------------------------------------------------------------
-            QueueCpuAsync(
+            QueueCpuBlocking(
                 dev::DevCpu const & dev) :
-                    m_spQueueImpl(std::make_shared<cpu::detail::QueueCpuAsyncImpl>(dev))
+                    m_spQueueImpl(std::make_shared<cpu::detail::QueueCpuBlockingImpl>(dev))
             {
-                dev.m_spDevCpuImpl->RegisterAsyncQueue(m_spQueueImpl);
+                dev.m_spDevCpuImpl->RegisterBlockingQueue(m_spQueueImpl);
             }
             //-----------------------------------------------------------------------------
-            QueueCpuAsync(QueueCpuAsync const &) = default;
+            QueueCpuBlocking(QueueCpuBlocking const &) = default;
             //-----------------------------------------------------------------------------
-            QueueCpuAsync(QueueCpuAsync &&) = default;
+            QueueCpuBlocking(QueueCpuBlocking &&) = default;
             //-----------------------------------------------------------------------------
-            auto operator=(QueueCpuAsync const &) -> QueueCpuAsync & = default;
+            auto operator=(QueueCpuBlocking const &) -> QueueCpuBlocking & = default;
             //-----------------------------------------------------------------------------
-            auto operator=(QueueCpuAsync &&) -> QueueCpuAsync & = default;
+            auto operator=(QueueCpuBlocking &&) -> QueueCpuBlocking & = default;
             //-----------------------------------------------------------------------------
-            auto operator==(QueueCpuAsync const & rhs) const
+            auto operator==(QueueCpuBlocking const & rhs) const
             -> bool
             {
                 return (m_spQueueImpl == rhs.m_spQueueImpl);
             }
             //-----------------------------------------------------------------------------
-            auto operator!=(QueueCpuAsync const & rhs) const
+            auto operator!=(QueueCpuBlocking const & rhs) const
             -> bool
             {
                 return !((*this) == rhs);
             }
             //-----------------------------------------------------------------------------
-            ~QueueCpuAsync() = default;
+            ~QueueCpuBlocking() = default;
 
         public:
-            std::shared_ptr<cpu::detail::QueueCpuAsyncImpl> m_spQueueImpl;
+            std::shared_ptr<cpu::detail::QueueCpuBlockingImpl> m_spQueueImpl;
         };
     }
 
@@ -126,22 +112,22 @@ namespace alpaka
         namespace traits
         {
             //#############################################################################
-            //! The CPU async device queue device type trait specialization.
+            //! The CPU blocking device queue device type trait specialization.
             template<>
             struct DevType<
-                queue::QueueCpuAsync>
+                queue::QueueCpuBlocking>
             {
                 using type = dev::DevCpu;
             };
             //#############################################################################
-            //! The CPU async device queue device get trait specialization.
+            //! The CPU blocking device queue device get trait specialization.
             template<>
             struct GetDev<
-                queue::QueueCpuAsync>
+                queue::QueueCpuBlocking>
             {
                 //-----------------------------------------------------------------------------
                 ALPAKA_FN_HOST static auto getDev(
-                    queue::QueueCpuAsync const & queue)
+                    queue::QueueCpuBlocking const & queue)
                 -> dev::DevCpu
                 {
                     return queue.m_spQueueImpl->m_dev;
@@ -154,10 +140,10 @@ namespace alpaka
         namespace traits
         {
             //#############################################################################
-            //! The CPU async device queue event type trait specialization.
+            //! The CPU blocking device queue event type trait specialization.
             template<>
             struct EventType<
-                queue::QueueCpuAsync>
+                queue::QueueCpuBlocking>
             {
                 using type = event::EventCpu;
             };
@@ -168,44 +154,64 @@ namespace alpaka
         namespace traits
         {
             //#############################################################################
-            //! The CPU async device queue enqueue trait specialization.
+            //! The CPU blocking device queue enqueue trait specialization.
             //! This default implementation for all tasks directly invokes the function call operator of the task.
             template<
                 typename TTask>
             struct Enqueue<
-                queue::QueueCpuAsync,
+                queue::QueueCpuBlocking,
                 TTask>
             {
                 //-----------------------------------------------------------------------------
                 ALPAKA_FN_HOST static auto enqueue(
-#if !(BOOST_COMP_CLANG_CUDA && BOOST_ARCH_PTX)
-                    queue::QueueCpuAsync & queue,
+                    queue::QueueCpuBlocking & queue,
                     TTask const & task)
-#else
-                    queue::QueueCpuAsync &,
-                    TTask const &)
-#endif
                 -> void
                 {
-// Workaround: Clang can not support this when natively compiling device code. See ConcurrentExecPool.hpp.
-#if !(BOOST_COMP_CLANG_CUDA && BOOST_ARCH_PTX)
-                    queue.m_spQueueImpl->m_workerThread.enqueueTask(
-                        task);
-#endif
+                    std::lock_guard<std::mutex> lk(queue.m_spQueueImpl->m_mutex);
+
+                    queue.m_spQueueImpl->m_bCurrentlyExecutingTask = true;
+
+                    task();
+
+                    queue.m_spQueueImpl->m_bCurrentlyExecutingTask = false;
                 }
             };
             //#############################################################################
-            //! The CPU async device queue test trait specialization.
+            //! The CPU blocking device queue test trait specialization.
             template<>
             struct Empty<
-                queue::QueueCpuAsync>
+                queue::QueueCpuBlocking>
             {
                 //-----------------------------------------------------------------------------
                 ALPAKA_FN_HOST static auto empty(
-                    queue::QueueCpuAsync const & queue)
+                    queue::QueueCpuBlocking const & queue)
                 -> bool
                 {
-                    return queue.m_spQueueImpl->m_workerThread.isIdle();
+                    return !queue.m_spQueueImpl->m_bCurrentlyExecutingTask;
+                }
+            };
+        }
+    }
+
+    namespace wait
+    {
+        namespace traits
+        {
+            //#############################################################################
+            //! The CPU blocking device queue thread wait trait specialization.
+            //!
+            //! Blocks execution of the calling thread until the queue has finished processing all previously requested tasks (kernels, data copies, ...)
+            template<>
+            struct CurrentThreadWaitFor<
+                queue::QueueCpuBlocking>
+            {
+                //-----------------------------------------------------------------------------
+                ALPAKA_FN_HOST static auto currentThreadWaitFor(
+                    queue::QueueCpuBlocking const & queue)
+                -> void
+                {
+                    std::lock_guard<std::mutex> lk(queue.m_spQueueImpl->m_mutex);
                 }
             };
         }

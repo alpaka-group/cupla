@@ -8,7 +8,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 3.11.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.11.4)
 
 # Search in <PackageName>_ROOT:
 # https://cmake.org/cmake/help/v3.12/policy/CMP0074.html
@@ -16,7 +16,6 @@ if(POLICY CMP0074)
     cmake_policy(SET CMP0074 NEW)
 endif()
 
-SET(ALPAKA_ROOT "${CMAKE_CURRENT_LIST_DIR}/../" CACHE STRING "The location of the alpaka library")
 LIST(APPEND CMAKE_MODULE_PATH "${ALPAKA_ROOT}")
 FIND_PACKAGE(alpaka REQUIRED)
 
@@ -49,7 +48,7 @@ IF(MSVC)
 ENDIF()
 IF(ALPAKA_USE_INTERNAL_CATCH2)
     target_include_directories(CatchMain SYSTEM PUBLIC
-        ${alpakaAll_SOURCE_DIR}/thirdParty/catch2/include)
+        ${CMAKE_CURRENT_LIST_DIR}/../thirdParty/catch2/include)
 ELSE()
     target_include_directories(CatchMain SYSTEM PUBLIC
         $<TARGET_PROPERTY:Catch2::Catch2,INTERFACE_INCLUDE_DIRECTORIES>)

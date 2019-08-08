@@ -30,8 +30,8 @@
 #include <alpaka/acc/AccGpuHipRt.hpp>
 #include <alpaka/dev/DevHipRt.hpp>
 #include <alpaka/kernel/Traits.hpp>
-#include <alpaka/queue/QueueHipRtSync.hpp>
-#include <alpaka/queue/QueueHipRtAsync.hpp>
+#include <alpaka/queue/QueueHipRtBlocking.hpp>
+#include <alpaka/queue/QueueHipRtNonBlocking.hpp>
 #include <alpaka/workdiv/WorkDivMembers.hpp>
 
 #if ALPAKA_DEBUG >= ALPAKA_DEBUG_MINIMAL
@@ -77,11 +77,14 @@ namespace alpaka
 #if BOOST_ARCH_PTX && (BOOST_ARCH_PTX < BOOST_VERSION_NUMBER(2, 0, 0))
     #error "Cuda device capability >= 2.0 is required!"
 #endif
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wignored-attributes"
                     static_assert(
                         std::is_same<typename std::result_of<
                             TKernelFnObj(acc::AccGpuHipRt<TDim, TIdx> const &, TArgs const & ...)>::type, void>::value,
                         "The TKernelFnObj is required to return void!");
-                    
+#pragma clang diagnostic pop
+
                     acc::AccGpuHipRt<TDim, TIdx> acc(threadElemExtent);
 
                     kernelFnObj(
@@ -283,20 +286,20 @@ namespace alpaka
         namespace traits
         {
             //#############################################################################
-            //! The HIP asynchronous kernel enqueue trait specialization.
+            //! The HIP non-blocking kernel enqueue trait specialization.
             template<
                 typename TDim,
                 typename TIdx,
                 typename TKernelFnObj,
                 typename... TArgs>
             struct Enqueue<
-                queue::QueueHipRtAsync,
+                queue::QueueHipRtNonBlocking,
                 kernel::TaskKernelGpuHipRt<TDim, TIdx, TKernelFnObj, TArgs...>>
             {
                 //-----------------------------------------------------------------------------
 
                 ALPAKA_FN_HOST static auto enqueue(
-                    queue::QueueHipRtAsync & queue,
+                    queue::QueueHipRtNonBlocking & queue,
                     kernel::TaskKernelGpuHipRt<TDim, TIdx, TKernelFnObj, TArgs...> const & task)
                 -> void
                 {
@@ -390,15 +393,16 @@ namespace alpaka
                     meta::apply(
                         [&](TArgs ... args)
                         {
-                            hipLaunchKernel(
+                            hipLaunchKernelGGL(
                                 HIP_KERNEL_NAME(kernel::hip::detail::hipKernel< TDim, TIdx, TKernelFnObj, TArgs... >),
                                 gridDim,
                                 blockDim,
-                                static_cast<std::size_t>(blockSharedMemDynSizeBytes),
+                                static_cast<std::uint32_t>(blockSharedMemDynSizeBytes),
                                 queue.m_spQueueImpl->m_HipQueue,
+                                hipLaunchParm{},
                                 threadElemExtent,
                                 task.m_kernelFnObj,
-                                args...
+                                std::move(args)...
                             );
 
                         },
@@ -422,13 +426,13 @@ namespace alpaka
                 typename TKernelFnObj,
                 typename... TArgs>
             struct Enqueue<
-                queue::QueueHipRtSync,
+                queue::QueueHipRtBlocking,
                 kernel::TaskKernelGpuHipRt<TDim, TIdx, TKernelFnObj, TArgs...>>
             {
                 //-----------------------------------------------------------------------------
 
                 ALPAKA_FN_HOST static auto enqueue(
-                    queue::QueueHipRtSync & queue,
+                    queue::QueueHipRtBlocking & queue,
                     kernel::TaskKernelGpuHipRt<TDim, TIdx, TKernelFnObj, TArgs...> const & task)
                 -> void
                 {

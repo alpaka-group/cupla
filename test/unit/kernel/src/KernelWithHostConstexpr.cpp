@@ -7,10 +7,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-
 // NVCC needs --expt-relaxed-constexpr
-#if !defined(__NVCC__) || \
-    ( defined(__NVCC__) && defined(__CUDACC_RELAXED_CONSTEXPR__) )
+#if !defined(__NVCC__) || (defined(__NVCC__) && defined(__CUDACC_RELAXED_CONSTEXPR__))
 
 #include <alpaka/alpaka.hpp>
 #include <alpaka/test/acc/Acc.hpp>
@@ -43,13 +41,9 @@ public:
     #pragma warning(push)
     #pragma warning(disable: 4127)  // warning C4127: conditional expression is constant
 #endif
-        // FIXME: workaround for HIP(HCC) where numeric_limits::* do not provide
-        // matching host-device restriction requirements
-#if defined(BOOST_COMP_HCC) && BOOST_COMP_HCC
-        constexpr auto max = static_cast<std::uint32_t>(-1);
-#else
+
         constexpr auto max = std::numeric_limits< std::uint32_t >::max();
-#endif
+
         ALPAKA_CHECK(*success, 0 != max);
 #if BOOST_COMP_MSVC
     #pragma warning(pop)
