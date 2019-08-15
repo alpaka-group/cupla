@@ -100,3 +100,7 @@
 #if( CUPLA_NUM_SELECTED_THREAD_PARALLEL_DEVICES > 1 )
     #error "it is only alowed to select one thread parallelized Alpaka accelerator"
 #endif
+
+#ifndef CUPLA_HEADER_ONLY_FUNC_SPEC
+#   define CUPLA_HEADER_ONLY_FUNC_SPEC
+#endif

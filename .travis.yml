@@ -39,6 +39,7 @@ before_install:
   - mkdir -p $HOME/asyncAPI
   - mkdir -p $HOME/asyncAPI_tuned
   - mkdir -p $HOME/vectorAdd
+  - mkdir -p $HOME/test/config
   - export CMAKE_FLAGS="-DALPAKA_ACC_"$STRATEGY"_ENABLE=ON"
   - if [ "$COMPILER" == "gcc" ]; then
         echo "Using g++-4.9 and sequential OpenMP2 threads ...";
@@ -155,5 +156,9 @@ script:
       ./vectorAdd 100000;
     fi
   #############################################################################
-  # Test: (To do: add tests in $TRAVIS_BUILD_DIR/test/                        #
+  # Test: additional tests                                                    #
   #############################################################################
+  - cd $HOME/test/config
+  - if [[ $CXX =~ "^g\+\+" ]] || [[ "$COMPILER" == "nvcc" ]] ; then
+      $TRAVIS_BUILD_DIR/test/system/config/test.sh $CXX;
+    fi
