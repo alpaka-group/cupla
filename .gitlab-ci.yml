@@ -28,7 +28,7 @@
         && if [[ $CMAKE_FLAGS =~ -*DALPAKA_ACC_GPU_CUDA_ENABLE=ON.* ]]; then
           cmake $cupla_DIR/example/CUDASamples/matrixMul/ $CMAKE_FLAGS -DCMAKE_BUILD_TYPE=$CUPLA_BUILD_TYPE
           && make -j
-          && ./matrixMul -wA=64 -wB=64 -hA=64 -hB=64
+          && time ./matrixMul -wA=64 -wB=64 -hA=64 -hB=64
           && rm -r * ;
         fi
         && echo "###################################################"
@@ -39,7 +39,7 @@
         && if [[ $CMAKE_FLAGS =~ -*DALPAKA_ACC_GPU_CUDA_ENABLE=ON.* ]]; then
           cmake $cupla_DIR/example/CUDASamples/asyncAPI/ $CMAKE_FLAGS -DCMAKE_BUILD_TYPE=$CUPLA_BUILD_TYPE
           && make -j
-          && ./asyncAPI
+          && time ./asyncAPI
           && rm -r * ;
         fi
         && echo "###################################################"
@@ -47,14 +47,14 @@
         && echo "###################################################"
         && cmake $cupla_DIR/example/CUDASamples/asyncAPI_tuned/ $CMAKE_FLAGS -DCMAKE_BUILD_TYPE=$CUPLA_BUILD_TYPE
         && make -j
-        && ./asyncAPI_tuned
+        && time ./asyncAPI_tuned
         && rm -r *
         && echo "###################################################"
         && echo "Example vectorAdd (added elements layer)"
         && echo "###################################################"
         && cmake $cupla_DIR/example/CUDASamples/vectorAdd/ $CMAKE_FLAGS -DCMAKE_BUILD_TYPE=$CUPLA_BUILD_TYPE
         && make -j
-        && ./vectorAdd 100000
+        && time ./vectorAdd 100000
         && rm -r * ;
       done
 
