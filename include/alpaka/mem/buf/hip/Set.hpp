@@ -7,19 +7,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-
 #pragma once
 
 #ifdef ALPAKA_ACC_GPU_HIP_ENABLED
 
-#include <alpaka/core/Common.hpp>
+#include <alpaka/core/BoostPredef.hpp>
 
 #if !BOOST_LANG_HIP
     #error If ALPAKA_ACC_GPU_HIP_ENABLED is set, the compiler has to support HIP!
 #endif
 
-#include <alpaka/queue/QueueHipRtSync.hpp>
-#include <alpaka/queue/QueueHipRtAsync.hpp>
+#include <alpaka/queue/QueueHipRtBlocking.hpp>
+#include <alpaka/queue/QueueHipRtNonBlocking.hpp>
 
 #include <alpaka/dev/Traits.hpp>
 #include <alpaka/dim/DimIntegralConst.hpp>
@@ -128,17 +127,17 @@ namespace alpaka
         namespace traits
         {
             //#############################################################################
-            //! The HIP async device queue 1D set enqueue trait specialization.
+            //! The HIP non-blocking device queue 1D set enqueue trait specialization.
             template<
                 typename TView,
                 typename TExtent>
             struct Enqueue<
-                queue::QueueHipRtAsync,
+                queue::QueueHipRtNonBlocking,
                 mem::view::hip::detail::TaskSetHip<dim::DimInt<1u>, TView, TExtent>>
             {
                 //-----------------------------------------------------------------------------
                 ALPAKA_FN_HOST static auto enqueue(
-                    queue::QueueHipRtAsync & queue,
+                    queue::QueueHipRtNonBlocking & queue,
                     mem::view::hip::detail::TaskSetHip<dim::DimInt<1u>, TView, TExtent> const & task)
                 -> void
                 {
@@ -184,19 +183,19 @@ namespace alpaka
                 }
             };
             //#############################################################################
-            //! The HIP sync device queue 1D set enqueue trait specialization.
+            //! The HIP blocking device queue 1D set enqueue trait specialization.
             template<
                 typename TView,
                 typename TExtent>
             struct Enqueue<
-                queue::QueueHipRtSync,
+                queue::QueueHipRtBlocking,
                 mem::view::hip::detail::TaskSetHip<dim::DimInt<1u>, TView, TExtent>>
             {
                 //-----------------------------------------------------------------------------
                 //
                 //-----------------------------------------------------------------------------
                 ALPAKA_FN_HOST static auto enqueue(
-                    queue::QueueHipRtSync &,
+                    queue::QueueHipRtBlocking &,
                     mem::view::hip::detail::TaskSetHip<dim::DimInt<1u>, TView, TExtent> const & task)
                 -> void
                 {
@@ -241,17 +240,17 @@ namespace alpaka
                 }
             };
             //#############################################################################
-            //! The HIP async device queue 2D set enqueue trait specialization.
+            //! The HIP non-blocking device queue 2D set enqueue trait specialization.
             template<
                 typename TView,
                 typename TExtent>
             struct Enqueue<
-                queue::QueueHipRtAsync,
+                queue::QueueHipRtNonBlocking,
                 mem::view::hip::detail::TaskSetHip<dim::DimInt<2u>, TView, TExtent>>
             {
                 //-----------------------------------------------------------------------------
                 ALPAKA_FN_HOST static auto enqueue(
-                    queue::QueueHipRtAsync & queue,
+                    queue::QueueHipRtNonBlocking & queue,
                     mem::view::hip::detail::TaskSetHip<dim::DimInt<2u>, TView, TExtent> const & task)
                 -> void
                 {
@@ -303,17 +302,17 @@ namespace alpaka
                 }
             };
             //#############################################################################
-            //! The HIP sync device queue 2D set enqueue trait specialization.
+            //! The HIP blocking device queue 2D set enqueue trait specialization.
             template<
                 typename TView,
                 typename TExtent>
             struct Enqueue<
-                queue::QueueHipRtSync,
+                queue::QueueHipRtBlocking,
                 mem::view::hip::detail::TaskSetHip<dim::DimInt<2u>, TView, TExtent>>
             {
                 //-----------------------------------------------------------------------------
                 ALPAKA_FN_HOST static auto enqueue(
-                    queue::QueueHipRtSync &,
+                    queue::QueueHipRtBlocking &,
                     mem::view::hip::detail::TaskSetHip<dim::DimInt<2u>, TView, TExtent> const & task)
                 -> void
                 {
@@ -364,17 +363,17 @@ namespace alpaka
                 }
             };
             //#############################################################################
-            //! The HIP async device queue 3D set enqueue trait specialization.
+            //! The HIP non-blocking device queue 3D set enqueue trait specialization.
             template<
                 typename TView,
                 typename TExtent>
             struct Enqueue<
-                queue::QueueHipRtAsync,
+                queue::QueueHipRtNonBlocking,
                 mem::view::hip::detail::TaskSetHip<dim::DimInt<3u>, TView, TExtent>>
             {
                 //-----------------------------------------------------------------------------
                 ALPAKA_FN_HOST static auto enqueue(
-                    queue::QueueHipRtAsync & queue,
+                    queue::QueueHipRtNonBlocking & queue,
                     mem::view::hip::detail::TaskSetHip<dim::DimInt<3u>, TView, TExtent> const & task)
                 -> void
                 {
@@ -444,17 +443,17 @@ namespace alpaka
                 }
             };
             //#############################################################################
-            //! The HIP sync device queue 3D set enqueue trait specialization.
+            //! The HIP blocking device queue 3D set enqueue trait specialization.
             template<
                 typename TView,
                 typename TExtent>
             struct Enqueue<
-                queue::QueueHipRtSync,
+                queue::QueueHipRtBlocking,
                 mem::view::hip::detail::TaskSetHip<dim::DimInt<3u>, TView, TExtent>>
             {
                 //-----------------------------------------------------------------------------
                 ALPAKA_FN_HOST static auto enqueue(
-                    queue::QueueHipRtSync &,
+                    queue::QueueHipRtBlocking &,
                     mem::view::hip::detail::TaskSetHip<dim::DimInt<3u>, TView, TExtent> const & task)
                 -> void
                 {

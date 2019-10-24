@@ -7,23 +7,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-
 #pragma once
 
 #ifdef ALPAKA_ACC_GPU_HIP_ENABLED
 
-#include <alpaka/core/Common.hpp>
-#include <alpaka/core/Unused.hpp>
+#include <alpaka/core/BoostPredef.hpp>
 
 #if !BOOST_LANG_HIP
     #error If ALPAKA_ACC_GPU_HIP_ENABLED is set, the compiler has to support HIP!
 #endif
 
-#include <alpaka/math/exp/Traits.hpp>   // Exp
+#include <alpaka/math/exp/Traits.hpp>
 
+#include <alpaka/core/Unused.hpp>
 
-
-#include <type_traits>
 #if BOOST_COMP_NVCC >= BOOST_VERSION_NUMBER(9, 0, 0)
     #include <cuda_runtime_api.h>
 #else
@@ -34,12 +31,14 @@
     #endif
 #endif
 
+#include <type_traits>
+
 namespace alpaka
 {
     namespace math
     {
         //#############################################################################
-        //! The standard library exp.
+        //! The HIP exp.
         class ExpHipBuiltIn
         {
         public:
@@ -49,7 +48,7 @@ namespace alpaka
         namespace traits
         {
             //#############################################################################
-            //! The standard library exp trait specialization.
+            //! The HIP exp trait specialization.
             template<
                 typename TArg>
             struct Exp<
@@ -65,6 +64,21 @@ namespace alpaka
                 {
                     alpaka::ignore_unused(exp_ctx);
                     return ::exp(arg);
+                }
+            };
+            //! The HIP exp float specialization.
+            template<>
+            struct Exp<
+                ExpHipBuiltIn,
+                float>
+            {
+                __device__ static auto exp(
+                    ExpHipBuiltIn const & exp_ctx,
+                    float const & arg)
+                -> float
+                {
+                    alpaka::ignore_unused(exp_ctx);
+                    return ::expf(arg);
                 }
             };
         }

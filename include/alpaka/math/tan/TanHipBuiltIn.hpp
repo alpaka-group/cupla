@@ -7,23 +7,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-
 #pragma once
 
 #ifdef ALPAKA_ACC_GPU_HIP_ENABLED
 
-#include <alpaka/core/Common.hpp>
-#include <alpaka/core/Unused.hpp>
+#include <alpaka/core/BoostPredef.hpp>
 
 #if !BOOST_LANG_HIP
     #error If ALPAKA_ACC_GPU_HIP_ENABLED is set, the compiler has to support HIP!
 #endif
 
-#include <alpaka/math/tan/Traits.hpp>   // Tan
+#include <alpaka/math/tan/Traits.hpp>
 
+#include <alpaka/core/Unused.hpp>
 
-
-#include <type_traits>
 #if BOOST_COMP_NVCC >= BOOST_VERSION_NUMBER(9, 0, 0)
     #include <cuda_runtime_api.h>
 #else
@@ -34,13 +31,14 @@
     #endif
 #endif
 
+#include <type_traits>
 
 namespace alpaka
 {
     namespace math
     {
         //#############################################################################
-        //! The standard library tan.
+        //! The HIP tan.
         class TanHipBuiltIn
         {
         public:
@@ -50,7 +48,7 @@ namespace alpaka
         namespace traits
         {
             //#############################################################################
-            //! The standard library tan trait specialization.
+            //! The HIP tan trait specialization.
             template<
                 typename TArg>
             struct Tan<
@@ -63,6 +61,21 @@ namespace alpaka
                     TanHipBuiltIn const & tan_ctx,
                     TArg const & arg)
                 -> decltype(::tan(arg))
+                {
+                    alpaka::ignore_unused(tan_ctx);
+                    return ::tan(arg);
+                }
+            };
+            //! The HIP tan float specialization.
+            template<>
+            struct Tan<
+                TanHipBuiltIn,
+                float>
+            {
+                __device__ static auto tan(
+                    TanHipBuiltIn const & tan_ctx,
+                    float const & arg)
+                -> float
                 {
                     alpaka::ignore_unused(tan_ctx);
                     return ::tanf(arg);

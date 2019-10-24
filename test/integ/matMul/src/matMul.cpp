@@ -7,10 +7,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-
 #include <alpaka/alpaka.hpp>
+
 #include <alpaka/test/MeasureKernelRunTime.hpp>
-#include <alpaka/test/acc/Acc.hpp>
+#include <alpaka/test/acc/TestAccs.hpp>
 #include <alpaka/test/queue/Queue.hpp>
 
 #include <catch2/catch.hpp>
@@ -218,7 +218,7 @@ void operator()()
     using QueueAcc = alpaka::test::queue::DefaultQueue<alpaka::dev::Dev<TAcc>>;
     using PltfHost = alpaka::pltf::PltfCpu;
     using DevHost = alpaka::dev::Dev<PltfHost>;
-    using QueueHost = alpaka::queue::QueueCpuAsync;
+    using QueueHost = alpaka::queue::QueueCpuNonBlocking;
 
     // Create the kernel function object.
     MatMulKernel kernel;

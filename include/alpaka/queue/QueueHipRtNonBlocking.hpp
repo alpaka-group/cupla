@@ -7,12 +7,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-
 #pragma once
 
 #ifdef ALPAKA_ACC_GPU_HIP_ENABLED
 
-#include <alpaka/core/Common.hpp>
+#include <alpaka/core/BoostPredef.hpp>
 
 #if !BOOST_LANG_HIP
     #error If ALPAKA_ACC_GPU_HIP_ENABLED is set, the compiler has to support HIP!
@@ -51,12 +50,12 @@ namespace alpaka
             namespace detail
             {
                 //#############################################################################
-                //! The HIP RT sync queue implementation.
-                class QueueHipRtSyncImpl final
+                //! The HIP RT non-blocking queue implementation.
+                class QueueHipRtNonBlockingImpl final
                 {
                 public:
                     //-----------------------------------------------------------------------------
-                    ALPAKA_FN_HOST QueueHipRtSyncImpl(
+                    ALPAKA_FN_HOST QueueHipRtNonBlockingImpl(
                         dev::DevHipRt const & dev) :
                             m_dev(dev),
                             m_HipQueue()
@@ -79,19 +78,19 @@ namespace alpaka
                                 hipStreamNonBlocking));
                     }
                     //-----------------------------------------------------------------------------
-                    QueueHipRtSyncImpl(QueueHipRtSyncImpl const &) = delete;
+                    QueueHipRtNonBlockingImpl(QueueHipRtNonBlockingImpl const &) = delete;
                     //-----------------------------------------------------------------------------
-                    QueueHipRtSyncImpl(QueueHipRtSyncImpl &&) = default;
+                    QueueHipRtNonBlockingImpl(QueueHipRtNonBlockingImpl &&) = delete;
                     //-----------------------------------------------------------------------------
-                    auto operator=(QueueHipRtSyncImpl const &) -> QueueHipRtSyncImpl & = delete;
+                    auto operator=(QueueHipRtNonBlockingImpl const &) -> QueueHipRtNonBlockingImpl & = delete;
                     //-----------------------------------------------------------------------------
-                    auto operator=(QueueHipRtSyncImpl &&) -> QueueHipRtSyncImpl & = default;
+                    auto operator=(QueueHipRtNonBlockingImpl &&) -> QueueHipRtNonBlockingImpl & = delete;
                     //-----------------------------------------------------------------------------
-                    ALPAKA_FN_HOST ~QueueHipRtSyncImpl()
+                    ALPAKA_FN_HOST ~QueueHipRtNonBlockingImpl()
                     {
                         ALPAKA_DEBUG_MINIMAL_LOG_SCOPE;
 
-                        // Set the current device. \TODO: Is setting the current device before hipStreamDestroy required?
+                        // Set the current device.
                         ALPAKA_HIP_RT_CHECK(
                             hipSetDevice(
                                 m_dev.m_iDevice));
@@ -106,46 +105,55 @@ namespace alpaka
                 public:
                     dev::DevHipRt const m_dev;   //!< The device this queue is bound to.
                     hipStream_t m_HipQueue;
-                    int m_callees = 0; //FIXME: workaround for failing stream query
+
+#if BOOST_COMP_HCC  // NOTE: workaround for unwanted nonblocking hip streams for HCC (NVCC streams are blocking)
+                    int m_callees = 0;
+                    std::mutex m_mutex;
+#endif
                 };
             }
         }
 
         //#############################################################################
-        //! The HIP RT sync queue.
-        class QueueHipRtSync final
+        //! The HIP RT non-blocking queue.
+        class QueueHipRtNonBlocking final
         {
         public:
             //-----------------------------------------------------------------------------
-            ALPAKA_FN_HOST QueueHipRtSync(
+            ALPAKA_FN_HOST QueueHipRtNonBlocking(
                 dev::DevHipRt const & dev) :
-                m_spQueueImpl(std::make_shared<hip::detail::QueueHipRtSyncImpl>(dev))
+                m_spQueueImpl(std::make_shared<hip::detail::QueueHipRtNonBlockingImpl>(dev))
             {}
             //-----------------------------------------------------------------------------
-            QueueHipRtSync(QueueHipRtSync const &) = default;
+            QueueHipRtNonBlocking(QueueHipRtNonBlocking const &) = default;
             //-----------------------------------------------------------------------------
-            QueueHipRtSync(QueueHipRtSync &&) = default;
+            QueueHipRtNonBlocking(QueueHipRtNonBlocking &&) = default;
             //-----------------------------------------------------------------------------
-            auto operator=(QueueHipRtSync const &) -> QueueHipRtSync & = default;
+            auto operator=(QueueHipRtNonBlocking const &) -> QueueHipRtNonBlocking & = default;
             //-----------------------------------------------------------------------------
-            auto operator=(QueueHipRtSync &&) -> QueueHipRtSync & = default;
+            auto operator=(QueueHipRtNonBlocking &&) -> QueueHipRtNonBlocking & = default;
             //-----------------------------------------------------------------------------
-            ALPAKA_FN_HOST auto operator==(QueueHipRtSync const & rhs) const
+            ALPAKA_FN_HOST auto operator==(QueueHipRtNonBlocking const & rhs) const
             -> bool
             {
                 return (m_spQueueImpl == rhs.m_spQueueImpl);
             }
             //-----------------------------------------------------------------------------
-            ALPAKA_FN_HOST auto operator!=(QueueHipRtSync const & rhs) const
+            ALPAKA_FN_HOST auto operator!=(QueueHipRtNonBlocking const & rhs) const
             -> bool
             {
                 return !((*this) == rhs);
             }
             //-----------------------------------------------------------------------------
-            ALPAKA_FN_HOST ~QueueHipRtSync() = default;
+            ALPAKA_FN_HOST ~QueueHipRtNonBlocking() {
+#if BOOST_COMP_HCC  // NOTE: workaround for unwanted nonblocking hip streams for HCC (NVCC streams are blocking)
+                // we are a non-blocking queue, so we have to wait here with its destruction until all spawned tasks have been processed
+                alpaka::wait::wait(*this);
+#endif
+            }
 
         public:
-            std::shared_ptr<hip::detail::QueueHipRtSyncImpl> m_spQueueImpl;
+            std::shared_ptr<hip::detail::QueueHipRtNonBlockingImpl> m_spQueueImpl;
         };
     }
 
@@ -154,22 +162,22 @@ namespace alpaka
         namespace traits
         {
             //#############################################################################
-            //! The HIP RT sync queue device type trait specialization.
+            //! The HIP RT non-blocking queue device type trait specialization.
             template<>
             struct DevType<
-                queue::QueueHipRtSync>
+                queue::QueueHipRtNonBlocking>
             {
                 using type = dev::DevHipRt;
             };
             //#############################################################################
-            //! The HIP RT sync queue device get trait specialization.
+            //! The HIP RT non-blocking queue device get trait specialization.
             template<>
             struct GetDev<
-                queue::QueueHipRtSync>
+                queue::QueueHipRtNonBlocking>
             {
                 //-----------------------------------------------------------------------------
                 ALPAKA_FN_HOST static auto getDev(
-                    queue::QueueHipRtSync const & queue)
+                    queue::QueueHipRtNonBlocking const & queue)
                 -> dev::DevHipRt
                 {
                     return queue.m_spQueueImpl->m_dev;
@@ -182,10 +190,10 @@ namespace alpaka
         namespace traits
         {
             //#############################################################################
-            //! The HIP RT sync queue event type trait specialization.
+            //! The HIP RT non-blocking queue event type trait specialization.
             template<>
             struct EventType<
-                queue::QueueHipRtSync>
+                queue::QueueHipRtNonBlocking>
             {
                 using type = event::EventHipRt;
             };
@@ -196,11 +204,11 @@ namespace alpaka
         namespace traits
         {
             //#############################################################################
-            //! The HIP RT sync queue enqueue trait specialization.
+            //! The HIP RT blocking queue enqueue trait specialization.
             template<
                 typename TTask>
             struct Enqueue<
-                queue::QueueHipRtSync,
+                queue::QueueHipRtNonBlocking,
                 TTask>
             {
                 //#############################################################################
@@ -247,17 +255,20 @@ namespace alpaka
 
                 //-----------------------------------------------------------------------------
                 ALPAKA_FN_HOST static auto enqueue(
-                    queue::QueueHipRtSync & queue,
+                    queue::QueueHipRtNonBlocking & queue,
                     TTask const & task)
                 -> void
                 {
-                    auto pCallbackSynchronizationData = std::make_shared<CallbackSynchronizationData>();
 
+#if BOOST_COMP_HCC  // NOTE: workaround for unwanted nonblocking hip streams for HCC (NVCC streams are blocking)
                     {
-                        std::unique_lock<std::mutex> lock(pCallbackSynchronizationData.get()->m_mutex);
+                        // thread-safe callee incrementing
+                        std::lock_guard<std::mutex> guard(queue.m_spQueueImpl->m_mutex);
                         queue.m_spQueueImpl->m_callees += 1;
                     }
-
+#endif
+                    auto pCallbackSynchronizationData = std::make_shared<CallbackSynchronizationData>();
+                    // test example: https://github.com/ROCm-Developer-Tools/HIP/blob/roc-1.9.x/tests/src/runtimeApi/stream/hipStreamAddCallback.cpp
                     ALPAKA_HIP_RT_CHECK(hipStreamAddCallback(
                         queue.m_spQueueImpl->m_HipQueue,
                         hipRtCallback,
@@ -270,7 +281,17 @@ namespace alpaka
                     // The HIP thread is waiting for the std::thread to signal that it is finished executing the task
                     // before it executes the next task in the queue (HIP stream).
                     std::thread t(
-                        [pCallbackSynchronizationData, task, &queue](){
+                        [pCallbackSynchronizationData,
+                         task
+#if BOOST_COMP_HCC // NOTE: workaround for unwanted nonblocking hip streams for HCC (NVCC streams are blocking)
+                         ,&queue // requires queue's destructor to wait for all tasks
+#endif
+                        ](){
+
+#if BOOST_COMP_HCC // NOTE: workaround for unwanted nonblocking hip streams for HCC (NVCC streams are blocking)
+                            // thread-safe task execution and callee decrementing
+                            std::lock_guard<std::mutex> guard(queue.m_spQueueImpl->m_mutex);
+#endif
 
                             // If the callback has not yet been called, we wait for it.
                             {
@@ -289,34 +310,34 @@ namespace alpaka
 
                                 // Notify the waiting HIP thread.
                                 pCallbackSynchronizationData->state = CallbackState::finished;
-                                queue.m_spQueueImpl->m_callees -= 1;
                             }
                             pCallbackSynchronizationData->m_event.notify_one();
+#if BOOST_COMP_HCC // NOTE: workaround for unwanted nonblocking hip streams for HCC (NVCC streams are blocking)
+                            queue.m_spQueueImpl->m_callees -= 1;
+#endif
                         }
                     );
 
-                    t.join();
+                    t.detach();
                 }
             };
             //#############################################################################
-            //! The HIP RT sync queue test trait specialization.
+            //! The HIP RT non-blocking queue test trait specialization.
             template<>
             struct Empty<
-                queue::QueueHipRtSync>
+                queue::QueueHipRtNonBlocking>
             {
                 //-----------------------------------------------------------------------------
                 ALPAKA_FN_HOST static auto empty(
-                    queue::QueueHipRtSync const & queue)
+                    queue::QueueHipRtNonBlocking const & queue)
                 -> bool
                 {
                     ALPAKA_DEBUG_MINIMAL_LOG_SCOPE;
 
-                    // see: https://github.com/ROCm-Developer-Tools/HIP/blob/roc-1.9.x/tests/src/runtimeApi/stream/hipStreamWaitEvent.cpp
-
-#if defined( BOOST_COMP_HCC ) && BOOST_COMP_HCC
-                    // FIXME: workaround, see m_callees
+#if BOOST_COMP_HCC  // NOTE: workaround for unwanted nonblocking hip streams for HCC (NVCC streams are blocking)
                     return (queue.m_spQueueImpl->m_callees==0);
 #else
+
                     // Query is allowed even for queues on non current device.
                     hipError_t ret = hipSuccess;
                     ALPAKA_HIP_RT_CHECK_IGNORE(
@@ -334,29 +355,28 @@ namespace alpaka
         namespace traits
         {
             //#############################################################################
-            //! The HIP RT sync queue thread wait trait specialization.
+            //! The HIP RT non-blocking queue thread wait trait specialization.
             //!
             //! Blocks execution of the calling thread until the queue has finished processing all previously requested tasks (kernels, data copies, ...)
             template<>
             struct CurrentThreadWaitFor<
-                queue::QueueHipRtSync>
+                queue::QueueHipRtNonBlocking>
             {
                 //-----------------------------------------------------------------------------
                 ALPAKA_FN_HOST static auto currentThreadWaitFor(
-                    queue::QueueHipRtSync const & queue)
+                    queue::QueueHipRtNonBlocking const & queue)
                 -> void
                 {
                     ALPAKA_DEBUG_MINIMAL_LOG_SCOPE;
 
-#if defined( BOOST_COMP_HCC ) && BOOST_COMP_HCC
-                    // FIXME: workaround, see m_callees
+#if BOOST_COMP_HCC  // NOTE: workaround for unwanted nonblocking hip streams for HCC (NVCC streams are blocking)
                     while(queue.m_spQueueImpl->m_callees>0) {
-                        std::this_thread::sleep_for(std::chrono::milliseconds(100u));
+                        std::this_thread::sleep_for(std::chrono::milliseconds(10u));
                     }
 #else
                     // Sync is allowed even for queues on non current device.
                     ALPAKA_HIP_RT_CHECK( hipStreamSynchronize(
-                        queue.m_spQueueImpl->m_HipQueue));
+                            queue.m_spQueueImpl->m_HipQueue));
 #endif
                 }
             };

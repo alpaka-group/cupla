@@ -7,16 +7,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#include <alpaka/queue/Traits.hpp>
+#include <alpaka/meta/Concatenate.hpp>
 
-#include <catch2/catch.hpp>
+#include <alpaka/test/queue/QueueCpuOmp2Collective.hpp>
 
-#include <alpaka/alpaka.hpp>
 #include <alpaka/test/queue/Queue.hpp>
 #include <alpaka/test/queue/QueueTestFixture.hpp>
 
+#include <catch2/catch.hpp>
+
 #include <future>
 #include <thread>
-
 
 //-----------------------------------------------------------------------------
 struct TestTemplateEmpty
@@ -98,8 +100,8 @@ void operator()()
             CallbackFinished = true;
         });
 
-    // A synchronous queue will always stay empty because the task has been executed immediately.
-    if(!alpaka::test::queue::IsSyncQueue<typename Fixture::Queue>::value)
+    // A non-blocking queue will always stay empty because the task has been executed immediately.
+    if(!alpaka::test::queue::IsBlockingQueue<typename Fixture::Queue>::value)
     {
         alpaka::wait::wait(f.m_queue);
     }
@@ -159,7 +161,13 @@ void operator()()
 }
 };
 
-using TestQueues = alpaka::test::queue::TestQueues;
+using TestQueues = alpaka::meta::Concatenate<
+        alpaka::test::queue::TestQueues
+ #ifdef ALPAKA_ACC_CPU_B_OMP2_T_SEQ_ENABLED
+        ,
+        std::tuple<std::tuple<alpaka::dev::DevCpu, alpaka::queue::QueueCpuOmp2Collective>>
+#endif
+    >;
 
 TEST_CASE( "queueIsInitiallyEmpty", "[queue]")
 {
