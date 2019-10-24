@@ -7,7 +7,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-
 #pragma once
 
 #include <alpaka/vec/Vec.hpp>
@@ -206,8 +205,8 @@ namespace alpaka
 
 #if ALPAKA_DEBUG >= ALPAKA_DEBUG_FULL
             std::cout << __func__
-                << " gridBlockExtent: " << workdiv::getWorkDiv<Grid, Blocks>(workDiv)
-                << ", blockThreadExtent: " << workdiv::getWorkDiv<Block, Threads>(workDiv)
+                << " workDiv: " << workDiv
+                << ", kernelFnObj: " << typeid(kernelFnObj).name()
                 << std::endl;
 #endif
             return

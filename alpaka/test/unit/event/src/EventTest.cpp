@@ -7,14 +7,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#include <alpaka/event/Traits.hpp>
 
-#include <catch2/catch.hpp>
-
-#include <alpaka/alpaka.hpp>
 #include <alpaka/test/event/EventHostManualTrigger.hpp>
 #include <alpaka/test/queue/Queue.hpp>
 #include <alpaka/test/queue/QueueTestFixture.hpp>
+#include <alpaka/test/queue/QueueCpuOmp2Collective.hpp>
 
+#include <catch2/catch.hpp>
 
 //-----------------------------------------------------------------------------
 struct TestTemplateInitTrue
@@ -49,14 +49,14 @@ void operator()()
         alpaka::event::Event<Queue> e1(f1.m_dev);
         alpaka::test::event::EventHostManualTrigger<Dev> k1(f1.m_dev);
 
-        if(!alpaka::test::queue::IsSyncQueue<Queue>::value)
+        if(!alpaka::test::queue::IsBlockingQueue<Queue>::value)
         {
             alpaka::queue::enqueue(q1, k1);
         }
 
         alpaka::queue::enqueue(q1, e1);
 
-        if(!alpaka::test::queue::IsSyncQueue<Queue>::value)
+        if(!alpaka::test::queue::IsBlockingQueue<Queue>::value)
         {
             REQUIRE(alpaka::event::test(e1) == false);
 
@@ -84,7 +84,7 @@ void operator()()
     using Queue = typename Fixture::Queue;
     using Dev = typename Fixture::Dev;
 
-    if(!alpaka::test::queue::IsSyncQueue<Queue>::value)
+    if(!alpaka::test::queue::IsBlockingQueue<Queue>::value)
     {
         Fixture f1;
         if(alpaka::test::event::isEventHostManualTriggerSupported(f1.m_dev))
@@ -146,7 +146,7 @@ void operator()()
     using Queue = typename Fixture::Queue;
     using Dev = typename Fixture::Dev;
 
-    if(!alpaka::test::queue::IsSyncQueue<Queue>::value)
+    if(!alpaka::test::queue::IsBlockingQueue<Queue>::value)
     {
         Fixture f1;
         Fixture f2;
@@ -225,7 +225,7 @@ void operator()()
     using Queue = typename Fixture::Queue;
     using Dev = typename Fixture::Dev;
 
-    if(!alpaka::test::queue::IsSyncQueue<Queue>::value)
+    if(!alpaka::test::queue::IsBlockingQueue<Queue>::value)
     {
         Fixture f1;
         Fixture f2;
@@ -286,7 +286,13 @@ void operator()()
 }
 };
 
-using TestQueues = alpaka::test::queue::TestQueues;
+using TestQueues = alpaka::meta::Concatenate<
+        alpaka::test::queue::TestQueues
+ #ifdef ALPAKA_ACC_CPU_B_OMP2_T_SEQ_ENABLED
+        ,
+        std::tuple<std::tuple<alpaka::dev::DevCpu, alpaka::queue::QueueCpuOmp2Collective>>
+#endif
+    >;
 
 TEST_CASE( "eventTestShouldInitiallyBeTrue", "[event]")
 {

@@ -7,7 +7,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-
 #pragma once
 
 #include <alpaka/meta/IsStrictBase.hpp>
@@ -40,6 +39,7 @@ namespace alpaka
         //! \tparam TArg The arg type.
         //! \param exp_ctx The object specializing Exp.
         //! \param arg The arg.
+        ALPAKA_NO_HOST_ACC_WARNING
         template<
             typename T,
             typename TArg>

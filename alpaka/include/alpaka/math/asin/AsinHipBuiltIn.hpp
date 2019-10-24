@@ -7,21 +7,19 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-
 #pragma once
 
 #ifdef ALPAKA_ACC_GPU_HIP_ENABLED
 
-#include <alpaka/core/Common.hpp>
-#include <alpaka/core/Unused.hpp>
+#include <alpaka/core/BoostPredef.hpp>
 
 #if !BOOST_LANG_HIP
     #error If ALPAKA_ACC_GPU_HIP_ENABLED is set, the compiler has to support HIP!
 #endif
 
-#include <alpaka/math/asin/Traits.hpp>  // Asin
+#include <alpaka/math/asin/Traits.hpp>
 
-#include <type_traits>
+#include <alpaka/core/Unused.hpp>
 
 #if BOOST_COMP_NVCC >= BOOST_VERSION_NUMBER(9, 0, 0)
     #include <cuda_runtime_api.h>
@@ -33,12 +31,14 @@
     #endif
 #endif
 
+#include <type_traits>
+
 namespace alpaka
 {
     namespace math
     {
         //#############################################################################
-        //! The standard library asin.
+        //! The HIP asin.
         class AsinHipBuiltIn
         {
         public:
@@ -48,7 +48,7 @@ namespace alpaka
         namespace traits
         {
             //#############################################################################
-            //! The standard library asin trait specialization.
+            //! The HIP asin trait specialization.
             template<
                 typename TArg>
             struct Asin<
@@ -64,6 +64,21 @@ namespace alpaka
                 {
                     alpaka::ignore_unused(asin_ctx);
                     return ::asin(arg);
+                }
+            };
+            //! The HIP asin float specialization.
+            template<>
+            struct Asin<
+                AsinHipBuiltIn,
+                float>
+            {
+                __device__ static auto asin(
+                    AsinHipBuiltIn const & asin_ctx,
+                    float const & arg)
+                -> float
+                {
+                    alpaka::ignore_unused(asin_ctx);
+                    return ::asinf(arg);
                 }
             };
         }

@@ -7,23 +7,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-
 #pragma once
 
 #ifdef ALPAKA_ACC_GPU_HIP_ENABLED
 
-#include <alpaka/core/Common.hpp>
-#include <alpaka/core/Unused.hpp>
+#include <alpaka/core/BoostPredef.hpp>
 
 #if !BOOST_LANG_HIP
     #error If ALPAKA_ACC_GPU_HIP_ENABLED is set, the compiler has to support HIP!
 #endif
 
-#include <alpaka/math/cos/Traits.hpp>   // Cos
+#include <alpaka/math/cos/Traits.hpp>
 
+#include <alpaka/core/Unused.hpp>
 
-
-#include <type_traits>
 #if BOOST_COMP_NVCC >= BOOST_VERSION_NUMBER(9, 0, 0)
     #include <cuda_runtime_api.h>
 #else
@@ -34,12 +31,14 @@
     #endif
 #endif
 
+#include <type_traits>
+
 namespace alpaka
 {
     namespace math
     {
         //#############################################################################
-        //! The standard library cos.
+        //! The HIP cos.
         class CosHipBuiltIn
         {
         public:
@@ -49,7 +48,7 @@ namespace alpaka
         namespace traits
         {
             //#############################################################################
-            //! The standard library cos trait specialization.
+            //! The HIP cos trait specialization.
             template<
                 typename TArg>
             struct Cos<
@@ -65,6 +64,21 @@ namespace alpaka
                 {
                     alpaka::ignore_unused(cos_ctx);
                     return ::cos(arg);
+                }
+            };
+            //! The HIP cos float specialization.
+            template<>
+            struct Cos<
+                CosHipBuiltIn,
+                float>
+            {
+                __device__ static auto cos(
+                    CosHipBuiltIn const & cos_ctx,
+                    float const & arg)
+                -> float
+                {
+                    alpaka::ignore_unused(cos_ctx);
+                    return ::cosf(arg);
                 }
             };
         }

@@ -7,12 +7,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-
 #pragma once
 
 #ifdef ALPAKA_ACC_GPU_HIP_ENABLED
 
-#include <alpaka/core/Common.hpp>
+#include <alpaka/core/BoostPredef.hpp>
 
 #if !BOOST_LANG_HIP
     #error If ALPAKA_ACC_GPU_HIP_ENABLED is set, the compiler has to support HIP!
@@ -24,7 +23,12 @@
 
 #include <alpaka/core/Hip.hpp>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wduplicate-decl-specifier"
+
 #include <hiprand_kernel.h>
+
+#pragma clang diagnostic pop
 
 #include <type_traits>
 

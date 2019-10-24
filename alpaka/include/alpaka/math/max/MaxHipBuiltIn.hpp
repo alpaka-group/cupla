@@ -7,23 +7,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-
 #pragma once
 
 #ifdef ALPAKA_ACC_GPU_HIP_ENABLED
 
-#include <alpaka/core/Common.hpp>
-#include <alpaka/core/Unused.hpp>
+#include <alpaka/core/BoostPredef.hpp>
 
 #if !BOOST_LANG_HIP
     #error If ALPAKA_ACC_GPU_HIP_ENABLED is set, the compiler has to support HIP!
 #endif
 
-#include <alpaka/math/max/Traits.hpp>   // Max
+#include <alpaka/math/max/Traits.hpp>
 
+#include <alpaka/core/Unused.hpp>
 
-
-#include <type_traits>
 #if BOOST_COMP_NVCC >= BOOST_VERSION_NUMBER(9, 0, 0)
     #include <cuda_runtime_api.h>
 #else
@@ -34,12 +31,14 @@
     #endif
 #endif
 
+#include <type_traits>
+
 namespace alpaka
 {
     namespace math
     {
         //#############################################################################
-        //! The standard library max.
+        //! The HIP max.
         class MaxHipBuiltIn
         {
         public:
@@ -49,7 +48,7 @@ namespace alpaka
         namespace traits
         {
             //#############################################################################
-            //! The standard library integral max trait specialization.
+            //! The HIP integral max trait specialization.
             template<
                 typename Tx,
                 typename Ty>
@@ -72,7 +71,7 @@ namespace alpaka
                 }
             };
             //#############################################################################
-            //! The standard library mixed integral floating point max trait specialization.
+            //! The HIP mixed integral floating point max trait specialization.
             template<
                 typename Tx,
                 typename Ty>

@@ -7,23 +7,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-
 #pragma once
 
 #ifdef ALPAKA_ACC_GPU_HIP_ENABLED
 
-#include <alpaka/core/Common.hpp>
-#include <alpaka/core/Unused.hpp>
+#include <alpaka/core/BoostPredef.hpp>
 
 #if !BOOST_LANG_HIP
     #error If ALPAKA_ACC_GPU_HIP_ENABLED is set, the compiler has to support HIP!
 #endif
 
-#include <alpaka/math/sin/Traits.hpp>   // Sin
+#include <alpaka/math/sin/Traits.hpp>
 
+#include <alpaka/core/Unused.hpp>
 
-
-#include <type_traits>
 #if BOOST_COMP_NVCC >= BOOST_VERSION_NUMBER(9, 0, 0)
     #include <cuda_runtime_api.h>
 #else
@@ -34,13 +31,14 @@
     #endif
 #endif
 
+#include <type_traits>
 
 namespace alpaka
 {
     namespace math
     {
         //#############################################################################
-        //! The standard library sin.
+        //! The HIP sin.
         class SinHipBuiltIn
         {
         public:
@@ -50,7 +48,7 @@ namespace alpaka
         namespace traits
         {
             //#############################################################################
-            //! The standard library sin trait specialization.
+            //! The HIP sin trait specialization.
             template<
                 typename TArg>
             struct Sin<
@@ -66,6 +64,21 @@ namespace alpaka
                 {
                     alpaka::ignore_unused(sin_ctx);
                     return ::sin(arg);
+                }
+            };
+            //! The HIP sin float specialization.
+            template<>
+            struct Sin<
+                SinHipBuiltIn,
+                float>
+            {
+                __device__ static auto sin(
+                    SinHipBuiltIn const & sin_ctx,
+                    float const & arg)
+                -> float
+                {
+                    alpaka::ignore_unused(sin_ctx);
+                    return ::sinf(arg);
                 }
             };
         }
