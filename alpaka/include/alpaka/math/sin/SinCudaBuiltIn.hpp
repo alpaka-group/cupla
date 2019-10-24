@@ -7,13 +7,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-
 #pragma once
 
 #ifdef ALPAKA_ACC_GPU_CUDA_ENABLED
 
-#include <alpaka/core/Common.hpp>
-#include <alpaka/core/Unused.hpp>
+#include <alpaka/core/BoostPredef.hpp>
 
 #if !BOOST_LANG_CUDA
     #error If ALPAKA_ACC_GPU_CUDA_ENABLED is set, the compiler has to support CUDA!
@@ -21,16 +19,18 @@
 
 #include <alpaka/math/sin/Traits.hpp>
 
-#include <cuda_runtime.h>
-#include <type_traits>
+#include <alpaka/core/Unused.hpp>
 
+#include <cuda_runtime.h>
+
+#include <type_traits>
 
 namespace alpaka
 {
     namespace math
     {
         //#############################################################################
-        //! The standard library sin.
+        //! The CUDA sin.
         class SinCudaBuiltIn
         {
         public:
@@ -40,7 +40,7 @@ namespace alpaka
         namespace traits
         {
             //#############################################################################
-            //! The standard library sin trait specialization.
+            //! The CUDA sin trait specialization.
             template<
                 typename TArg>
             struct Sin<
@@ -56,6 +56,21 @@ namespace alpaka
                 {
                     alpaka::ignore_unused(sin_ctx);
                     return ::sin(arg);
+                }
+            };
+            //! The CUDA sin float specialization.
+            template<>
+            struct Sin<
+                SinCudaBuiltIn,
+                float>
+            {
+                __device__ static auto sin(
+                    SinCudaBuiltIn const & sin_ctx,
+                    float const & arg)
+                -> float
+                {
+                    alpaka::ignore_unused(sin_ctx);
+                    return ::sinf(arg);
                 }
             };
         }

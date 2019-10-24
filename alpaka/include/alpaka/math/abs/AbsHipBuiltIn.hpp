@@ -7,13 +7,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-
 #pragma once
 
 #ifdef ALPAKA_ACC_GPU_HIP_ENABLED
 
-#include <alpaka/core/Common.hpp>
-#include <alpaka/core/Unused.hpp>
+#include <alpaka/core/BoostPredef.hpp>
 
 #if !BOOST_LANG_HIP
     #error If ALPAKA_ACC_GPU_HIP_ENABLED is set, the compiler has to support HIP!
@@ -21,7 +19,7 @@
 
 #include <alpaka/math/abs/Traits.hpp>
 
-#include <type_traits>
+#include <alpaka/core/Unused.hpp>
 
 #if BOOST_COMP_NVCC >= BOOST_VERSION_NUMBER(9, 0, 0)
     #include <cuda_runtime_api.h>
@@ -33,12 +31,14 @@
     #endif
 #endif
 
+#include <type_traits>
+
 namespace alpaka
 {
     namespace math
     {
         //#############################################################################
-        //! The standard library abs.
+        //! The HIP built in abs.
         class AbsHipBuiltIn
         {
         public:
@@ -64,6 +64,36 @@ namespace alpaka
                 {
                     alpaka::ignore_unused(abs_ctx);
                     return ::abs(arg);
+                }
+            };
+            //! The HIP built in abs double specialization.
+            template<>
+            struct Abs<
+                AbsHipBuiltIn,
+                double>
+            {
+                __device__ static auto abs(
+                    AbsHipBuiltIn const & abs_ctx,
+                    double const & arg)
+                -> decltype(::fabs(arg))
+                {
+                    alpaka::ignore_unused(abs_ctx);
+                    return ::fabs(arg);
+                }
+            };
+            //! The HIP built in abs float specialization.
+            template<>
+            struct Abs<
+                AbsHipBuiltIn,
+                float>
+            {
+                __device__ static auto abs(
+                    AbsHipBuiltIn const & abs_ctx,
+                    float const & arg)
+                -> float
+                {
+                    alpaka::ignore_unused(abs_ctx);
+                    return ::fabsf(arg);
                 }
             };
         }

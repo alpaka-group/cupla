@@ -18,6 +18,7 @@ function compile {
     if [ $# -eq 4 ] ; then
         compiler_flags="$4"
     fi
+    echo "execute: "${compiler_name} ${test_code_dir}/main.cpp ${test_code_dir}/kernel.cpp  -I${test_code_dir}/../../../include -I${test_code_dir}/../../../alpaka/include -std=c++11 -DCUPLA_ACC_${acc_name} -DCUPLA_HEADER_ONLY -o ${acc_name} ${compiler_flags}
     ret=$(${compiler_name} ${test_code_dir}/main.cpp ${test_code_dir}/kernel.cpp  -I${test_code_dir}/../../../include -I${test_code_dir}/../../../alpaka/include -std=c++11 -DCUPLA_ACC_${acc_name} -DCUPLA_HEADER_ONLY -o ${acc_name} ${compiler_flags} && \
         { echo 0; } || { echo 1; })
     if [ $ret -eq 0 ] && [ $execute_bin -eq 1 ] ; then
@@ -35,11 +36,11 @@ compile 1 "$1" CpuOmp2Blocks "-fopenmp $boost_include"
 compile 1 "$1" CpuOmp2Blocks "-fopenmp -DCUPLA_STREAM_ASYNC_ENABLE=1 $boost_include"
 compile 0 "$1" CpuOmp2Threads "-fopenmp $boost_include"
 compile 0 "$1" CpuOmp2Threads "-fopenmp -DCUPLA_STREAM_ASYNC_ENABLE=1 $boost_include"
-# -lpthread  is required for std::future in C++11
-compile 1 "$1" CpuSerial "-lpthread  $boost_include"
-compile 1 "$1" CpuSerial "-lpthread -DCUPLA_STREAM_ASYNC_ENABLE=1 $boost_include"
-compile 0 "$1" CpuThreads "-lpthread $boost_include"
-compile 0 "$1" CpuThreads "-lpthread -DCUPLA_STREAM_ASYNC_ENABLE=1 $boost_include"
+# -pthread and -lpthread  is required for std::future in C++11
+compile 1 "$1" CpuSerial "-pthread -lpthread  $boost_include"
+compile 1 "$1" CpuSerial "-pthread -pthread -lpthread -DCUPLA_STREAM_ASYNC_ENABLE=1 $boost_include"
+compile 0 "$1" CpuThreads "-pthread -lpthread $boost_include"
+compile 0 "$1" CpuThreads "-pthread -lpthread -DCUPLA_STREAM_ASYNC_ENABLE=1 $boost_include"
 
 nvcc_found=$(which nvcc >/dev/null && { echo 0; } || { echo 1; })
 if [ $nvcc_found -eq 0 ] ; then

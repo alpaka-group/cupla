@@ -15,15 +15,15 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
 #include "alpakaConfig.hpp"
 #include "kernel.hpp"
 #include <alpaka/alpaka.hpp>
 #include <cstdlib>
 #include <iostream>
 
-// hardcode the serial CPU accelerator
-#ifdef ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED
+// This example is hard-coded to use the sequential backend.
+// It requires support for extended lambdas when using nvcc as CUDA compiler.
+#if defined(ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED) && (!defined(__NVCC__) || (defined(__NVCC__) && defined(__CUDACC_EXTENDED_LAMBDA__) ))
 
 // use defines of a specific accelerator
 using Accelerator = CpuSerial;

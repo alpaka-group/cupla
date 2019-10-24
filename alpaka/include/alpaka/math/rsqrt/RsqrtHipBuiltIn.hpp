@@ -7,23 +7,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-
 #pragma once
 
 #ifdef ALPAKA_ACC_GPU_HIP_ENABLED
 
-#include <alpaka/core/Common.hpp>
-#include <alpaka/core/Unused.hpp>
+#include <alpaka/core/BoostPredef.hpp>
 
 #if !BOOST_LANG_HIP
     #error If ALPAKA_ACC_GPU_HIP_ENABLED is set, the compiler has to support HIP!
 #endif
 
-#include <alpaka/math/rsqrt/Traits.hpp> // Rsqrt
+#include <alpaka/math/rsqrt/Traits.hpp>
 
+#include <alpaka/core/Unused.hpp>
 
-
-#include <type_traits>
 #if BOOST_COMP_NVCC >= BOOST_VERSION_NUMBER(9, 0, 0)
     #include <cuda_runtime_api.h>
 #else
@@ -34,13 +31,14 @@
     #endif
 #endif
 
+#include <type_traits>
 
 namespace alpaka
 {
     namespace math
     {
         //#############################################################################
-        //! The standard library rsqrt.
+        //! The HIP rsqrt.
         class RsqrtHipBuiltIn
         {
         public:
@@ -50,7 +48,7 @@ namespace alpaka
         namespace traits
         {
             //#############################################################################
-            //! The standard library rsqrt trait specialization.
+            //! The HIP rsqrt trait specialization.
             template<
                 typename TArg>
             struct Rsqrt<
@@ -66,6 +64,21 @@ namespace alpaka
                 {
                     alpaka::ignore_unused(rsqrt_ctx);
                     return ::rsqrt(arg);
+                }
+            };
+            //! The HIP rsqrt float specialization.
+            template<>
+            struct Rsqrt<
+                RsqrtHipBuiltIn,
+                float>
+            {
+                __device__ static auto rsqrt(
+                    RsqrtHipBuiltIn const & rsqrt_ctx,
+                    float const & arg)
+                -> float
+                {
+                    alpaka::ignore_unused(rsqrt_ctx);
+                    return ::rsqrtf(arg);
                 }
             };
         }

@@ -7,23 +7,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-
 #pragma once
 
 #ifdef ALPAKA_ACC_GPU_HIP_ENABLED
 
-#include <alpaka/core/Common.hpp>
-#include <alpaka/core/Unused.hpp>
+#include <alpaka/core/BoostPredef.hpp>
 
 #if !BOOST_LANG_HIP
     #error If ALPAKA_ACC_GPU_HIP_ENABLED is set, the compiler has to support HIP!
 #endif
 
-#include <alpaka/math/cbrt/Traits.hpp>  // Cbrt
+#include <alpaka/math/cbrt/Traits.hpp>
 
+#include <alpaka/core/Unused.hpp>
 
-
-#include <type_traits>
 #if BOOST_COMP_NVCC >= BOOST_VERSION_NUMBER(9, 0, 0)
     #include <cuda_runtime_api.h>
 #else
@@ -34,12 +31,14 @@
     #endif
 #endif
 
+#include <type_traits>
+
 namespace alpaka
 {
     namespace math
     {
         //#############################################################################
-        //! The standard library cbrt.
+        //! The HIP cbrt.
         class CbrtHipBuiltIn
         {
         public:
@@ -49,7 +48,7 @@ namespace alpaka
         namespace traits
         {
             //#############################################################################
-            //! The standard library cbrt trait specialization.
+            //! The HIP cbrt trait specialization.
             template<
                 typename TArg>
             struct Cbrt<
@@ -65,6 +64,21 @@ namespace alpaka
                 {
                     alpaka::ignore_unused(cbrt_ctx);
                     return ::cbrt(arg);
+                }
+            };
+            //! The HIP cbrt float specialization.
+            template<>
+            struct Cbrt<
+                CbrtHipBuiltIn,
+                float>
+            {
+                __device__ static auto cbrt(
+                    CbrtHipBuiltIn const & cbrt_ctx,
+                    float const & arg)
+                -> float
+                {
+                    alpaka::ignore_unused(cbrt_ctx);
+                    return ::cbrtf(arg);
                 }
             };
         }

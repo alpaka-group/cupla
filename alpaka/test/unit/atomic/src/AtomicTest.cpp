@@ -7,15 +7,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#include <alpaka/atomic/Traits.hpp>
 
-#include <alpaka/alpaka.hpp>
-#include <alpaka/test/acc/Acc.hpp>
+#include <alpaka/test/acc/TestAccs.hpp>
 #include <alpaka/test/KernelExecutionFixture.hpp>
 
 #include <catch2/catch.hpp>
 
 #include <climits>
-
 
 //-----------------------------------------------------------------------------
 ALPAKA_NO_HOST_ACC_WARNING
@@ -950,21 +949,19 @@ struct TestTemplate
     template< typename TAcc >
     void operator()()
     {
-        // This test exceeds the maximum compilation time on MSVC.
-#if !defined(ALPAKA_CI)
         TestAtomicOperations<TAcc, unsigned char>::testAtomicOperations();
         TestAtomicOperations<TAcc, char>::testAtomicOperations();
         TestAtomicOperations<TAcc, unsigned short>::testAtomicOperations();
         TestAtomicOperations<TAcc, short>::testAtomicOperations();
-#endif
+
         TestAtomicOperations<TAcc, unsigned int>::testAtomicOperations();
         TestAtomicOperations<TAcc, int>::testAtomicOperations();
-#if !(defined(ALPAKA_CI) && BOOST_COMP_MSVC)
+
         TestAtomicOperations<TAcc, unsigned long>::testAtomicOperations();
         TestAtomicOperations<TAcc, long>::testAtomicOperations();
         TestAtomicOperations<TAcc, unsigned long long>::testAtomicOperations();
         TestAtomicOperations<TAcc, long long>::testAtomicOperations();
-#endif
+
         // Not all atomic operations are possible with floating point values.
         //TestAtomicOperations<TAcc, float>::testAtomicOperations();
         //TestAtomicOperations<TAcc, double>::testAtomicOperations();
@@ -973,5 +970,9 @@ struct TestTemplate
 
 TEST_CASE( "atomicOperationsWorking", "[atomic]")
 {
-    alpaka::meta::forEachType< alpaka::test::acc::TestAccs >( TestTemplate() );
+    using TestAccs = alpaka::test::acc::EnabledAccs<
+        alpaka::dim::DimInt<1u>,
+        std::size_t>;
+
+    alpaka::meta::forEachType< TestAccs >( TestTemplate() );
 }
