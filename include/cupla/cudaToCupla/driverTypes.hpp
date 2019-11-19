@@ -53,7 +53,7 @@
 /* cudaEventBlockingSync is a define in CUDA, hence we must remove
  * the old definition with the cupla enum
  */
-#define cudaEventBlockingSync cuplaEventBlockingSync 
+#define cudaEventBlockingSync cuplaEventBlockingSync
 
 #ifdef cudaEventDisableTiming
 #undef cudaEventDisableTiming
@@ -77,23 +77,37 @@
 #define cudaMemcpyDeviceToDevice cuplaMemcpyDeviceToDevice
 #define cudaMemcpyHostToHost cuplaMemcpyHostToHost
 
-// index renaming
+/* index renaming
+ *
+ * cupla_acc_uint3 will be later renamed to ::cupla::CUPLA_ACCELERATOR_NAMESPACE::uint3
+ */
 #define blockIdx                                                               \
-  static_cast<uint3>(                                                \
+  static_cast<cupla_acc_uint3>(                                                \
       ::alpaka::idx::getIdx<::alpaka::Grid, ::alpaka::Blocks>(acc))
 #define threadIdx                                                              \
-  static_cast<uint3>(                                                \
+  static_cast<cupla_acc_uint3>(                                                \
       ::alpaka::idx::getIdx<::alpaka::Block, ::alpaka::Threads>(acc))
 
 #define gridDim                                                                \
-  static_cast<uint3>(                                                \
+  static_cast<cupla_acc_uint3>(                                                \
       ::alpaka::workdiv::getWorkDiv<::alpaka::Grid, ::alpaka::Blocks>(acc))
 #define blockDim                                                               \
-  static_cast<uint3>(                                                \
+  static_cast<cupla_acc_uint3>(                                                \
       ::alpaka::workdiv::getWorkDiv<::alpaka::Block, ::alpaka::Threads>(acc))
 #define elemDim                                                               \
-  static_cast<uint3>(                                                \
+  static_cast<cupla_acc_uint3>(                                                \
       ::alpaka::workdiv::getWorkDiv<::alpaka::Thread, ::alpaka::Elems>(acc))
+
+/* rename uint3 to ::cupla::CUPLA_ACCELERATOR_NAMESPACE::uint3
+ *
+ * The renaming needs two steps to allow the user to remove (undefine) this macro definition
+ * and use ::cupla::uint3 directly in the usercode.
+ *
+ * ATTENTION: The full type ::cupla::uint3 can not be used in the user code as long as this macro definition is defined.
+ */
+#define uint3 cupla_acc_uint3
+// stage two to rename names used in blockIdx, threadIdx macro 
+#define cupla_acc_uint3 ::cupla::CUPLA_ACCELERATOR_NAMESPACE::uint3
 
 // atomic functions
 #define atomicAdd(...) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Add>(acc, __VA_ARGS__)
@@ -107,8 +121,6 @@
 #define atomicAnd(...) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::And>(acc, __VA_ARGS__)
 #define atomicXor(...) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Xor>(acc, __VA_ARGS__)
 #define atomicOr(...) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Or>(acc, __VA_ARGS__)
-
-#define uint3 ::cupla::uint3
 
 // recast functions
 namespace cupla
