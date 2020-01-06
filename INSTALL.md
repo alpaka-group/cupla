@@ -33,6 +33,7 @@ Compile an example
         - `ALPAKA_ACC_CPU_B_SEQ_T_THREADS_ENABLE`
         - `ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLE`
         - `ALPAKA_ACC_GPU_CUDA_ENABLE`
+        - `ALPAKA_ACC_CPU_BT_OMP4_ENABLE`
         - `ALPAKA_ACC_CPU_B_OMP2_T_SEQ_ENABLE` (only allowed in combination with
           `CUPLA_KERNEL_OPTI` and `CUPLA_KERNEL_ELEM`, because the `blockSize` must be `dim3(1,1,1)`)
           see [TuningGuide.md](doc/TuningGuide.md)
