@@ -30,7 +30,6 @@
 #if( CUPLA_HEADER_ONLY == 1 )
 #   define CUPLA_HEADER_ONLY_FUNC_SPEC inline
 #endif
-#include "cuda_to_cupla.hpp"
 
 #if( CUPLA_HEADER_ONLY == 1 )
 #   include "cupla/../../src/manager/Driver.cpp"
@@ -40,3 +39,5 @@
 #   include "cupla/../../src/memory.cpp"
 #   include "cupla/../../src/stream.cpp"
 #endif
+
+#include "cuda_to_cupla.hpp"
