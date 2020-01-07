@@ -23,7 +23,6 @@ macro(CUPLA_ADD_EXECUTABLE BinaryName)
     alpaka_add_executable(
         ${BinaryName}
         ${ARGN}
-        ${cupla_SOURCE_FILES}
         )
     target_link_libraries(${BinaryName} PUBLIC cupla)
 endmacro()

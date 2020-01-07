@@ -202,74 +202,71 @@ append_recursive_files_add_to_src_group("${_cupla_SUFFIXED_SOURCE_DIR}" "${_cupl
 
 
 ################################################################################
-# Target.
+# cupla Target.
 ################################################################################
-if(NOT TARGET cupla)
 
-    add_library(
+alpaka_add_library(
+    "cupla"
+    ${_cupla_FILES_HEADER} ${_cupla_FILES_OTHER} ${_cupla_FILES_SOURCE})
+
+# Even if there are no sources CMAKE has to know the language.
+set_target_properties("cupla" PROPERTIES LINKER_LANGUAGE CXX)
+
+# properties
+target_compile_features("cupla"
+    PUBLIC cxx_std_11
+    )
+set_target_properties("cupla" PROPERTIES
+    CXX_EXTENSIONS OFF
+    CXX_STANDARD_REQUIRED ON
+    )
+
+# Compile options.
+message(STATUS "_cupla_COMPILE_OPTIONS_PUBLIC: ${_cupla_COMPILE_OPTIONS_PUBLIC}")
+list(
+    LENGTH
+    _cupla_COMPILE_OPTIONS_PUBLIC
+    _cupla_COMPILE_OPTIONS_PUBLIC_LENGTH)
+if("${_cupla_COMPILE_OPTIONS_PUBLIC_LENGTH}")
+    TARGET_COMPILE_OPTIONS(
         "cupla"
-        ${_cupla_FILES_HEADER} ${_cupla_FILES_OTHER})
+        PUBLIC ${_cupla_COMPILE_OPTIONS_PUBLIC})
+endif()
 
-    # Even if there are no sources CMAKE has to know the language.
-    set_target_properties("cupla" PROPERTIES LINKER_LANGUAGE CXX)
+# Compile definitions.
+message(STATUS "_cupla_COMPILE_DEFINITIONS_PUBLIC: ${_cupla_COMPILE_DEFINITIONS_PUBLIC}")
+list(
+    LENGTH
+    _cupla_COMPILE_DEFINITIONS_PUBLIC
+    _cupla_COMPILE_DEFINITIONS_PUBLIC_LENGTH)
+if("${_cupla_COMPILE_DEFINITIONS_PUBLIC_LENGTH}")
+    TARGET_COMPILE_DEFINITIONS(
+        "cupla"
+        PUBLIC ${_cupla_COMPILE_DEFINITIONS_PUBLIC})
+endif()
 
-    # properties
-    target_compile_features("cupla"
-        PUBLIC cxx_std_11
-        )
-    set_target_properties("cupla" PROPERTIES
-        CXX_EXTENSIONS OFF
-        CXX_STANDARD_REQUIRED ON
-        )
+# Include directories.
+message(STATUS "_cupla_INCLUDE_DIRECTORIES_PUBLIC: ${_cupla_INCLUDE_DIRECTORIES_PUBLIC}")
+list(
+    LENGTH
+    _cupla_INCLUDE_DIRECTORIES_PUBLIC
+    _cupla_INCLUDE_DIRECTORIES_PUBLIC_LENGTH)
+if("${_cupla_INCLUDE_DIRECTORIES_PUBLIC_LENGTH}")
+    TARGET_INCLUDE_DIRECTORIES(
+        "cupla"
+        PUBLIC ${_cupla_INCLUDE_DIRECTORIES_PUBLIC})
+endif()
 
-
-    # Compile options.
-    message(STATUS "_cupla_COMPILE_OPTIONS_PUBLIC: ${_cupla_COMPILE_OPTIONS_PUBLIC}")
-    list(
-        LENGTH
-        _cupla_COMPILE_OPTIONS_PUBLIC
-        _cupla_COMPILE_OPTIONS_PUBLIC_LENGTH)
-    if("${_cupla_COMPILE_OPTIONS_PUBLIC_LENGTH}")
-        TARGET_COMPILE_OPTIONS(
-            "cupla"
-            PUBLIC ${_cupla_COMPILE_OPTIONS_PUBLIC})
-    endif()
-
-    # Compile definitions.
-    message(STATUS "_cupla_COMPILE_DEFINITIONS_PUBLIC: ${_cupla_COMPILE_DEFINITIONS_PUBLIC}")
-    list(
-        LENGTH
-        _cupla_COMPILE_DEFINITIONS_PUBLIC
-        _cupla_COMPILE_DEFINITIONS_PUBLIC_LENGTH)
-    if("${_cupla_COMPILE_DEFINITIONS_PUBLIC_LENGTH}")
-        TARGET_COMPILE_DEFINITIONS(
-            "cupla"
-            PUBLIC ${_cupla_COMPILE_DEFINITIONS_PUBLIC})
-    endif()
-
-    # Include directories.
-    message(STATUS "_cupla_INCLUDE_DIRECTORIES_PUBLIC: ${_cupla_INCLUDE_DIRECTORIES_PUBLIC}")
-    list(
-        LENGTH
-        _cupla_INCLUDE_DIRECTORIES_PUBLIC
-        _cupla_INCLUDE_DIRECTORIES_PUBLIC_LENGTH)
-    if("${_cupla_INCLUDE_DIRECTORIES_PUBLIC_LENGTH}")
-        TARGET_INCLUDE_DIRECTORIES(
-            "cupla"
-            PUBLIC ${_cupla_INCLUDE_DIRECTORIES_PUBLIC})
-    endif()
-
-    # Link libraries.
-    message(STATUS "_cupla_LINK_LIBRARIES_PUBLIC: ${_cupla_LINK_LIBRARIES_PUBLIC}")
-    list(
-        LENGTH
-        _cupla_LINK_LIBRARIES_PUBLIC
-        _cupla_LINK_LIBRARIES_PUBLIC_LENGTH)
-    if("${_cupla_LINK_LIBRARIES_PUBLIC_LENGTH}")
-        target_link_libraries(
-            "cupla"
-            PUBLIC alpaka ${_cupla_LINK_LIBRARIES_PUBLIC})
-    endif()
+# Link libraries.
+message(STATUS "_cupla_LINK_LIBRARIES_PUBLIC: ${_cupla_LINK_LIBRARIES_PUBLIC}")
+list(
+    LENGTH
+    _cupla_LINK_LIBRARIES_PUBLIC
+    _cupla_LINK_LIBRARIES_PUBLIC_LENGTH)
+if("${_cupla_LINK_LIBRARIES_PUBLIC_LENGTH}")
+    target_link_libraries(
+        "cupla"
+        PUBLIC alpaka ${_cupla_LINK_LIBRARIES_PUBLIC})
 endif()
 
 ################################################################################
