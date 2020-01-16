@@ -95,7 +95,16 @@
   static_cast<uint3>(                                                \
       ::alpaka::workdiv::getWorkDiv<::alpaka::Thread, ::alpaka::Elems>(acc))
 
-// atomic functions
+/** Atomic functions
+ *
+ * Compared to their CUDA counterparts, these functions take an additional last
+ * parameter to denote atomicity (synchronization) level. This parameter is
+ * of type ::alpaka::hierarchy::{Grids|Blocks|Threads}. Grids corresponds
+ * to atomicity between different kernels, Blocks - to different blocks
+ * in the same kernel, Threads - to threads of the same block.
+ *
+ * @{
+ */
 #define atomicAdd(...) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Add>(acc, __VA_ARGS__)
 #define atomicSub(...) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Sub>(acc, __VA_ARGS__)
 #define atomicMin(...) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Min>(acc, __VA_ARGS__)
@@ -107,6 +116,7 @@
 #define atomicAnd(...) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::And>(acc, __VA_ARGS__)
 #define atomicXor(...) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Xor>(acc, __VA_ARGS__)
 #define atomicOr(...) ::alpaka::atomic::atomicOp<::alpaka::atomic::op::Or>(acc, __VA_ARGS__)
+/** @} */
 
 #define uint3 ::cupla::uint3
 
