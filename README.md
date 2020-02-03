@@ -53,15 +53,20 @@ Usage
 Authors
 -------
 
-### Maintainers and core developers
+### Maintainers* and Core Developers
 
-- Rene Widera
-- Matthias Werner
+- [Dr. Sergei Bastrakov](https://github.com/sbastrakov)*
+- [Dr. Andrea Bocci](https://github.com/fwyzard)
+- [Simeon Ehrig](https://github.com/SimeonEhrig)
+- [Matthias Werner](https://github.com/tdd11235813)*
+- [Rene Widera](https://github.com/psychocoderHPC)*
 
 ### Former Members, Contributions and Thanks
 
-- Axel Huebl
-- Dr. Michael Bussmann
+- [Dr. Michael Bussmann](https://www.hzdr.de/db/!ContMan.Visi.Card?pUser=4167&pNid=0)
+- [Dr. Axel Huebl](https://github.com/ax3l)
+- [Maximilian Knespel](https://github.com/mxmlnkn)
+- [Vincent Ridder](https://github.com/vincentridder)
 
 
 Trademarks Disclaimer
