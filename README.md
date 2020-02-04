@@ -3,6 +3,8 @@
 
 [![Build Status dev](https://img.shields.io/travis/ComputationalRadiationPhysics/cupla/dev.svg?label=dev)](https://travis-ci.org/ComputationalRadiationPhysics/cupla/branches)
 
+![cupla Release](doc/logo/cupla_logo_320x210.png)
+
 **cupla** [[qχɑpˈlɑʔ]](https://en.wiktionary.org/wiki/Qapla%27) is a simple user
 interface for the platform independent parallel kernel
 acceleration library
