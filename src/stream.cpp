@@ -19,6 +19,7 @@
  */
 
 
+#include "cupla/namespace.hpp"
 #include "cupla_runtime.hpp"
 #include "cupla/manager/Memory.hpp"
 #include "cupla/manager/Device.hpp"
@@ -27,7 +28,10 @@
 
 #include "cupla/api/stream.hpp"
 
+inline namespace CUPLA_ACCELERATOR_NAMESPACE
+{
 
+CUPLA_HEADER_ONLY_FUNC_SPEC
 cuplaError_t
 cuplaStreamCreate(
     cuplaStream_t * stream
@@ -41,6 +45,7 @@ cuplaStreamCreate(
     return cuplaSuccess;
 };
 
+CUPLA_HEADER_ONLY_FUNC_SPEC
 cuplaError_t
 cuplaStreamDestroy( cuplaStream_t stream )
 {
@@ -55,6 +60,7 @@ cuplaStreamDestroy( cuplaStream_t stream )
         return cuplaErrorInitializationError;
 };
 
+CUPLA_HEADER_ONLY_FUNC_SPEC
 cuplaError_t
 cuplaStreamSynchronize(
     cuplaStream_t stream
@@ -67,6 +73,8 @@ cuplaStreamSynchronize(
     ::alpaka::wait::wait( streamObject );
     return cuplaSuccess;
 }
+
+CUPLA_HEADER_ONLY_FUNC_SPEC
 cuplaError_t
 cuplaStreamWaitEvent(
     cuplaStream_t stream,
@@ -88,6 +96,7 @@ cuplaStreamWaitEvent(
     return cuplaSuccess;
 }
 
+CUPLA_HEADER_ONLY_FUNC_SPEC
 cuplaError_t
 cuplaStreamQuery( cuplaStream_t stream )
 {
@@ -96,8 +105,10 @@ cuplaStreamQuery( cuplaStream_t stream )
         cupla::AccStream
     >::get().stream( stream );
 
-    if( alpaka::stream::empty( streamObject ) )
+    if( alpaka::queue::empty( streamObject ) )
         return cuplaSuccess;
     else
         return cuplaErrorNotReady;
 };
+
+} //namespace CUPLA_ACCELERATOR_NAMESPACE
