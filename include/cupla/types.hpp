@@ -130,10 +130,17 @@ inline namespace CUPLA_ACCELERATOR_NAMESPACE
 #endif
 
 #ifdef ALPAKA_ACC_CPU_BT_OMP4_ENABLED
-    using Acc = ::alpaka::acc::AccCpuOmp4<
-        KernelDim,
-        IdxType
-    >;
+    #if (CUPLA_NUM_SELECTED_DEVICES == 1)
+        using Acc = ::alpaka::acc::AccCpuOmp4<
+            KernelDim,
+            IdxType
+        >;
+    #else
+        using AccThreadSeq = ::alpaka::acc::AccCpuOmp4<
+            KernelDim,
+            IdxType
+        >;
+    #endif
 #endif
 
 #endif

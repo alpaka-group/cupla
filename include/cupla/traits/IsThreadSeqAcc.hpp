@@ -91,6 +91,22 @@ namespace traits
     };
 #endif
 
+#ifdef ALPAKA_ACC_CPU_BT_OMP4_ENABLED
+    template<
+        typename T_KernelDim,
+        typename T_IndexType
+    >
+    struct IsThreadSeqAcc<
+        ::alpaka::acc::AccCpuOmp4<
+            T_KernelDim,
+            T_IndexType
+        >
+    >
+    {
+        static constexpr bool value = true;
+    };
+#endif
+
 } // namespace traits
 } // namespace CUPLA_ACCELERATOR_NAMESPACE
 } // namespace cupla
