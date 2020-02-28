@@ -22,7 +22,7 @@ env:
     - CUDA_ROOT: $HOME/.cache/cuda
     - CMAKE_ROOT: $HOME/.cache/cmake
     - BOOST_ROOT: $HOME/.cache/boost
-    - BOOST_MIN: 106000 # careful: hard coded below
+    - BOOST_MIN: 106501 # careful: hard coded below
     - CUPLA_ROOT: $TRAVIS_BUILD_DIR
     - OMP_NUM_THREADS: 4 # ignored in thread layer
   matrix:
@@ -93,13 +93,13 @@ install:
   - if [ $BOOST_FOUND -ne 0 ]; then
       mkdir -p $ BOOST_ROOT &&
       cd $BOOST_ROOT &&
-      travis_retry wget --no-check-certificate -O boost.tar.bz2 http://sourceforge.net/projects/boost/files/boost/1.62.0/boost_1_62_0.tar.bz2/download &&
+      travis_retry wget --no-check-certificate -O boost.tar.bz2 http://sourceforge.net/projects/boost/files/boost/1.65.1/boost_1_65_1.tar.bz2/download &&
       tar -xjf boost.tar.bz2 &&
-      cd boost_1_62_0 &&
+      cd boost_1_65_1 &&
       ./bootstrap.sh --with-libraries=atomic,chrono,context,date_time,system,thread --prefix=$BOOST_ROOT &&
       ./b2 -j2 &&
       ./b2 install &&
-      rm -rf boost.tar.bz2 boost_1_62_0 &&
+      rm -rf boost.tar.bz2 boost_1_65_1 &&
       cd $HOME;
     fi
   #############################################################################

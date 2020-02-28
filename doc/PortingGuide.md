@@ -2,7 +2,7 @@ Requirements to Port Your Project to *cupla*
 ============================================
 
 - your build system must be `CMake`
-- your code must be compileable with C++11
+- your code must be compatible with C++14
 
 
 Reserved Variable Names
