@@ -38,7 +38,7 @@ For more information see [LICENSE.md](LICENSE.md).
 Dependencies
 ------------
 
-- **cmake 3.11.4**
+- **cmake 3.15.0**
 - **[alpaka 0.5.0](https://github.com/ComputationalRadiationPhysics/alpaka/)**
   - alpaka is loaded as `git subtree` within **cupla**, see [INSTALL.md](INSTALL.md)
 
