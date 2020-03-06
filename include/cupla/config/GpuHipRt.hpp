@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <alpaka/standalone/GpuCudaHipRt.hpp>
+#include <alpaka/standalone/GpuHipRt.hpp>
 
 #ifndef CUPLA_HEADER_ONLY
 #   define CUPLA_HEADER_ONLY 1
