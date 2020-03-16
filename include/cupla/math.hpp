@@ -1,4 +1,4 @@
-/* Copyright 2016-2020 Rene Widera
+/* Copyright 2020 Rene Widera
  *
  * This file is part of cupla.
  *
@@ -21,9 +21,11 @@
 
 #pragma once
 
-#include "cupla.hpp"
-
-#include "cupla/device_functions.hpp"
-
-#include "cupla/cudaToCupla/driverTypes.hpp"
-#include "cupla/cudaToCupla/runtime.hpp"
+#include "cupla/math/Abs.hpp"
+#include "cupla/math/Comparison.hpp"
+#include "cupla/math/Exp.hpp"
+#include "cupla/math/Log.hpp"
+#include "cupla/math/Mod.hpp"
+#include "cupla/math/Root.hpp"
+#include "cupla/math/Round.hpp"
+#include "cupla/math/Trigo.hpp"

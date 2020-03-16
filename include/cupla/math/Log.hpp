@@ -1,4 +1,4 @@
-/* Copyright 2016-2020 Rene Widera
+/* Copyright 2020 Rene Widera
  *
  * This file is part of cupla.
  *
@@ -21,9 +21,24 @@
 
 #pragma once
 
-#include "cupla.hpp"
+#pragma once
 
-#include "cupla/device_functions.hpp"
+#include "cupla/math/Common.hpp"
+#include "cupla/types.hpp"
 
-#include "cupla/cudaToCupla/driverTypes.hpp"
-#include "cupla/cudaToCupla/runtime.hpp"
+namespace cupla
+{
+inline namespace CUPLA_ACCELERATOR_NAMESPACE
+{
+inline namespace device
+{
+inline namespace math
+{
+
+    //! Computes the natural (base e) logarithm.
+    CUPLA_UNARY_MATH_FN( log, alpaka::math::ConceptMathLog, Log )
+
+} // namespace math
+} // namespace device
+} // namespace CUPLA_ACCELERATOR_NAMESPACE
+} // namespace cupla

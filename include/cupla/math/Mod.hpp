@@ -1,4 +1,4 @@
-/* Copyright 2016-2020 Rene Widera
+/* Copyright 2020 Rene Widera
  *
  * This file is part of cupla.
  *
@@ -21,9 +21,25 @@
 
 #pragma once
 
-#include "cupla.hpp"
+#include "cupla/math/Common.hpp"
+#include "cupla/types.hpp"
 
-#include "cupla/device_functions.hpp"
+namespace cupla
+{
+inline namespace CUPLA_ACCELERATOR_NAMESPACE
+{
+inline namespace device
+{
+inline namespace math
+{
 
-#include "cupla/cudaToCupla/driverTypes.hpp"
-#include "cupla/cudaToCupla/runtime.hpp"
+    //! Computes the floating-point remainder of the division operation x/y.
+    CUPLA_BINARY_MATH_FN( fmod, alpaka::math::ConceptMathFmod, Fmod )
+
+    //! Computes the IEEE remainder of the floating point division operation x/y.
+    CUPLA_BINARY_MATH_FN( remainder, alpaka::math::ConceptMathRemainder, Remainder )
+
+} // namespace math
+} // namespace device
+} // namespace CUPLA_ACCELERATOR_NAMESPACE
+} // namespace cupla
