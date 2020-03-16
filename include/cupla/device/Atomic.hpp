@@ -53,13 +53,13 @@ inline namespace device
             typename T_Type                                                    \
         >                                                                      \
         ALPAKA_FN_ACC ALPAKA_FN_INLINE                                         \
-        void functionName(                                                     \
+        T_Type functionName(                                                   \
             T_Acc const & acc,                                                 \
             T_Type *ptr,                                                       \
             T_Type const & value                                               \
         )                                                                      \
         {                                                                      \
-            ::alpaka::atomic::atomicOp< alpakaOp >(                            \
+            return ::alpaka::atomic::atomicOp< alpakaOp >(                     \
                 acc,                                                           \
                 ptr,                                                           \
                 value,                                                         \
@@ -75,14 +75,14 @@ inline namespace device
             typename T_Hierarchy = alpaka::hierarchy::Grids                    \
         >                                                                      \
         ALPAKA_FN_ACC ALPAKA_FN_INLINE                                         \
-        void functionName(                                                     \
+        T_Type functionName(                                                   \
             T_Acc const & acc,                                                 \
             T_Type *ptr,                                                       \
             T_Type const & value,                                              \
             T_Hierarchy const & hierarchy = T_Hierarchy()                      \
         )                                                                      \
         {                                                                      \
-            functionName< T_Hierarchy >(                                       \
+            return functionName< T_Hierarchy >(                                \
                 acc,                                                           \
                 ptr,                                                           \
                 value                                                          \
@@ -130,14 +130,14 @@ inline namespace device
             typename T_Type
         >
         ALPAKA_FN_ACC ALPAKA_FN_INLINE
-        void atomicCas(
+        T_Type atomicCas(
             T_Acc const & acc,
             T_Type *ptr,
             T_Type const & compare,
             T_Type const & value
         )
         {
-            ::alpaka::atomic::atomicOp< ::alpaka::atomic::op::Cas >(
+            return ::alpaka::atomic::atomicOp< ::alpaka::atomic::op::Cas >(
                 acc,
                 ptr,
                 compare,
@@ -154,7 +154,7 @@ inline namespace device
             typename T_Hierarchy = hierarchy::Grids
         >
         ALPAKA_FN_ACC ALPAKA_FN_INLINE
-        void atomicCas(
+        T_Type atomicCas(
             T_Acc const & acc,
             T_Type *ptr,
             T_Type const & compare,
@@ -162,7 +162,7 @@ inline namespace device
             T_Hierarchy const & hierarchy = T_Hierarchy()
         )
         {
-            atomicCas< T_Hierarchy >(
+            return atomicCas< T_Hierarchy >(
                 acc,
                 ptr,
                 compare,
