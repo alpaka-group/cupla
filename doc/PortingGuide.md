@@ -176,7 +176,7 @@ Porting Step by Step
        auto result = deviceFunction( acc, x );
 
 - Cupla code can be mixed with
-  [**alpaka**](https://github.com/ComputationalRadiationPhysics/alpaka)
+  [**alpaka**](https://github.com/alpaka-group/alpaka)
   low level code. This becomes necessary as you are progressing to write more
   general, performance portable code. Additional functionality provided by
   alpaka includes for example, platform independent math functions inside
