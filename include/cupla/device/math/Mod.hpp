@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "cupla/math/Common.hpp"
+#include "cupla/device/math/Common.hpp"
 #include "cupla/types.hpp"
 
 namespace cupla
@@ -33,11 +33,11 @@ inline namespace device
 inline namespace math
 {
 
-    //! Calculates the smaller value of two arguments.
-    CUPLA_BINARY_MATH_FN( min, alpaka::math::ConceptMathMin, Min )
+    //! Computes the floating-point remainder of the division operation x/y.
+    CUPLA_BINARY_MATH_FN( fmod, alpaka::math::ConceptMathFmod, Fmod )
 
-    //! Calculates the larger value of two arguments.
-    CUPLA_BINARY_MATH_FN( max, alpaka::math::ConceptMathMax, Max )
+    //! Computes the IEEE remainder of the floating point division operation x/y.
+    CUPLA_BINARY_MATH_FN( remainder, alpaka::math::ConceptMathRemainder, Remainder )
 
 } // namespace math
 } // namespace device

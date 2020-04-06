@@ -21,28 +21,11 @@
 
 #pragma once
 
-#include "cupla/math/Common.hpp"
-#include "cupla/types.hpp"
-
-namespace cupla
-{
-inline namespace CUPLA_ACCELERATOR_NAMESPACE
-{
-inline namespace device
-{
-inline namespace math
-{
-
-    //! Computes the square root.
-    CUPLA_UNARY_MATH_FN( sqrt, alpaka::math::ConceptMathSqrt, Sqrt )
-
-    //! Computes the inverse square root.
-    CUPLA_UNARY_MATH_FN( rsqrt, alpaka::math::ConceptMathRsqrt, Rsqrt )
-
-    //! Computes the cubic root.
-    CUPLA_UNARY_MATH_FN( cbrt, alpaka::math::ConceptMathCbrt, Cbrt )
-
-} // namespace math
-} // namespace device
-} // namespace CUPLA_ACCELERATOR_NAMESPACE
-} // namespace cupla
+#include "cupla/device/math/Abs.hpp"
+#include "cupla/device/math/Comparison.hpp"
+#include "cupla/device/math/Exp.hpp"
+#include "cupla/device/math/Log.hpp"
+#include "cupla/device/math/Mod.hpp"
+#include "cupla/device/math/Root.hpp"
+#include "cupla/device/math/Round.hpp"
+#include "cupla/device/math/Trigo.hpp"

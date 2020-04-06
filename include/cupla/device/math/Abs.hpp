@@ -21,9 +21,7 @@
 
 #pragma once
 
-#pragma once
-
-#include "cupla/math/Common.hpp"
+#include "cupla/device/math/Common.hpp"
 #include "cupla/types.hpp"
 
 namespace cupla
@@ -35,8 +33,9 @@ inline namespace device
 inline namespace math
 {
 
-    //! Computes the natural (base e) logarithm.
-    CUPLA_UNARY_MATH_FN( log, alpaka::math::ConceptMathLog, Log )
+    //! Computes the absolute value.
+    CUPLA_UNARY_MATH_FN( abs, alpaka::math::ConceptMathAbs, Abs )
+
 
 } // namespace math
 } // namespace device

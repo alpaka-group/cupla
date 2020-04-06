@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "cupla/math/Common.hpp"
+#include "cupla/device/math/Common.hpp"
 #include "cupla/types.hpp"
 
 namespace cupla
@@ -33,8 +33,11 @@ inline namespace device
 inline namespace math
 {
 
-    //! Computes e (Euler's number, 2.7182818...) raised to the given power.
-    CUPLA_UNARY_MATH_FN( exp, alpaka::math::ConceptMathExp, Exp )
+    //! Calculates the smaller value of two arguments.
+    CUPLA_BINARY_MATH_FN( min, alpaka::math::ConceptMathMin, Min )
+
+    //! Calculates the larger value of two arguments.
+    CUPLA_BINARY_MATH_FN( max, alpaka::math::ConceptMathMax, Max )
 
 } // namespace math
 } // namespace device
