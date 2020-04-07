@@ -21,11 +21,22 @@
 
 #pragma once
 
-#include "cupla/math/Abs.hpp"
-#include "cupla/math/Comparison.hpp"
-#include "cupla/math/Exp.hpp"
-#include "cupla/math/Log.hpp"
-#include "cupla/math/Mod.hpp"
-#include "cupla/math/Root.hpp"
-#include "cupla/math/Round.hpp"
-#include "cupla/math/Trigo.hpp"
+#include "cupla/device/math/Common.hpp"
+#include "cupla/types.hpp"
+
+namespace cupla
+{
+inline namespace CUPLA_ACCELERATOR_NAMESPACE
+{
+inline namespace device
+{
+inline namespace math
+{
+
+    //! Computes e (Euler's number, 2.7182818...) raised to the given power.
+    CUPLA_UNARY_MATH_FN( exp, alpaka::math::ConceptMathExp, Exp )
+
+} // namespace math
+} // namespace device
+} // namespace CUPLA_ACCELERATOR_NAMESPACE
+} // namespace cupla

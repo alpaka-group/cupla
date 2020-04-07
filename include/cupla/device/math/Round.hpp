@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "cupla/math/Common.hpp"
+#include "cupla/device/math/Common.hpp"
 #include "cupla/types.hpp"
 
 namespace cupla

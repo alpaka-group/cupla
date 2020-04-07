@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "cupla/math/Common.hpp"
+#include "cupla/device/math/Common.hpp"
 #include "cupla/types.hpp"
 
 namespace cupla
@@ -33,11 +33,14 @@ inline namespace device
 inline namespace math
 {
 
-    //! Computes the floating-point remainder of the division operation x/y.
-    CUPLA_BINARY_MATH_FN( fmod, alpaka::math::ConceptMathFmod, Fmod )
+    //! Computes the square root.
+    CUPLA_UNARY_MATH_FN( sqrt, alpaka::math::ConceptMathSqrt, Sqrt )
 
-    //! Computes the IEEE remainder of the floating point division operation x/y.
-    CUPLA_BINARY_MATH_FN( remainder, alpaka::math::ConceptMathRemainder, Remainder )
+    //! Computes the inverse square root.
+    CUPLA_UNARY_MATH_FN( rsqrt, alpaka::math::ConceptMathRsqrt, Rsqrt )
+
+    //! Computes the cubic root.
+    CUPLA_UNARY_MATH_FN( cbrt, alpaka::math::ConceptMathCbrt, Cbrt )
 
 } // namespace math
 } // namespace device
