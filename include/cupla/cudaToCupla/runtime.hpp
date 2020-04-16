@@ -88,4 +88,15 @@
 #define __fdividef(a,b) ((a)/(b))
 #define __expf(a) alpaka::math::exp(acc,a)
 #define __logf(a) alpaka::math::log(acc,a)
+#define __max(a,b) alpaka::math::max(acc,a,b)
+#endif
+
+#if !defined(ALPAKA_ACC_GPU_CUDA_ENABLED) && !defined(ALPAKA_ACC_GPU_HIP_ENABLED)
+#if defined(__GNUC__) || defined(__GNUG__)
+  #define __popc __builtin_popcount
+#endif
+#ifdef _MSC_VER
+  #include <intrin.h>
+  #define __popc __popcnt
+#endif
 #endif
