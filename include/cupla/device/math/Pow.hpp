@@ -21,13 +21,22 @@
 
 #pragma once
 
-#include "cupla/device/math/Abs.hpp"
-#include "cupla/device/math/Comparison.hpp"
-#include "cupla/device/math/Erf.hpp"
-#include "cupla/device/math/Exp.hpp"
-#include "cupla/device/math/Log.hpp"
-#include "cupla/device/math/Mod.hpp"
-#include "cupla/device/math/Pow.hpp"
-#include "cupla/device/math/Root.hpp"
-#include "cupla/device/math/Round.hpp"
-#include "cupla/device/math/Trigo.hpp"
+#include "cupla/device/math/Common.hpp"
+#include "cupla/types.hpp"
+
+namespace cupla
+{
+inline namespace CUPLA_ACCELERATOR_NAMESPACE
+{
+inline namespace device
+{
+inline namespace math
+{
+
+    //! Computes the value of base raised to the power exp.
+    CUPLA_BINARY_MATH_FN( pow, alpaka::math::ConceptMathPow, Pow )
+
+} // namespace math
+} // namespace device
+} // namespace CUPLA_ACCELERATOR_NAMESPACE
+} // namespace cupla
