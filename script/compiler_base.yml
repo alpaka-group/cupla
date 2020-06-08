@@ -39,3 +39,17 @@
   tags:
     - cuda
     - intel
+
+.base_cuda_clang:
+  variables:
+    GIT_SUBMODULE_STRATEGY: normal
+    ALPAKA_ACCS: "ALPAKA_ACC_GPU_CUDA_ENABLE"
+    CUPLA_CMAKE_ARGS: "-DALPAKA_CUDA_COMPILER=clang"
+  before_script:
+    - nvidia-smi
+    - nvcc --version
+  script:
+      - source script/run_test.sh
+  tags:
+    - cuda
+    - intel
