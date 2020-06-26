@@ -31,6 +31,7 @@
 #include <alpaka/block/shared/dyn/BlockSharedMemDynUniformCudaHipBuiltIn.hpp>
 #include <alpaka/block/shared/st/BlockSharedMemStUniformCudaHipBuiltIn.hpp>
 #include <alpaka/block/sync/BlockSyncUniformCudaHipBuiltIn.hpp>
+#include <alpaka/intrinsic/IntrinsicUniformCudaHipBuiltIn.hpp>
 #include <alpaka/rand/RandUniformCudaHipRand.hpp>
 #include <alpaka/time/TimeUniformCudaHipBuiltIn.hpp>
 
@@ -82,6 +83,7 @@ namespace alpaka
             public block::shared::dyn::BlockSharedMemDynUniformCudaHipBuiltIn,
             public block::shared::st::BlockSharedMemStUniformCudaHipBuiltIn,
             public block::sync::BlockSyncUniformCudaHipBuiltIn,
+            public intrinsic::IntrinsicUniformCudaHipBuiltIn,
             public rand::RandUniformCudaHipRand,
             public time::TimeUniformCudaHipBuiltIn
         {
@@ -307,7 +309,7 @@ namespace alpaka
             //! specialization of the TKernelFnObj return type evaluation
             //
             // It is not possible to determine the result type of a __device__ lambda for CUDA on the host side.
-            // https://github.com/ComputationalRadiationPhysics/alpaka/pull/695#issuecomment-446103194
+            // https://github.com/alpaka-group/alpaka/pull/695#issuecomment-446103194
             // The execution task TaskKernelGpuUniformCudaHipRt is therefore performing this check on device side.
             template<
                 typename TDim,

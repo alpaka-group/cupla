@@ -11,7 +11,7 @@
 
 #include <alpaka/core/Common.hpp>
 
-#include <boost/config.hpp>
+#include <alpaka/core/Concepts.hpp>
 
 namespace alpaka
 {
@@ -72,6 +72,10 @@ namespace alpaka
             typename T>
         using Dev = typename traits::DevType<T>::type;
 
+        struct ConceptGetDev;
+
+        struct ConceptDev;
+
         //-----------------------------------------------------------------------------
         //! \return The device this object is bound to.
         template<
@@ -79,9 +83,10 @@ namespace alpaka
         ALPAKA_FN_HOST auto getDev(
             T const & t)
         {
+            using ImplementationBase = concepts::ImplementationBase<ConceptGetDev, T>;
             return
                 traits::GetDev<
-                    T>
+                    ImplementationBase>
                 ::getDev(
                     t);
         }
@@ -144,6 +149,21 @@ namespace alpaka
                 TDev>
             ::reset(
                 dev);
+        }
+
+        namespace traits
+        {
+            //#############################################################################
+            //! Get device type
+            template<
+                typename TDev>
+            struct DevType<
+                TDev,
+                typename std::enable_if<concepts::ImplementsConcept<dev::ConceptDev, TDev>::value>::type
+            >
+            {
+                using type = typename concepts::ImplementationBase<dev::ConceptDev, TDev>;
+            };
         }
     }
 }

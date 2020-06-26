@@ -13,8 +13,6 @@
 
 #include <alpaka/core/Common.hpp>
 
-#include <boost/config.hpp>
-
 namespace alpaka
 {
     //-----------------------------------------------------------------------------
@@ -101,7 +99,8 @@ namespace alpaka
                 typename TElem,
                 typename TDim,
                 typename TIdx>
-            using Buf = typename traits::BufType<TDev, TElem, TDim, TIdx>::type;
+            using Buf = typename traits::BufType<
+                alpaka::dev::Dev<TDev>, TElem, TDim, TIdx>::type;
 
             //-----------------------------------------------------------------------------
             //! Allocates memory on the given device.

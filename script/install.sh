@@ -24,6 +24,13 @@ then
     travis_retry apt-get -y --quiet update
     travis_retry apt-get -y install sudo
 
+    # tzdata is installed by software-properties-common but it requires some special handling
+    if [[ "${ALPAKA_CI_DOCKER_BASE_IMAGE_NAME}" == *"20.04"* ]]
+    then
+        export DEBIAN_FRONTEND=noninteractive
+        travis_retry sudo apt-get --quiet --allow-unauthenticated --no-install-recommends install tzdata
+    fi
+
     # software-properties-common: 'add-apt-repository' and certificates for wget https download
     # binutils: ld
     # xz-utils: xzcat
@@ -35,10 +42,7 @@ then
     ./script/install_cmake.sh
 fi
 
-if [ "$TRAVIS_OS_NAME" = "linux" ]
-then
-    if [ "${ALPAKA_CI_ANALYSIS}" == "ON" ] ;then ./script/install_analysis.sh ;fi
-fi
+if [ "${ALPAKA_CI_ANALYSIS}" == "ON" ] ;then ./script/install_analysis.sh ;fi
 
 # Install CUDA before installing gcc as it installs gcc-4.8 and overwrites our selected compiler
 if [ "${ALPAKA_CI_INSTALL_CUDA}" == "ON" ] ;then ./script/install_cuda.sh ;fi
@@ -48,6 +52,9 @@ then
     if [ "${CXX}" == "g++" ] ;then ./script/install_gcc.sh ;fi
     if [ "${CXX}" == "clang++" ] ;then source ./script/install_clang.sh ;fi
     if [ "${ALPAKA_CI_INSTALL_HIP}" == "ON" ] ;then ./script/install_hip.sh ;fi
+elif [ "$TRAVIS_OS_NAME" = "osx" ]
+then
+    sudo xcode-select -s "/Applications/Xcode_${ALPAKA_CI_XCODE_VER}.app/Contents/Developer"
 fi
 
 if [ "${ALPAKA_CI_INSTALL_TBB}" = "ON" ]
