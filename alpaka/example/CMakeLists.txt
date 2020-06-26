@@ -28,7 +28,8 @@ project("alpakaExamples")
 # Add subdirectories.
 ################################################################################
 
-add_subdirectory("bufferCopy")
+add_subdirectory("bufferCopy/")
+add_subdirectory("heatEquation/")
 add_subdirectory("helloWorld/")
 add_subdirectory("helloWorldLambda/")
 add_subdirectory("reduce/")
