@@ -2,7 +2,7 @@
 # Copyright 2014-2020 Benjamin Worpitz, Erik Zenker, Axel Huebl, Jan Stephan
 #                     Rene Widera
 #
-# This file is part of Alpaka.
+# This file is part of alpaka.
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -39,7 +39,7 @@ endif()
 if(ALPAKA_ACC_GPU_HIP_ENABLE AND ALPAKA_HIP_PLATFORM MATCHES "clang")
     message(WARNING
         "The HIP back-end is currently experimental."
-        "Alpaka HIP backend compiled with clang does not support callback functions."
+        "alpaka HIP backend compiled with clang does not support callback functions."
         )
 endif()
 
@@ -137,6 +137,9 @@ if(NOT TARGET alpaka)
     add_library(alpaka::alpaka ALIAS alpaka)
 endif()
 
+option(ALPAKA_DEBUG_OFFLOAD_ASSUME_HOST "Allow host-only contructs like assert in offload code in debug mode." ON)
+set(ALPAKA_BLOCK_SHARED_DYN_MEMBER_ALLOC_KIB "30" CACHE STRING "Kibibytes (1024B) of memory to allocate for block shared memory for backends requiring static allocation (includes CPU_B_OMP2_T_SEQ, CPU_B_TBB_T_SEQ, CPU_B_SEQ_T_SEQ)")
+
 #-------------------------------------------------------------------------------
 # Debug output of common variables.
 if(${ALPAKA_DEBUG} GREATER 1)
@@ -192,14 +195,7 @@ find_package(Boost ${_ALPAKA_BOOST_MIN_VER} REQUIRED
 
 target_link_libraries(alpaka INTERFACE Boost::headers)
 
-if(Boost_FIBER_FOUND)
-    if(MSVC AND (${CMAKE_SIZEOF_VOID_P} EQUAL 4))
-        # On Win32 boost context triggers:
-        # libboost_context-vc141-mt-gd-1_64.lib(jump_i386_ms_pe_masm.obj) : error LNK2026: module unsafe for SAFESEH image.
-        target_link_options(Boost::fiber INTERFACE "/SAFESEH:NO")
-    endif()
-    target_link_libraries(alpaka INTERFACE Boost::fiber)
-else()
+if(NOT Boost_FIBER_FOUND)
     message(STATUS "Optional alpaka dependency Boost.Fiber could not be found! Fiber back-end disabled!")
     set(ALPAKA_ACC_CPU_B_SEQ_T_FIBERS_ENABLE OFF CACHE BOOL "Enable the Boost.Fiber CPU back-end" FORCE)
 endif()
@@ -759,6 +755,14 @@ if(ALPAKA_ACC_CPU_B_SEQ_T_THREADS_ENABLE)
 endif()
 if(ALPAKA_ACC_CPU_B_SEQ_T_FIBERS_ENABLE)
     target_compile_definitions(alpaka INTERFACE "ALPAKA_ACC_CPU_B_SEQ_T_FIBERS_ENABLED")
+
+    if(MSVC AND (${CMAKE_SIZEOF_VOID_P} EQUAL 4))
+        # On Win32 boost context triggers:
+        # libboost_context-vc141-mt-gd-1_64.lib(jump_i386_ms_pe_masm.obj) : error LNK2026: module unsafe for SAFESEH image.
+        target_link_options(Boost::fiber INTERFACE "/SAFESEH:NO")
+    endif()
+    target_link_libraries(alpaka INTERFACE Boost::fiber)
+
     message(STATUS ALPAKA_ACC_CPU_B_SEQ_T_FIBERS_ENABLED)
 endif()
 if(ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLE)
@@ -791,6 +795,10 @@ if(ALPAKA_EMU_MEMCPY3D)
 endif()
 
 target_compile_definitions(alpaka INTERFACE "ALPAKA_DEBUG=${ALPAKA_DEBUG}")
+if(ALPAKA_DEBUG_OFFLOAD_ASSUME_HOST)
+   target_compile_definitions(alpaka INTERFACE "ALPAKA_DEBUG_OFFLOAD_ASSUME_HOST")
+endif()
+target_compile_definitions(alpaka INTERFACE "ALPAKA_BLOCK_SHARED_DYN_MEMBER_ALLOC_KIB=${ALPAKA_BLOCK_SHARED_DYN_MEMBER_ALLOC_KIB}")
 
 if(ALPAKA_CI)
     target_compile_definitions(alpaka INTERFACE "ALPAKA_CI")
@@ -881,5 +889,10 @@ if((ALPAKA_ACC_GPU_CUDA_ENABLE OR ALPAKA_ACC_GPU_HIP_ENABLE) AND ALPAKA_CUDA_COM
                  PROPERTY INTERFACE_COMPILE_OPTIONS)
     string(REPLACE ";" " " _ALPAKA_COMPILE_OPTIONS_STRING "${_ALPAKA_COMPILE_OPTIONS_PUBLIC}")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_ALPAKA_COMPILE_OPTIONS_STRING}")
+
+    # Append CMAKE_CXX_FLAGS_[Release|Debug|RelWithDebInfo] to CMAKE_CXX_FLAGS
+    # because FindCUDA only propagates the latter to nvcc.
+    string(TOUPPER "${CMAKE_BUILD_TYPE}" build_config)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${build_config}}")
 endif()
 

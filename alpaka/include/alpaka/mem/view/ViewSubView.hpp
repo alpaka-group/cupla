@@ -1,6 +1,6 @@
 /* Copyright 2019 Benjamin Worpitz, Matthias Werner
  *
- * This file is part of Alpaka.
+ * This file is part of alpaka.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -150,7 +150,7 @@ namespace alpaka
                 //! \param view The view this view is a sub-view of.
                 template<
                     typename TView>
-                ViewSubView(
+                explicit ViewSubView(
                     TView const & view) :
                         ViewSubView(
                             view,
@@ -164,7 +164,7 @@ namespace alpaka
                 //! \param view The view this view is a sub-view of.
                 template<
                     typename TView>
-                ViewSubView(
+                explicit ViewSubView(
                     TView & view) :
                         ViewSubView(
                             view,
