@@ -3,7 +3,7 @@
 #
 # Copyright 2017-2019 Benjamin Worpitz
 #
-# This file is part of Alpaka.
+# This file is part of alpaka.
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -14,7 +14,7 @@ source ./script/travis_retry.sh
 
 source ./script/set.sh
 
-if [ "$TRAVIS_OS_NAME" = "linux" ]
+if [ "$ALPAKA_CI_OS_NAME" = "Linux" ]
 then
     #-------------------------------------------------------------------------------
     # Install sloc
@@ -26,7 +26,7 @@ then
     travis_retry sudo apt-get -y --quiet --allow-unauthenticated --no-install-recommends install shellcheck
     shellcheck --version
 
-elif [ "$TRAVIS_OS_NAME" = "osx" ]
+elif [ "$ALPAKA_CI_OS_NAME" = "macOS" ]
 then
     #-------------------------------------------------------------------------------
     # Install sloc

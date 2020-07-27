@@ -3,7 +3,7 @@
 #
 # Copyright 2017-2019 Benjamin Worpitz
 #
-# This file is part of Alpaka.
+# This file is part of alpaka.
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -12,7 +12,7 @@
 
 source ./script/set.sh
 
-if [ "$TRAVIS_OS_NAME" = "linux" ] || [ "$TRAVIS_OS_NAME" = "osx" ]
+if [ "$ALPAKA_CI_OS_NAME" = "Linux" ] || [ "$ALPAKA_CI_OS_NAME" = "macOS" ]
 then
     #-------------------------------------------------------------------------------
     # sloc
