@@ -1,6 +1,6 @@
 /* Copyright 2019 Benjamin Worpitz, Matthias Werner
  *
- * This file exemplifies usage of Alpaka.
+ * This file exemplifies usage of alpaka.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,6 +16,7 @@
  */
 
 #include <alpaka/alpaka.hpp>
+#include <alpaka/example/ExampleDefaultAcc.hpp>
 
 #include <random>
 #include <iostream>
@@ -79,6 +80,7 @@ auto main()
 #if defined(ALPAKA_CI) && !defined(ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED)
     return EXIT_SUCCESS;
 #else
+
     // Define the index domain
     using Dim = alpaka::dim::DimInt<1u>;
     using Idx = std::size_t;
@@ -88,6 +90,7 @@ auto main()
     // It is possible to choose from a set of accelerators
     // that are defined in the alpaka::acc namespace e.g.:
     // - AccGpuCudaRt
+    // - AccGpuHipRt
     // - AccCpuThreads
     // - AccCpuFibers
     // - AccCpuOmp2Threads
@@ -95,7 +98,9 @@ auto main()
     // - AccCpuOmp4
     // - AccCpuTbbBlocks
     // - AccCpuSerial
-    using Acc = alpaka::acc::AccCpuSerial<Dim, Idx>;
+    // using Acc = alpaka::acc::AccCpuSerial<Dim, Idx>;
+    using Acc = alpaka::example::ExampleDefaultAcc<Dim, Idx>;
+    std::cout << "Using alpaka accelerator: " << alpaka::acc::getAccName<Acc>() << std::endl;
 
     // Defines the synchronization behavior of a queue
     //
@@ -141,7 +146,7 @@ auto main()
     Data * const pBufHostB(alpaka::mem::view::getPtrNative(bufHostB));
     Data * const pBufHostC(alpaka::mem::view::getPtrNative(bufHostC));
 
-    // C++11 random generator for uniformly distributed numbers in {1,..,42}
+    // C++14 random generator for uniformly distributed numbers in {1,..,42}
     std::random_device rd{};
     std::default_random_engine eng{ rd() };
     std::uniform_int_distribution<Data> dist(1, 42);

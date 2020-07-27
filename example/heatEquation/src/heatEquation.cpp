@@ -1,6 +1,6 @@
 /* Copyright 2019 Benjamin Worpitz, Matthias Werner
  *
- * This file exemplifies usage of Alpaka.
+ * This file exemplifies usage of alpaka.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,6 +16,7 @@
  */
 
 #include <alpaka/alpaka.hpp>
+#include <alpaka/example/ExampleDefaultAcc.hpp>
 
 #include <algorithm>
 #include <cmath>
@@ -23,7 +24,7 @@
 
 
 //#############################################################################
-//! Alpaka version of explicit finite-difference 1d heat equation solver
+//! alpaka version of explicit finite-difference 1d heat equation solver
 //!
 //! Solving equation u_t(x, t) = u_xx(x, t) using a simple explicit scheme with
 //! forward difference in t and second-order central difference in x
@@ -120,10 +121,9 @@ auto main( ) -> int
     using Idx = uint32_t;
 
     // Select accelerator-types for host and device
-    using Acc = alpaka::acc::AccCpuSerial<
-        Dim,
-        Idx
-    >;
+    // using Acc = alpaka::acc::AccCpuSerial<Dim, Idx>;
+    using Acc = alpaka::example::ExampleDefaultAcc<Dim, Idx>;
+    std::cout << "Using alpaka accelerator: " << alpaka::acc::getAccName<Acc>() << std::endl;
 
     using DevHost = alpaka::dev::DevCpu;
 

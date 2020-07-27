@@ -1,6 +1,6 @@
 /* Copyright 2020 Sergei Bastrakov
  *
- * This file is part of Alpaka.
+ * This file is part of alpaka.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -56,27 +56,51 @@ namespace alpaka
                 //-----------------------------------------------------------------------------
                 __device__ static auto popcount(
                     intrinsic::IntrinsicUniformCudaHipBuiltIn const & /*intrinsic*/,
-                    unsigned int value)
-                -> int
+                    std::uint32_t value)
+                -> std::int32_t
                 {
-#if BOOST_COMP_CLANG
+#if BOOST_COMP_CLANG && BOOST_LANG_CUDA
                     return __popc(static_cast<int>(value));
 #else
-                    return __popc(value);
+                    return __popc(static_cast<unsigned int>(value));
 #endif
                 }
 
                 //-----------------------------------------------------------------------------
                 __device__ static auto popcount(
                     intrinsic::IntrinsicUniformCudaHipBuiltIn const & /*intrinsic*/,
-                    unsigned long long value)
-                -> int
+                    std::uint64_t value)
+                -> std::int32_t
                 {
-#if BOOST_COMP_CLANG
+#if BOOST_COMP_CLANG && BOOST_LANG_CUDA
                     return __popcll(static_cast<long long>(value));
 #else
-                    return __popcll(value);
+                    return __popcll(static_cast<unsigned long long>(value));
 #endif
+                }
+            };
+
+            //#############################################################################
+            template<>
+            struct Ffs<
+                IntrinsicUniformCudaHipBuiltIn>
+            {
+                //-----------------------------------------------------------------------------
+                __device__ static auto ffs(
+                    intrinsic::IntrinsicUniformCudaHipBuiltIn const & /*intrinsic*/,
+                    std::int32_t value)
+                -> std::int32_t
+                {
+                    return __ffs(static_cast<int>(value));
+                }
+
+                //-----------------------------------------------------------------------------
+                __device__ static auto ffs(
+                    intrinsic::IntrinsicUniformCudaHipBuiltIn const & /*intrinsic*/,
+                    std::int64_t value)
+                -> std::int32_t
+                {
+                    return __ffsll(static_cast<long long>(value));
                 }
             };
         }
