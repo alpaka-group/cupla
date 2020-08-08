@@ -1,5 +1,24 @@
+Mapping onto Specific Hardware Architectures
+============================================
+
+By providing an accelerator independent interface for kernels, their execution and memory accesses at different hierarchy levels, *alpaka* allows the user to write accelerator independent code that does not neglect performance.
+
+The mapping of the decomposition to the execution environment is handled by the back-ends provided by the *alpaka* library as well as user defined back-ends.
+A computation that is described with a maximum of the parallelism available in the *redundant hierarchical parallelism* abstraction can not be mapped one to one to any existing hardware.
+GPUs do not have vector registers for ``float`` or ``double`` types.
+Therefore, the element level is often omitted on *CUDA* accelerators.
+CPUs in turn are not (currently) capable of running thousands of threads concurrently and do not have equivalently fast inter-thread synchronization and shared memory access as GPUs do.
+
+A major point of the *redundant hierarchical parallelism* abstraction is to ignore specific unsupported levels and utilize only the ones supported on a specific accelerator.
+This allows a mapping to various current and future accelerators in a variety of ways enabling optimal usage of the underlying compute and memory capabilities.
+
+The grid level is always mapped to the whole device being in consideration.
+The scheduler can always execute multiple kernel grids from multiple queues in parallel by statically or dynamically subdividing the available resources.
+However, this will only ever simplify the mapping due to less available processing units.
+Furthermore, being restricted to less resources automatically improves the locality of data due to spatial and temporal locality properties of the caching hierarchy.
+
 x86 CPUs
-========
+````````
 
 There are multiple possible ways to map the *alpaka* abstraction to x86 CPUs.
 The following figure shows the compute and memory hierarchy of a dual-socket (package) node with dual-core CPUs and symmetric multithreading (Hyper-Threading).
@@ -17,7 +36,7 @@ Warp
 ----
 
 Even though a warp seems to be identical to a vector register, because both execute a single uniform instruction on multiple data elements, they are not the same.
-:doc:`Warps </usage/abstraction>` can handle branches with divergent control flows of multiple threads.
+:doc:`Warps </basic/abstraction>` can handle branches with divergent control flows of multiple threads.
 There is no equivalent hardware unit in a CPU supporting this.
 Therefore, the warp level can not be utilized on CPUs leading to a one-to-one mapping of threads to warps which does not violate the rules of the abstraction.
 
@@ -59,7 +78,8 @@ Each processing unit (possibly a Hyper-Thread) executes one or more threads of o
 This possible mapping of blocks, threads and elements to the compute and memory hierarchy of a dual-socket node with dual-core CPUs and symmetric multithreading is illustrated in the following figure.
 ![x86_cpu](x86/x86_cpu_mapping.png)
 
-### One Block Per Thread
+One Block Per Thread
+++++++++++++++++++++
 
 If there is no symmetric multithreading or if it is desired, it is also possible to implement a mapping of one block with exactly one thread for each processing unit.
 This allows to completely remove the synchronization overhead for tasks where this is not required at all.
@@ -98,3 +118,12 @@ An advantage of a user level scheduler over the operating system thread schedule
 Furthermore, fibers reduce the number of locks and busy waits within a block because only one fiber is active per operating system thread at a time.
 
 There are multiple C++ Standards Committee Papers (N3858, N3985, N4134) discussing the inclusion of fibers, awaitable functions and similar concepts into C++.
+
+GPUs (CUDA/HIP)
+```````````````
+
+Mapping the abstraction to GPUs supporting *CUDA* and *HIP* is straightforward because the hierarchy levels are identical up to the element level.
+So blocks of warps of threads will be mapped directly to their *CUDA*/*HIP* equivalent.
+
+The element level is supported through an additional run-time variable containing the extent of elements per thread.
+This variable can be accessed by all threads and should optimally be placed in constant device memory for fast access.
