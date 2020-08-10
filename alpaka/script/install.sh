@@ -25,7 +25,7 @@ then
     travis_retry apt-get -y install sudo
 
     # tzdata is installed by software-properties-common but it requires some special handling
-    if [[ "${ALPAKA_CI_DOCKER_BASE_IMAGE_NAME}" == *"20.04"* ]]
+    if [[ "$(cat /etc/os-release)" == *"20.04"* ]]
     then
         export DEBIAN_FRONTEND=noninteractive
         travis_retry sudo apt-get --quiet --allow-unauthenticated --no-install-recommends install tzdata
@@ -51,7 +51,6 @@ if [ "$ALPAKA_CI_OS_NAME" = "Linux" ]
 then
     if [ "${CXX}" == "g++" ] ;then ./script/install_gcc.sh ;fi
     if [ "${CXX}" == "clang++" ] ;then source ./script/install_clang.sh ;fi
-    if [ "${ALPAKA_CI_INSTALL_HIP}" == "ON" ] ;then ./script/install_hip.sh ;fi
 elif [ "$ALPAKA_CI_OS_NAME" = "macOS" ]
 then
     sudo xcode-select -s "/Applications/Xcode_${ALPAKA_CI_XCODE_VER}.app/Contents/Developer"
@@ -64,10 +63,3 @@ fi
 
 ./script/install_boost.sh
 
-if [ "$ALPAKA_CI_OS_NAME" = "Linux" ]
-then
-    # Minimize docker image size
-    sudo apt-get --quiet --purge autoremove
-    sudo apt-get clean
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-fi

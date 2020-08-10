@@ -82,47 +82,20 @@ then
 
     # HIP
     # HIP_PATH required by HIP tools
-    export HIP_PATH=${ALPAKA_CI_HIP_ROOT_DIR}
-    # CUDA_PATH required by HIP tools
-    if [ -n "$(command -v nvcc)" ]
-    then
-        export CUDA_PATH=$(dirname $(which nvcc))/../
-    else
-        export CUDA_PATH=/usr/local/cuda-${ALPAKA_CUDA_VERSION}
-    fi
+    export HIP_PATH=/opt/rocm
 
     export PATH=${HIP_PATH}/bin:$PATH
     export LD_LIBRARY_PATH=${HIP_PATH}/lib64:${HIP_PATH}/hiprand/lib:${LD_LIBRARY_PATH}
     export CMAKE_PREFIX_PATH=${HIP_PATH}:${HIP_PATH}/hiprand:${CMAKE_PREFIX_PATH:-}
-    # to avoid "use of uninitialized value .." warnings in perl script hipcc
-    # TODO: rely on CI vars for platform and architecture
-    export HIP_PLATFORM=nvcc
-    export HIP_RUNTIME=nvcc
     # calls nvcc or clang
     which hipcc
-    hipcc -V
+    hipcc --version
     which hipconfig
     hipconfig --platform
     hipconfig -v
     # print newline as previous command does not do this
     echo
 
-fi
-
-# clang
-if [ "$ALPAKA_CI_OS_NAME" = "Linux" ]
-then
-    if [ "${CXX}" == "clang++" ]
-    then
-        # We have to prepend /usr/bin to the path because else the preinstalled clang from usr/bin/local/ is used.
-        export PATH=${ALPAKA_CI_CLANG_DIR}/bin:${PATH}
-        export LD_LIBRARY_PATH=${ALPAKA_CI_CLANG_DIR}/lib:${LD_LIBRARY_PATH}
-        if [ -z "${CPPFLAGS+x}" ]
-        then
-            CPPFLAGS=
-        fi
-        export CPPFLAGS="-I ${ALPAKA_CI_CLANG_DIR}/include/c++/v1 ${CPPFLAGS}"
-    fi
 fi
 
 # stdlib
