@@ -61,19 +61,19 @@ public:
     }
 };
 
-using TestAccs = alpaka::test::acc::EnabledAccs<
-    alpaka::dim::DimInt<1u>,
+using TestAccs = alpaka::test::EnabledAccs<
+    alpaka::DimInt<1u>,
     std::size_t>;
 
 //-----------------------------------------------------------------------------
 TEMPLATE_LIST_TEST_CASE( "sincos", "[sincos]", TestAccs)
 {
     using Acc = TestType;
-    using Dim = alpaka::dim::Dim<Acc>;
-    using Idx = alpaka::idx::Idx<Acc>;
+    using Dim = alpaka::Dim<Acc>;
+    using Idx = alpaka::Idx<Acc>;
 
     alpaka::test::KernelExecutionFixture<Acc> fixture(
-        alpaka::vec::Vec<Dim, Idx>::ones());
+        alpaka::Vec<Dim, Idx>::ones());
 
     SinCosTestKernel kernel;
 

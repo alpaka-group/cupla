@@ -57,12 +57,12 @@ public:
 //-----------------------------------------------------------------------------
 TEST_CASE("cudaOnlyModeWorking", "[cudaOnly]")
 {
-    using TAcc = alpaka::acc::AccGpuCudaRt<alpaka::dim::DimInt<1u>, std::uint32_t>;
-    using Dim = alpaka::dim::Dim<TAcc>;
-    using Idx = alpaka::idx::Idx<TAcc>;
+    using TAcc = alpaka::AccGpuCudaRt<alpaka::DimInt<1u>, std::uint32_t>;
+    using Dim = alpaka::Dim<TAcc>;
+    using Idx = alpaka::Idx<TAcc>;
 
     alpaka::test::KernelExecutionFixture<TAcc> fixture(
-        alpaka::vec::Vec<Dim, Idx>::ones());
+        alpaka::Vec<Dim, Idx>::ones());
 
     CudaOnlyTestKernel kernel;
 

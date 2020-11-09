@@ -44,14 +44,14 @@ private:
 };
 
 //-----------------------------------------------------------------------------
-TEMPLATE_LIST_TEST_CASE( "kernelWithConstructorAndMember", "[kernel]", alpaka::test::acc::TestAccs)
+TEMPLATE_LIST_TEST_CASE( "kernelWithConstructorAndMember", "[kernel]", alpaka::test::TestAccs)
 {
     using Acc = TestType;
-    using Dim = alpaka::dim::Dim<Acc>;
-    using Idx = alpaka::idx::Idx<Acc>;
+    using Dim = alpaka::Dim<Acc>;
+    using Idx = alpaka::Idx<Acc>;
 
     alpaka::test::KernelExecutionFixture<Acc> fixture(
-        alpaka::vec::Vec<Dim, Idx>::ones());
+        alpaka::Vec<Dim, Idx>::ones());
 
     KernelWithConstructorAndMember kernel(42);
 
@@ -59,14 +59,14 @@ TEMPLATE_LIST_TEST_CASE( "kernelWithConstructorAndMember", "[kernel]", alpaka::t
 }
 
 //-----------------------------------------------------------------------------
-TEMPLATE_LIST_TEST_CASE( "kernelWithConstructorDefaultParamAndMember", "[kernel]", alpaka::test::acc::TestAccs)
+TEMPLATE_LIST_TEST_CASE( "kernelWithConstructorDefaultParamAndMember", "[kernel]", alpaka::test::TestAccs)
 {
     using Acc = TestType;
-    using Dim = alpaka::dim::Dim<Acc>;
-    using Idx = alpaka::idx::Idx<Acc>;
+    using Dim = alpaka::Dim<Acc>;
+    using Idx = alpaka::Idx<Acc>;
 
     alpaka::test::KernelExecutionFixture<Acc> fixture(
-        alpaka::vec::Vec<Dim, Idx>::ones());
+        alpaka::Vec<Dim, Idx>::ones());
 
     KernelWithConstructorAndMember kernel;
 

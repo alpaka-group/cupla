@@ -28,11 +28,11 @@ public:
     -> void
     {
         std::uint64_t const start(
-            alpaka::time::clock(acc));
+            alpaka::clock(acc));
         ALPAKA_CHECK(*success, 0u != start);
 
         std::uint64_t const end(
-            alpaka::time::clock(acc));
+            alpaka::clock(acc));
         ALPAKA_CHECK(*success, 0u != end);
 
         // 'end' has to be greater equal 'start'.
@@ -42,14 +42,14 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-TEMPLATE_LIST_TEST_CASE( "clockIsWorking", "[timeClock]", alpaka::test::acc::TestAccs)
+TEMPLATE_LIST_TEST_CASE( "clockIsWorking", "[timeClock]", alpaka::test::TestAccs)
 {
     using Acc = TestType;
-    using Dim = alpaka::dim::Dim<Acc>;
-    using Idx = alpaka::idx::Idx<Acc>;
+    using Dim = alpaka::Dim<Acc>;
+    using Idx = alpaka::Idx<Acc>;
 
     alpaka::test::KernelExecutionFixture<Acc> fixture(
-        alpaka::vec::Vec<Dim, Idx>::ones());
+        alpaka::Vec<Dim, Idx>::ones());
 
     ClockTestKernel kernel;
 

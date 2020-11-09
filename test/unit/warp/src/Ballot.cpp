@@ -59,10 +59,10 @@ public:
         ALPAKA_CHECK(*success, alpaka::warp::ballot(acc, 0) == 0u);
 
         // Test relies on having a single warp per thread block
-        auto const blockExtent = alpaka::workdiv::getWorkDiv<alpaka::Block, alpaka::Threads>(acc);
+        auto const blockExtent = alpaka::getWorkDiv<alpaka::Block, alpaka::Threads>(acc);
         ALPAKA_CHECK(*success, static_cast<std::int32_t>(blockExtent.prod()) == warpExtent);
-        auto const localThreadIdx = alpaka::idx::getIdx<alpaka::Block, alpaka::Threads>(acc);
-        auto const threadIdxInWarp = static_cast<std::int32_t>(alpaka::idx::mapIdx<1u>(
+        auto const localThreadIdx = alpaka::getIdx<alpaka::Block, alpaka::Threads>(acc);
+        auto const threadIdxInWarp = static_cast<std::int32_t>(alpaka::mapIdx<1u>(
             localThreadIdx,
             blockExtent)[0]);
 
@@ -90,21 +90,21 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-TEMPLATE_LIST_TEST_CASE( "ballot", "[warp]", alpaka::test::acc::TestAccs)
+TEMPLATE_LIST_TEST_CASE( "ballot", "[warp]", alpaka::test::TestAccs)
 {
     using Acc = TestType;
-    using Dev = alpaka::dev::Dev<Acc>;
-    using Pltf = alpaka::pltf::Pltf<Dev>;
-    using Dim = alpaka::dim::Dim<Acc>;
-    using Idx = alpaka::idx::Idx<Acc>;
+    using Dev = alpaka::Dev<Acc>;
+    using Pltf = alpaka::Pltf<Dev>;
+    using Dim = alpaka::Dim<Acc>;
+    using Idx = alpaka::Idx<Acc>;
 
-    Dev const dev(alpaka::pltf::getDevByIdx<Pltf>(0u));
-    auto const warpExtent = alpaka::dev::getWarpSize(dev);
+    Dev const dev(alpaka::getDevByIdx<Pltf>(0u));
+    auto const warpExtent = alpaka::getWarpSize(dev);
     if (warpExtent == 1)
     {
         Idx const gridThreadExtentPerDim = 4;
         alpaka::test::KernelExecutionFixture<Acc> fixture(
-            alpaka::vec::Vec<Dim, Idx>::all(gridThreadExtentPerDim));
+            alpaka::Vec<Dim, Idx>::all(gridThreadExtentPerDim));
         BallotSingleThreadWarpTestKernel kernel;
         REQUIRE(
             fixture(
@@ -113,15 +113,15 @@ TEMPLATE_LIST_TEST_CASE( "ballot", "[warp]", alpaka::test::acc::TestAccs)
     else
     {
         // Work around gcc 7.5 trying and failing to offload for OpenMP 4.0
-#if BOOST_COMP_GNUC && (BOOST_COMP_GNUC == BOOST_VERSION_NUMBER(7, 5, 0)) && ALPAKA_ACC_CPU_BT_OMP4_ENABLED
+#if BOOST_COMP_GNUC && (BOOST_COMP_GNUC == BOOST_VERSION_NUMBER(7, 5, 0)) && defined ALPAKA_ACC_ANY_BT_OMP5_ENABLED
         return;
 #else
         using ExecutionFixture = alpaka::test::KernelExecutionFixture<Acc>;
-        auto const gridBlockExtent = alpaka::vec::Vec<Dim, Idx>::all(2);
+        auto const gridBlockExtent = alpaka::Vec<Dim, Idx>::all(2);
         // Enforce one warp per thread block
-        auto blockThreadExtent = alpaka::vec::Vec<Dim, Idx>::ones();
+        auto blockThreadExtent = alpaka::Vec<Dim, Idx>::ones();
         blockThreadExtent[0] = static_cast<Idx>(warpExtent);
-        auto const threadElementExtent = alpaka::vec::Vec<Dim, Idx>::ones();
+        auto const threadElementExtent = alpaka::Vec<Dim, Idx>::ones();
         auto workDiv = typename ExecutionFixture::WorkDiv{
             gridBlockExtent,
             blockThreadExtent,

@@ -36,14 +36,14 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-TEMPLATE_LIST_TEST_CASE("KernelWithAdditionalParamByValue", "[kernel]", alpaka::test::acc::TestAccs)
+TEMPLATE_LIST_TEST_CASE("KernelWithAdditionalParamByValue", "[kernel]", alpaka::test::TestAccs)
 {
     using Acc = TestType;
-    using Dim = alpaka::dim::Dim<Acc>;
-    using Idx = alpaka::idx::Idx<Acc>;
+    using Dim = alpaka::Dim<Acc>;
+    using Idx = alpaka::Idx<Acc>;
 
     alpaka::test::KernelExecutionFixture<Acc> fixture(
-        alpaka::vec::Vec<Dim, Idx>::ones());
+        alpaka::Vec<Dim, Idx>::ones());
 
     KernelWithAdditionalParamByValue kernel;
 
@@ -73,14 +73,14 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-TEMPLATE_LIST_TEST_CASE("KernelWithAdditionalParamByRef", "[kernel]", alpaka::test::acc::TestAccs)
+TEMPLATE_LIST_TEST_CASE("KernelWithAdditionalParamByRef", "[kernel]", alpaka::test::TestAccs)
 {
     using Acc = TestType;
-    using Dim = alpaka::dim::Dim<Acc>;
-    using Idx = alpaka::idx::Idx<Acc>;
+    using Dim = alpaka::Dim<Acc>;
+    using Idx = alpaka::Idx<Acc>;
 
     alpaka::test::KernelExecutionFixture<Acc> fixture(
-        alpaka::vec::Vec<Dim, Idx>::ones());
+        alpaka::Vec<Dim, Idx>::ones());
 
     KernelWithAdditionalParamByRef kernel;
 
@@ -106,14 +106,14 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-TEMPLATE_LIST_TEST_CASE("KernelWithAdditionalParamByConstRef", "[kernel]", alpaka::test::acc::TestAccs)
+TEMPLATE_LIST_TEST_CASE("KernelWithAdditionalParamByConstRef", "[kernel]", alpaka::test::TestAccs)
 {
     using Acc = TestType;
-    using Dim = alpaka::dim::Dim<Acc>;
-    using Idx = alpaka::idx::Idx<Acc>;
+    using Dim = alpaka::Dim<Acc>;
+    using Idx = alpaka::Idx<Acc>;
 
     alpaka::test::KernelExecutionFixture<Acc> fixture(
-        alpaka::vec::Vec<Dim, Idx>::ones());
+        alpaka::Vec<Dim, Idx>::ones());
 
     KernelWithAdditionalParamByConstRef kernel;
 

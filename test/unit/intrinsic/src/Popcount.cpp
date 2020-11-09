@@ -37,7 +37,7 @@ public:
         for( auto const input : inputs )
         {
             int const expected = popcountNaive(input);
-            int const actual = alpaka::intrinsic::popcount(acc, input);
+            int const actual = alpaka::popcount(acc, input);
             ALPAKA_CHECK(*success, actual == expected);
         }
     }
@@ -56,14 +56,14 @@ private:
 };
 
 //-----------------------------------------------------------------------------
-TEMPLATE_LIST_TEST_CASE( "popcount", "[intrinsic]", alpaka::test::acc::TestAccs)
+TEMPLATE_LIST_TEST_CASE( "popcount", "[intrinsic]", alpaka::test::TestAccs)
 {
     using Acc = TestType;
-    using Dim = alpaka::dim::Dim<Acc>;
-    using Idx = alpaka::idx::Idx<Acc>;
+    using Dim = alpaka::Dim<Acc>;
+    using Idx = alpaka::Idx<Acc>;
 
     alpaka::test::KernelExecutionFixture<Acc> fixture(
-        alpaka::vec::Vec<Dim, Idx>::ones());
+        alpaka::Vec<Dim, Idx>::ones());
 
     PopcountTestKernel<std::uint32_t> kernel32bit;
     REQUIRE(

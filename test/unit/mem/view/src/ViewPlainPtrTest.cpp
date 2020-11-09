@@ -30,10 +30,6 @@ namespace alpaka
 {
 namespace test
 {
-namespace mem
-{
-namespace view
-{
     //-----------------------------------------------------------------------------
     template<
         typename TAcc,
@@ -42,14 +38,14 @@ namespace view
         typename TDim,
         typename TIdx>
     auto testViewPlainPtrImmutable(
-        alpaka::mem::view::ViewPlainPtr<TDev, TElem, TDim, TIdx> const & view,
+        alpaka::ViewPlainPtr<TDev, TElem, TDim, TIdx> const & view,
         TDev const & dev,
-        alpaka::vec::Vec<TDim, TIdx> const & extentView,
-        alpaka::vec::Vec<TDim, TIdx> const & offsetView)
+        alpaka::Vec<TDim, TIdx> const & extentView,
+        alpaka::Vec<TDim, TIdx> const & offsetView)
     -> void
     {
         //-----------------------------------------------------------------------------
-        alpaka::test::mem::view::testViewImmutable<
+        alpaka::test::testViewImmutable<
             TElem>(
                 view,
                 dev,
@@ -65,10 +61,10 @@ namespace view
         typename TDim,
         typename TIdx>
     auto testViewPlainPtrMutable(
-        alpaka::mem::view::ViewPlainPtr<TDev, TElem, TDim, TIdx> & view,
+        alpaka::ViewPlainPtr<TDev, TElem, TDim, TIdx> & view,
         TDev const & dev,
-        alpaka::vec::Vec<TDim, TIdx> const & extentView,
-        alpaka::vec::Vec<TDim, TIdx> const & offsetView)
+        alpaka::Vec<TDim, TIdx> const & extentView,
+        alpaka::Vec<TDim, TIdx> const & offsetView)
     -> void
     {
         //-----------------------------------------------------------------------------
@@ -79,10 +75,10 @@ namespace view
                 extentView,
                 offsetView);
 
-        using Queue = alpaka::test::queue::DefaultQueue<TDev>;
+        using Queue = alpaka::test::DefaultQueue<TDev>;
         Queue queue(dev);
         //-----------------------------------------------------------------------------
-        alpaka::test::mem::view::testViewMutable<
+        alpaka::test::testViewMutable<
             TAcc>(
                 queue,
                 view);
@@ -95,27 +91,27 @@ namespace view
     auto testViewPlainPtr()
     -> void
     {
-        using Dev = alpaka::dev::Dev<TAcc>;
-        using Pltf = alpaka::pltf::Pltf<Dev>;
+        using Dev = alpaka::Dev<TAcc>;
+        using Pltf = alpaka::Pltf<Dev>;
 
-        using Dim = alpaka::dim::Dim<TAcc>;
-        using Idx = alpaka::idx::Idx<TAcc>;
-        using View = alpaka::mem::view::ViewPlainPtr<Dev, TElem, Dim, Idx>;
+        using Dim = alpaka::Dim<TAcc>;
+        using Idx = alpaka::Idx<TAcc>;
+        using View = alpaka::ViewPlainPtr<Dev, TElem, Dim, Idx>;
 
-        Dev const dev(alpaka::pltf::getDevByIdx<Pltf>(0u));
+        Dev const dev(alpaka::getDevByIdx<Pltf>(0u));
 
-        auto const extentBuf(alpaka::vec::createVecFromIndexedFn<Dim, alpaka::test::CreateVecWithIdx<Idx>::template ForExtentBuf>());
-        auto buf(alpaka::mem::buf::alloc<TElem, Idx>(dev, extentBuf));
+        auto const extentBuf(alpaka::createVecFromIndexedFn<Dim, alpaka::test::CreateVecWithIdx<Idx>::template ForExtentBuf>());
+        auto buf(alpaka::allocBuf<TElem, Idx>(dev, extentBuf));
 
         auto const extentView(extentBuf);
-        auto const offsetView(alpaka::vec::Vec<Dim, Idx>::all(static_cast<Idx>(0)));
+        auto const offsetView(alpaka::Vec<Dim, Idx>::all(static_cast<Idx>(0)));
         View view(
-            alpaka::mem::view::getPtrNative(buf),
-            alpaka::dev::getDev(buf),
+            alpaka::getPtrNative(buf),
+            alpaka::getDev(buf),
             alpaka::extent::getExtentVec(buf),
-            alpaka::mem::view::getPitchBytesVec(buf));
+            alpaka::getPitchBytesVec(buf));
 
-        alpaka::test::mem::view::testViewPlainPtrMutable<TAcc>(view, dev, extentView, offsetView);
+        alpaka::test::testViewPlainPtrMutable<TAcc>(view, dev, extentView, offsetView);
     }
 
     //-----------------------------------------------------------------------------
@@ -125,27 +121,27 @@ namespace view
     auto testViewPlainPtrConst()
     -> void
     {
-        using Dev = alpaka::dev::Dev<TAcc>;
-        using Pltf = alpaka::pltf::Pltf<Dev>;
+        using Dev = alpaka::Dev<TAcc>;
+        using Pltf = alpaka::Pltf<Dev>;
 
-        using Dim = alpaka::dim::Dim<TAcc>;
-        using Idx = alpaka::idx::Idx<TAcc>;
-        using View = alpaka::mem::view::ViewPlainPtr<Dev, TElem, Dim, Idx>;
+        using Dim = alpaka::Dim<TAcc>;
+        using Idx = alpaka::Idx<TAcc>;
+        using View = alpaka::ViewPlainPtr<Dev, TElem, Dim, Idx>;
 
-        Dev const dev(alpaka::pltf::getDevByIdx<Pltf>(0u));
+        Dev const dev(alpaka::getDevByIdx<Pltf>(0u));
 
-        auto const extentBuf(alpaka::vec::createVecFromIndexedFn<Dim, alpaka::test::CreateVecWithIdx<Idx>::template ForExtentBuf>());
-        auto buf(alpaka::mem::buf::alloc<TElem, Idx>(dev, extentBuf));
+        auto const extentBuf(alpaka::createVecFromIndexedFn<Dim, alpaka::test::CreateVecWithIdx<Idx>::template ForExtentBuf>());
+        auto buf(alpaka::allocBuf<TElem, Idx>(dev, extentBuf));
 
         auto const extentView(extentBuf);
-        auto const offsetView(alpaka::vec::Vec<Dim, Idx>::all(static_cast<Idx>(0)));
+        auto const offsetView(alpaka::Vec<Dim, Idx>::all(static_cast<Idx>(0)));
         View const view(
-            alpaka::mem::view::getPtrNative(buf),
-            alpaka::dev::getDev(buf),
+            alpaka::getPtrNative(buf),
+            alpaka::getDev(buf),
             alpaka::extent::getExtentVec(buf),
-            alpaka::mem::view::getPitchBytesVec(buf));
+            alpaka::getPitchBytesVec(buf));
 
-        alpaka::test::mem::view::testViewPlainPtrImmutable<TAcc>(view, dev, extentView, offsetView);
+        alpaka::test::testViewPlainPtrImmutable<TAcc>(view, dev, extentView, offsetView);
     }
 
     //-----------------------------------------------------------------------------
@@ -155,23 +151,23 @@ namespace view
     auto testViewPlainPtrOperators()
     -> void
     {
-        using Dev = alpaka::dev::Dev<TAcc>;
-        using Pltf = alpaka::pltf::Pltf<Dev>;
+        using Dev = alpaka::Dev<TAcc>;
+        using Pltf = alpaka::Pltf<Dev>;
 
-        using Dim = alpaka::dim::Dim<TAcc>;
-        using Idx = alpaka::idx::Idx<TAcc>;
-        using View = alpaka::mem::view::ViewPlainPtr<Dev, TElem, Dim, Idx>;
+        using Dim = alpaka::Dim<TAcc>;
+        using Idx = alpaka::Idx<TAcc>;
+        using View = alpaka::ViewPlainPtr<Dev, TElem, Dim, Idx>;
 
-        Dev const dev(alpaka::pltf::getDevByIdx<Pltf>(0u));
+        Dev const dev(alpaka::getDevByIdx<Pltf>(0u));
 
-        auto const extentBuf(alpaka::vec::createVecFromIndexedFn<Dim, alpaka::test::CreateVecWithIdx<Idx>::template ForExtentBuf>());
-        auto buf(alpaka::mem::buf::alloc<TElem, Idx>(dev, extentBuf));
+        auto const extentBuf(alpaka::createVecFromIndexedFn<Dim, alpaka::test::CreateVecWithIdx<Idx>::template ForExtentBuf>());
+        auto buf(alpaka::allocBuf<TElem, Idx>(dev, extentBuf));
 
         View view(
-            alpaka::mem::view::getPtrNative(buf),
-            alpaka::dev::getDev(buf),
+            alpaka::getPtrNative(buf),
+            alpaka::getDev(buf),
             alpaka::extent::getExtentVec(buf),
-            alpaka::mem::view::getPitchBytesVec(buf));
+            alpaka::getPitchBytesVec(buf));
 
         // copy-constructor
         View viewCopy(view);
@@ -181,26 +177,24 @@ namespace view
     }
 }
 }
-}
-}
 #if BOOST_COMP_GNUC
     #pragma GCC diagnostic pop
 #endif
 
 //-----------------------------------------------------------------------------
-TEMPLATE_LIST_TEST_CASE( "viewPlainPtrTest", "[memView]", alpaka::test::acc::TestAccs)
+TEMPLATE_LIST_TEST_CASE( "viewPlainPtrTest", "[memView]", alpaka::test::TestAccs)
 {
-    alpaka::test::mem::view::testViewPlainPtr<TestType, float>();
+    alpaka::test::testViewPlainPtr<TestType, float>();
 }
 
 //-----------------------------------------------------------------------------
-TEMPLATE_LIST_TEST_CASE( "viewPlainPtrConstTest", "[memView]", alpaka::test::acc::TestAccs)
+TEMPLATE_LIST_TEST_CASE( "viewPlainPtrConstTest", "[memView]", alpaka::test::TestAccs)
 {
-    alpaka::test::mem::view::testViewPlainPtrConst<TestType, float>();
+    alpaka::test::testViewPlainPtrConst<TestType, float>();
 }
 
 //-----------------------------------------------------------------------------
-TEMPLATE_LIST_TEST_CASE( "viewPlainPtrOperatorTest", "[memView]", alpaka::test::acc::TestAccs)
+TEMPLATE_LIST_TEST_CASE( "viewPlainPtrOperatorTest", "[memView]", alpaka::test::TestAccs)
 {
-    alpaka::test::mem::view::testViewPlainPtrOperators<TestType, float>();
+    alpaka::test::testViewPlainPtrOperators<TestType, float>();
 }

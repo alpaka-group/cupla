@@ -136,10 +136,10 @@ public:
     -> void
     {
         static_assert(
-            alpaka::dim::Dim<TAcc>::value == 2,
+            alpaka::Dim<TAcc>::value == 2,
             "The MandelbrotKernel expects 2-dimensional indices!");
 
-        auto const gridThreadIdx(alpaka::idx::getIdx<alpaka::Grid, alpaka::Threads>(acc));
+        auto const gridThreadIdx(alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc));
         auto const & gridThreadIdxX(gridThreadIdx[1u]);
         auto const & gridThreadIdxY(gridThreadIdx[0u]);
 
@@ -234,15 +234,15 @@ auto writeTgaColorImage(
 -> void
 {
     static_assert(
-        alpaka::dim::Dim<TBuf>::value == 2,
+        alpaka::Dim<TBuf>::value == 2,
         "The buffer has to be 2 dimensional!");
     static_assert(
-        std::is_integral<alpaka::elem::Elem<TBuf>>::value,
+        std::is_integral<alpaka::Elem<TBuf>>::value,
         "The buffer element type has to be integral!");
 
     // The width of the input buffer is in input elements.
     auto const bufWidthElems(alpaka::extent::getWidth(bufRgba));
-    auto const bufWidthBytes(bufWidthElems * sizeof(alpaka::elem::Elem<TBuf>));
+    auto const bufWidthBytes(bufWidthElems * sizeof(alpaka::Elem<TBuf>));
     // The row width in bytes has to be dividable by 4 Bytes (RGBA).
     ALPAKA_ASSERT(bufWidthBytes % sizeof(std::uint32_t) == 0);
     // The number of colors in a row.
@@ -250,7 +250,7 @@ auto writeTgaColorImage(
     ALPAKA_ASSERT(bufWidthColors >= 1);
     auto const bufHeightColors(alpaka::extent::getHeight(bufRgba));
     ALPAKA_ASSERT(bufHeightColors >= 1);
-    auto const bufPitchBytes(alpaka::mem::view::getPitchBytes<alpaka::dim::Dim<TBuf>::value - 1u>(bufRgba));
+    auto const bufPitchBytes(alpaka::getPitchBytes<alpaka::Dim<TBuf>::value - 1u>(bufRgba));
     ALPAKA_ASSERT(bufPitchBytes >= bufWidthBytes);
 
     std::ofstream ofs(
@@ -282,7 +282,7 @@ auto writeTgaColorImage(
     ofs.put(0x20);                      // Image Descriptor Byte.
 
     // Write the data.
-    char const * pData(reinterpret_cast<char const *>(alpaka::mem::view::getPtrNative(bufRgba)));
+    char const * pData(reinterpret_cast<char const *>(alpaka::getPtrNative(bufRgba)));
     // If there is no padding, we can directly write the whole buffer data ...
     if(bufPitchBytes == bufWidthBytes)
     {
@@ -302,15 +302,15 @@ auto writeTgaColorImage(
     }
 }
 
-using TestAccs = alpaka::test::acc::EnabledAccs<
-    alpaka::dim::DimInt<2u>,
+using TestAccs = alpaka::test::EnabledAccs<
+    alpaka::DimInt<2u>,
     std::uint32_t>;
 
 TEMPLATE_LIST_TEST_CASE( "mandelbrot", "[mandelbrot]", TestAccs)
 {
     using Acc = TestType;
-    using Dim = alpaka::dim::Dim<Acc>;
-    using Idx = alpaka::idx::Idx<Acc>;
+    using Dim = alpaka::Dim<Acc>;
+    using Idx = alpaka::Idx<Acc>;
 
 #ifdef ALPAKA_CI
     Idx const imageSize(1u<<5u);
@@ -326,68 +326,68 @@ TEMPLATE_LIST_TEST_CASE( "mandelbrot", "[mandelbrot]", TestAccs)
     Idx const maxIterations(300u);
 
     using Val = std::uint32_t;
-    using DevAcc = alpaka::dev::Dev<Acc>;
-    using PltfAcc = alpaka::pltf::Pltf<DevAcc>;
-    using QueueAcc = alpaka::test::queue::DefaultQueue<DevAcc>;
-    using PltfHost = alpaka::pltf::PltfCpu;
+    using DevAcc = alpaka::Dev<Acc>;
+    using PltfAcc = alpaka::Pltf<DevAcc>;
+    using QueueAcc = alpaka::test::DefaultQueue<DevAcc>;
+    using PltfHost = alpaka::PltfCpu;
 
     // Create the kernel function object.
     MandelbrotKernel kernel;
 
     // Get the host device.
     auto const devHost(
-        alpaka::pltf::getDevByIdx<PltfHost>(0u));
+        alpaka::getDevByIdx<PltfHost>(0u));
 
     // Select a device to execute on.
     auto const devAcc(
-        alpaka::pltf::getDevByIdx<PltfAcc>(0u));
+        alpaka::getDevByIdx<PltfAcc>(0u));
 
     // Get a queue on this device.
     QueueAcc queue(
         devAcc);
 
-    alpaka::vec::Vec<Dim, Idx> const extent(
+    alpaka::Vec<Dim, Idx> const extent(
         static_cast<Idx>(numRows),
         static_cast<Idx>(numCols));
 
     // Let alpaka calculate good block and grid sizes given our full problem extent.
-    alpaka::workdiv::WorkDivMembers<Dim, Idx> const workDiv(
-        alpaka::workdiv::getValidWorkDiv<Acc>(
+    alpaka::WorkDivMembers<Dim, Idx> const workDiv(
+        alpaka::getValidWorkDiv<Acc>(
             devAcc,
             extent,
-            alpaka::vec::Vec<Dim, Idx>::ones(),
+            alpaka::Vec<Dim, Idx>::ones(),
             false,
-            alpaka::workdiv::GridBlockExtentSubDivRestrictions::Unrestricted));
+            alpaka::GridBlockExtentSubDivRestrictions::Unrestricted));
 
     std::cout
         << "MandelbrotKernel("
         << " numRows:" << numRows
         << ", numCols:" << numCols
         << ", maxIterations:" << maxIterations
-        << ", accelerator: " << alpaka::acc::getAccName<Acc>()
+        << ", accelerator: " << alpaka::getAccName<Acc>()
         << ", kernel: " << typeid(kernel).name()
         << ", workDiv: " << workDiv
         << ")" << std::endl;
 
     // allocate host memory
     auto bufColorHost(
-        alpaka::mem::buf::alloc<Val, Idx>(devHost, extent));
+        alpaka::allocBuf<Val, Idx>(devHost, extent));
 
     // Allocate the buffer on the accelerator.
     auto bufColorAcc(
-        alpaka::mem::buf::alloc<Val, Idx>(devAcc, extent));
+        alpaka::allocBuf<Val, Idx>(devAcc, extent));
 
     // Copy Host -> Acc.
-    alpaka::mem::view::copy(queue, bufColorAcc, bufColorHost, extent);
+    alpaka::memcpy(queue, bufColorAcc, bufColorHost, extent);
 
     // Create the kernel execution task.
-    auto const taskKernel(alpaka::kernel::createTaskKernel<Acc>(
+    auto const taskKernel(alpaka::createTaskKernel<Acc>(
         workDiv,
         kernel,
-        alpaka::mem::view::getPtrNative(bufColorAcc),
+        alpaka::getPtrNative(bufColorAcc),
         numRows,
         numCols,
-        alpaka::mem::view::getPitchBytes<1u>(bufColorAcc),
+        alpaka::getPitchBytes<1u>(bufColorAcc),
         fMinR,
         fMaxR,
         fMinI,
@@ -403,13 +403,13 @@ TEMPLATE_LIST_TEST_CASE( "mandelbrot", "[mandelbrot]", TestAccs)
         << std::endl;
 
     // Copy back the result.
-    alpaka::mem::view::copy(queue, bufColorHost, bufColorAcc, extent);
+    alpaka::memcpy(queue, bufColorHost, bufColorAcc, extent);
 
     // Wait for the queue to finish the memory operation.
-    alpaka::wait::wait(queue);
+    alpaka::wait(queue);
 
     // Write the image to a file.
-    std::string fileName("mandelbrot"+std::to_string(numCols)+"x"+std::to_string(numRows)+"_"+alpaka::acc::getAccName<Acc>()+".tga");
+    std::string fileName("mandelbrot"+std::to_string(numCols)+"x"+std::to_string(numRows)+"_"+alpaka::getAccName<Acc>()+".tga");
     std::replace(fileName.begin(), fileName.end(), '<', '_');
     std::replace(fileName.begin(), fileName.end(), '>', '_');
     writeTgaColorImage(

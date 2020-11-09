@@ -18,8 +18,8 @@
 
 #include <catch2/catch.hpp>
 
-using TestAccs = alpaka::test::acc::EnabledAccs<
-    alpaka::dim::DimInt< 1u >,
+using TestAccs = alpaka::test::EnabledAccs<
+    alpaka::DimInt< 1u >,
     std::size_t
 >;
 
@@ -41,6 +41,7 @@ using DataTypes = std::tuple<
     double
 >;
 
+template <std::size_t TCapacity>
 struct TestKernel
 {
     //! @tparam TAcc Accelerator.
@@ -54,14 +55,14 @@ struct TestKernel
              typename TArgs>
     ALPAKA_FN_ACC auto operator()(
         TAcc const & acc,
-        TResults const & results,
+        TResults* results,
         TFunctor const & functor,
-        TArgs const & args) const noexcept
+        TArgs const* args) const noexcept
         -> void
     {
-        for( size_t i = 0; i < TArgs::capacity; ++i )
+        for( size_t i = 0; i < TCapacity; ++i )
         {
-          results(i, acc) = functor(args(i, acc), acc);
+            results[i] = functor(args[i], acc);
         }
     }
 };
@@ -87,15 +88,15 @@ struct TestTemplate
 
         // SETUP (defines and initialising)
         // DevAcc and DevHost are defined in Buffer.hpp too.
-        using DevAcc = alpaka::dev::Dev< TAcc >;
-        using DevHost = alpaka::dev::DevCpu;
-        using PltfAcc = alpaka::pltf::Pltf< DevAcc >;
-        using PltfHost = alpaka::pltf::Pltf< DevHost >;
+        using DevAcc = alpaka::Dev< TAcc >;
+        using DevHost = alpaka::DevCpu;
+        using PltfAcc = alpaka::Pltf< DevAcc >;
+        using PltfHost = alpaka::Pltf< DevHost >;
 
-        using Dim = alpaka::dim::DimInt< 1u >;
+        using Dim = alpaka::DimInt< 1u >;
         using Idx = std::size_t;
-        using WorkDiv = alpaka::workdiv::WorkDivMembers<Dim, Idx>;
-        using QueueAcc = alpaka::test::queue::DefaultQueue< DevAcc >;
+        using WorkDiv = alpaka::WorkDivMembers<Dim, Idx>;
+        using QueueAcc = alpaka::test::DefaultQueue< DevAcc >;
         using TArgsItem = alpaka::test::unit::math::ArgsItem<TData, TFunctor::arity>;
 
         static constexpr auto capacity = 1000;
@@ -115,23 +116,23 @@ struct TestTemplate
         static constexpr size_t elementsPerThread = 1u;
         static constexpr size_t sizeExtent = 1u;
 
-        DevAcc const devAcc{ alpaka::pltf::getDevByIdx< PltfAcc >( 0u ) };
-        DevHost const devHost{ alpaka::pltf::getDevByIdx< PltfHost >( 0u ) };
+        DevAcc const devAcc{ alpaka::getDevByIdx< PltfAcc >( 0u ) };
+        DevHost const devHost{ alpaka::getDevByIdx< PltfHost >( 0u ) };
 
         QueueAcc queue{ devAcc };
 
-        TestKernel kernel;
+        TestKernel<capacity> kernel;
         TFunctor functor;
         Args args{ devAcc };
         Results results{ devAcc };
 
         WorkDiv const workDiv{
-            alpaka::workdiv::getValidWorkDiv< TAcc >(
+            alpaka::getValidWorkDiv< TAcc >(
                 devAcc,
                 sizeExtent,
                 elementsPerThread,
                 false,
-                alpaka::workdiv::GridBlockExtentSubDivRestrictions::Unrestricted
+                alpaka::GridBlockExtentSubDivRestrictions::Unrestricted
             )};
         // SETUP COMPLETED.
 
@@ -145,19 +146,19 @@ struct TestTemplate
         results.copyToDevice(queue);
 
         auto const taskKernel(
-            alpaka::kernel::createTaskKernel< TAcc >(
+            alpaka::createTaskKernel< TAcc >(
                 workDiv,
                 kernel,
-                results,
+                results.pDevBuffer,
                 functor,
-                args
+                args.pDevBuffer
             )
         );
         // Enqueue the kernel execution task.
-        alpaka::queue::enqueue( queue, taskKernel );
+        alpaka::enqueue( queue, taskKernel );
         // Copy back the results (encapsulated in the buffer class).
         results.copyFromDevice( queue );
-        alpaka::wait::wait( queue );
+        alpaka::wait( queue );
         std::cout.precision( std::numeric_limits<TData>::digits10 + 1 );
 
         INFO("Operator: " << functor)

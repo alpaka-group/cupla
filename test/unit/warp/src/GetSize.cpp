@@ -37,19 +37,19 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-TEMPLATE_LIST_TEST_CASE( "getSize", "[warp]", alpaka::test::acc::TestAccs)
+TEMPLATE_LIST_TEST_CASE( "getSize", "[warp]", alpaka::test::TestAccs)
 {
     using Acc = TestType;
-    using Dev = alpaka::dev::Dev<Acc>;
-    using Pltf = alpaka::pltf::Pltf<Dev>;
-    using Dim = alpaka::dim::Dim<Acc>;
-    using Idx = alpaka::idx::Idx<Acc>;
+    using Dev = alpaka::Dev<Acc>;
+    using Pltf = alpaka::Pltf<Dev>;
+    using Dim = alpaka::Dim<Acc>;
+    using Idx = alpaka::Idx<Acc>;
 
-    Dev const dev(alpaka::pltf::getDevByIdx<Pltf>(0u));
-    auto const expectedWarpSize = static_cast<int>(alpaka::dev::getWarpSize(dev));
+    Dev const dev(alpaka::getDevByIdx<Pltf>(0u));
+    auto const expectedWarpSize = static_cast<int>(alpaka::getWarpSize(dev));
     Idx const gridThreadExtentPerDim = 8;
     alpaka::test::KernelExecutionFixture<Acc> fixture(
-        alpaka::vec::Vec<Dim, Idx>::all(gridThreadExtentPerDim));
+        alpaka::Vec<Dim, Idx>::all(gridThreadExtentPerDim));
     GetSizeTestKernel kernel;
     REQUIRE(
         fixture(
