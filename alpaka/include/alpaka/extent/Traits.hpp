@@ -42,9 +42,9 @@ namespace alpaka
                 ALPAKA_NO_HOST_ACC_WARNING
                 ALPAKA_FN_HOST_ACC static auto getExtent(
                     TExtent const &)
-                -> idx::Idx<TExtent>
+                -> Idx<TExtent>
                 {
-                    return static_cast<idx::Idx<TExtent>>(1);
+                    return static_cast<Idx<TExtent>>(1);
                 }
             };
 
@@ -66,11 +66,11 @@ namespace alpaka
             typename TExtent>
         ALPAKA_FN_HOST_ACC auto getExtent(
             TExtent const & extent = TExtent())
-        -> idx::Idx<TExtent>
+        -> Idx<TExtent>
         {
             return
                 traits::GetExtent<
-                    dim::DimInt<Tidx>,
+                    DimInt<Tidx>,
                     TExtent>
                 ::getExtent(
                     extent);
@@ -82,9 +82,9 @@ namespace alpaka
             typename TExtent>
         ALPAKA_FN_HOST_ACC auto getWidth(
             TExtent const & extent = TExtent())
-        -> idx::Idx<TExtent>
+        -> Idx<TExtent>
         {
-            return getExtent<dim::Dim<TExtent>::value - 1u>(extent);
+            return getExtent<Dim<TExtent>::value - 1u>(extent);
         }
         //-----------------------------------------------------------------------------
         //! \return The height.
@@ -93,9 +93,9 @@ namespace alpaka
             typename TExtent>
         ALPAKA_FN_HOST_ACC auto getHeight(
             TExtent const & extent = TExtent())
-        -> idx::Idx<TExtent>
+        -> Idx<TExtent>
         {
-            return getExtent<dim::Dim<TExtent>::value - 2u>(extent);
+            return getExtent<Dim<TExtent>::value - 2u>(extent);
         }
         //-----------------------------------------------------------------------------
         //! \return The depth.
@@ -104,9 +104,9 @@ namespace alpaka
             typename TExtent>
         ALPAKA_FN_HOST_ACC auto getDepth(
             TExtent const & extent = TExtent())
-        -> idx::Idx<TExtent>
+        -> Idx<TExtent>
         {
-            return getExtent<dim::Dim<TExtent>::value - 3u>(extent);
+            return getExtent<Dim<TExtent>::value - 3u>(extent);
         }
 
         namespace detail
@@ -119,13 +119,13 @@ namespace alpaka
             ALPAKA_FN_HOST_ACC auto getExtentProductInternal(
                 TExtent const & extent,
                 std::index_sequence<TIndices...> const & indices)
-            -> idx::Idx<TExtent>
+            -> Idx<TExtent>
             {
                 alpaka::ignore_unused(indices);
 
                 return
                     meta::foldr(
-                        std::multiplies<idx::Idx<TExtent>>(),
+                        std::multiplies<Idx<TExtent>>(),
                         getExtent<TIndices>(extent)...);
             }
         }
@@ -137,9 +137,9 @@ namespace alpaka
             typename TExtent>
         ALPAKA_FN_HOST_ACC auto getExtentProduct(
             TExtent const & extent = TExtent())
-        -> idx::Idx<TExtent>
+        -> Idx<TExtent>
         {
-            using IdxSequence = std::make_index_sequence<dim::Dim<TExtent>::value>;
+            using IdxSequence = std::make_index_sequence<Dim<TExtent>::value>;
             return
                 detail::getExtentProductInternal(
                     extent,
@@ -159,7 +159,7 @@ namespace alpaka
         -> void
         {
             traits::SetExtent<
-                dim::DimInt<Tidx>,
+                DimInt<Tidx>,
                 TExtent,
                 TExtentVal>
             ::setExtent(
@@ -177,7 +177,7 @@ namespace alpaka
             TWidth const & width)
         -> void
         {
-            setExtent<dim::Dim<TExtent>::value - 1u>(extent, width);
+            setExtent<Dim<TExtent>::value - 1u>(extent, width);
         }
         //-----------------------------------------------------------------------------
         //! Sets the height.
@@ -190,7 +190,7 @@ namespace alpaka
             THeight const & height)
         -> void
         {
-            setExtent<dim::Dim<TExtent>::value - 2u>(extent, height);
+            setExtent<Dim<TExtent>::value - 2u>(extent, height);
         }
         //-----------------------------------------------------------------------------
         //! Sets the depth.
@@ -203,7 +203,7 @@ namespace alpaka
             TDepth const & depth)
         -> void
         {
-            setExtent<dim::Dim<TExtent>::value - 3u>(extent, depth);
+            setExtent<Dim<TExtent>::value - 3u>(extent, depth);
         }
 
         //-----------------------------------------------------------------------------
@@ -215,7 +215,7 @@ namespace alpaka
             template<
                 typename TExtent>
             struct GetExtent<
-                dim::DimInt<0u>,
+                DimInt<0u>,
                 TExtent,
                 std::enable_if_t<
                     std::is_integral<TExtent>::value>>
@@ -223,7 +223,7 @@ namespace alpaka
                 ALPAKA_NO_HOST_ACC_WARNING
                 ALPAKA_FN_HOST_ACC static auto getExtent(
                     TExtent const & extent)
-                -> idx::Idx<TExtent>
+                -> Idx<TExtent>
                 {
                     return extent;
                 }
@@ -234,7 +234,7 @@ namespace alpaka
                 typename TExtent,
                 typename TExtentVal>
             struct SetExtent<
-                dim::DimInt<0u>,
+                DimInt<0u>,
                 TExtent,
                 TExtentVal,
                 std::enable_if_t<

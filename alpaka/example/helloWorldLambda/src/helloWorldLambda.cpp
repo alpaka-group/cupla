@@ -34,14 +34,14 @@ void ALPAKA_FN_ACC hiWorldFunction(
     TAcc const & acc,
     size_t const nExclamationMarks)
 {
-    using Dim = alpaka::dim::Dim<TAcc>;
-    using Idx = alpaka::idx::Idx<TAcc>;
-    using Vec = alpaka::vec::Vec<Dim, Idx>;
-    using Vec1 = alpaka::vec::Vec<alpaka::dim::DimInt<1u>, Idx>;
+    using Dim = alpaka::Dim<TAcc>;
+    using Idx = alpaka::Idx<TAcc>;
+    using Vec = alpaka::Vec<Dim, Idx>;
+    using Vec1 = alpaka::Vec<alpaka::DimInt<1u>, Idx>;
 
-    Vec const globalThreadIdx    = alpaka::idx::getIdx<alpaka::Grid, alpaka::Threads>(acc);
-    Vec const globalThreadExtent = alpaka::workdiv::getWorkDiv<alpaka::Grid, alpaka::Threads>(acc);
-    Vec1 const linearizedGlobalThreadIdx = alpaka::idx::mapIdx<1u>(globalThreadIdx,
+    Vec const globalThreadIdx    = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc);
+    Vec const globalThreadExtent = alpaka::getWorkDiv<alpaka::Grid, alpaka::Threads>(acc);
+    Vec1 const linearizedGlobalThreadIdx = alpaka::mapIdx<1u>(globalThreadIdx,
                                                               globalThreadExtent);
 
     printf("[z:%u, y:%u, x:%u][linear:%u] Hi world from a function",
@@ -66,49 +66,48 @@ auto main()
     (!defined(ALPAKA_CI) || defined(ALPAKA_ACC_CPU_B_SEQ_T_SEQ_ENABLED))
 
     // Define the index domain
-    using Dim = alpaka::dim::DimInt<3>;
+    using Dim = alpaka::DimInt<3>;
     using Idx = std::size_t;
 
     // Define the accelerator
     //
-    // It is possible to choose from a set of accelerators
-    // that are defined in the alpaka::acc namespace e.g.:
+    // It is possible to choose from a set of accelerators:
     // - AccGpuCudaRt
     // - AccGpuHipRt
     // - AccCpuThreads
     // - AccCpuFibers
     // - AccCpuOmp2Threads
     // - AccCpuOmp2Blocks
-    // - AccCpuOmp4
+    // - AccOmp5
     // - AccCpuTbbBlocks
     // - AccCpuSerial
-    // using Acc = alpaka::acc::AccCpuSerial<Dim, Idx>;
-    using Acc = alpaka::example::ExampleDefaultAcc<Dim, Idx>;
-    std::cout << "Using alpaka accelerator: " << alpaka::acc::getAccName<Acc>() << std::endl;
+    // using Acc = alpaka::AccCpuSerial<Dim, Idx>;
+    using Acc = alpaka::ExampleDefaultAcc<Dim, Idx>;
+    std::cout << "Using alpaka accelerator: " << alpaka::getAccName<Acc>() << std::endl;
 
     // Defines the synchronization behavior of a queue
     //
     // choose between Blocking and NonBlocking
-    using QueueProperty = alpaka::queue::Blocking;
-    using Queue = alpaka::queue::Queue<Acc, QueueProperty>;
+    using QueueProperty = alpaka::Blocking;
+    using Queue = alpaka::Queue<Acc, QueueProperty>;
 
     // Select a device
-    auto const devAcc = alpaka::pltf::getDevByIdx<Acc>(0u);
+    auto const devAcc = alpaka::getDevByIdx<Acc>(0u);
 
     // Create a queue on the device
     Queue queue(devAcc);
 
     // Define the work division
-    using Vec = alpaka::vec::Vec<Dim, Idx>;
+    using Vec = alpaka::Vec<Dim, Idx>;
     Vec const elementsPerThread(Vec::all(static_cast<Idx>(1)));
     Vec const threadsPerGrid(Vec::all(static_cast<Idx>(8)));
-    using WorkDiv = alpaka::workdiv::WorkDivMembers<Dim, Idx>;
-    WorkDiv const workDiv = alpaka::workdiv::getValidWorkDiv<Acc>(
+    using WorkDiv = alpaka::WorkDivMembers<Dim, Idx>;
+    WorkDiv const workDiv = alpaka::getValidWorkDiv<Acc>(
         devAcc,
         threadsPerGrid,
         elementsPerThread,
         false,
-        alpaka::workdiv::GridBlockExtentSubDivRestrictions::Unrestricted);
+        alpaka::GridBlockExtentSubDivRestrictions::Unrestricted);
 
     const size_t nExclamationMarks = 10;
 
@@ -123,13 +122,13 @@ auto main()
     // This example passes the number exclamation marks, that should
     // be written after we greet the world, to the
     // lambda function.
-    alpaka::kernel::exec<Acc>(
+    alpaka::exec<Acc>(
         queue,
         workDiv,
         [] ALPAKA_FN_ACC (Acc const & acc, size_t const nExclamationMarksAsArg) -> void {
-            auto globalThreadIdx    = alpaka::idx::getIdx<alpaka::Grid, alpaka::Threads>(acc);
-            auto globalThreadExtent = alpaka::workdiv::getWorkDiv<alpaka::Grid, alpaka::Threads>(acc);
-            auto linearizedGlobalThreadIdx = alpaka::idx::mapIdx<1u>(globalThreadIdx, globalThreadExtent);
+            auto globalThreadIdx    = alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc);
+            auto globalThreadExtent = alpaka::getWorkDiv<alpaka::Grid, alpaka::Threads>(acc);
+            auto linearizedGlobalThreadIdx = alpaka::mapIdx<1u>(globalThreadIdx, globalThreadExtent);
 
             printf("[z:%u, y:%u, x:%u][linear:%u] Hello world from a lambda",
                static_cast<unsigned>(globalThreadIdx[0]),
@@ -146,7 +145,7 @@ auto main()
         },
         nExclamationMarks
     );
-    alpaka::wait::wait(queue);
+    alpaka::wait(queue);
 
     return EXIT_SUCCESS;
 

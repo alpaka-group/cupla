@@ -29,22 +29,22 @@ public:
         bool * success) const
     -> void
     {
-        using Idx = alpaka::idx::Idx<TAcc>;
+        using Idx = alpaka::Idx<TAcc>;
 
         // Get the index of the current thread within the block and the block extent and map them to 1D.
-        auto const blockThreadIdx = alpaka::idx::getIdx<alpaka::Block, alpaka::Threads>(acc);
-        auto const blockThreadExtent = alpaka::workdiv::getWorkDiv<alpaka::Block, alpaka::Threads>(acc);
-        auto const blockThreadIdx1D = alpaka::idx::mapIdx<1u>(blockThreadIdx, blockThreadExtent)[0u];
+        auto const blockThreadIdx = alpaka::getIdx<alpaka::Block, alpaka::Threads>(acc);
+        auto const blockThreadExtent = alpaka::getWorkDiv<alpaka::Block, alpaka::Threads>(acc);
+        auto const blockThreadIdx1D = alpaka::mapIdx<1u>(blockThreadIdx, blockThreadExtent)[0u];
         auto const blockThreadExtent1D = blockThreadExtent.prod();
 
         // Allocate shared memory.
-        Idx * const pBlockSharedArray = alpaka::block::shared::dyn::getMem<Idx>(acc);
+        Idx * const pBlockSharedArray = alpaka::getMem<Idx>(acc);
    
         // Write the thread index into the shared memory.
         pBlockSharedArray[blockThreadIdx1D] = blockThreadIdx1D;
 
         // Synchronize the threads in the block.
-        alpaka::block::sync::syncBlockThreads(acc);
+        alpaka::syncBlockThreads(acc);
 
         // All other threads within the block should now have written their index into the shared memory.
         for(auto i(static_cast<Idx>(0u)); i < blockThreadExtent1D; ++i)
@@ -56,51 +56,47 @@ public:
 
 namespace alpaka
 {
-    namespace kernel
+    namespace traits
     {
-        namespace traits
+        //#############################################################################
+        //! The trait for getting the size of the block shared dynamic memory for a kernel.
+        template<
+            typename TAcc>
+        struct BlockSharedMemDynSizeBytes<
+            BlockSyncTestKernel,
+            TAcc>
         {
-            //#############################################################################
-            //! The trait for getting the size of the block shared dynamic memory for a kernel.
+            //-----------------------------------------------------------------------------
+            //! \return The size of the shared memory allocated for a block.
             template<
-                typename TAcc>
-            struct BlockSharedMemDynSizeBytes<
-                BlockSyncTestKernel,
-                TAcc>
+                typename TVec>
+            ALPAKA_FN_HOST_ACC static auto getBlockSharedMemDynSizeBytes(
+                BlockSyncTestKernel const & blockSharedMemDyn,
+                TVec const & blockThreadExtent,
+                TVec const & threadElemExtent,
+                bool * success)
+            -> std::size_t
             {
-                //-----------------------------------------------------------------------------
-                //! \return The size of the shared memory allocated for a block.
-                template<
-                    typename TVec>
-                ALPAKA_FN_HOST_ACC static auto getBlockSharedMemDynSizeBytes(
-                    BlockSyncTestKernel const & blockSharedMemDyn,
-                    TVec const & blockThreadExtent,
-                    TVec const & threadElemExtent,
-                    bool * success)
-                -> idx::Idx<TAcc>
-                {
-                    using Idx = alpaka::idx::Idx<TAcc>;
+                using Idx = alpaka::Idx<TAcc>;
 
-                    alpaka::ignore_unused(blockSharedMemDyn);
-                    alpaka::ignore_unused(threadElemExtent);
-                    alpaka::ignore_unused(success);
-                    return
-                        static_cast<idx::Idx<TAcc>>(sizeof(Idx)) * blockThreadExtent.prod();
-                }
-            };
-        }
+                alpaka::ignore_unused(blockSharedMemDyn);
+                alpaka::ignore_unused(threadElemExtent);
+                alpaka::ignore_unused(success);
+                return static_cast<std::size_t>(blockThreadExtent.prod()) * sizeof(Idx);
+            }
+        };
     }
 }
 
 //-----------------------------------------------------------------------------
-TEMPLATE_LIST_TEST_CASE( "synchronize", "[blockSync]", alpaka::test::acc::TestAccs)
+TEMPLATE_LIST_TEST_CASE( "synchronize", "[blockSync]", alpaka::test::TestAccs)
 {
     using Acc = TestType;
-    using Dim = alpaka::dim::Dim<Acc>;
-    using Idx = alpaka::idx::Idx<Acc>;
+    using Dim = alpaka::Dim<Acc>;
+    using Idx = alpaka::Idx<Acc>;
 
     alpaka::test::KernelExecutionFixture<Acc> fixture(
-        alpaka::vec::Vec<Dim, Idx>::all(static_cast<Idx>(BlockSyncTestKernel::gridThreadExtentPerDim)));
+        alpaka::Vec<Dim, Idx>::all(static_cast<Idx>(BlockSyncTestKernel::gridThreadExtentPerDim)));
 
     BlockSyncTestKernel kernel;
 

@@ -55,7 +55,7 @@ struct HeatEquationKernel
         // Each kernel executes one element
         double const r = dt / ( dx * dx );
         int idx =
-            alpaka::idx::getIdx<
+            alpaka::getIdx<
                 alpaka::Grid,
                 alpaka::Threads
             >( acc )[0];
@@ -115,50 +115,50 @@ auto main( ) -> int
     }
 
     // Set Dim and Idx type
-    using Dim = alpaka::dim::DimInt< 1u >;
+    using Dim = alpaka::DimInt< 1u >;
     using Idx = uint32_t;
 
     // Select accelerator-types for host and device
-    // using Acc = alpaka::acc::AccCpuSerial<Dim, Idx>;
-    using Acc = alpaka::example::ExampleDefaultAcc<Dim, Idx>;
-    std::cout << "Using alpaka accelerator: " << alpaka::acc::getAccName<Acc>() << std::endl;
+    // using Acc = alpaka::AccCpuSerial<Dim, Idx>;
+    using Acc = alpaka::ExampleDefaultAcc<Dim, Idx>;
+    std::cout << "Using alpaka accelerator: " << alpaka::getAccName<Acc>() << std::endl;
 
-    using DevHost = alpaka::dev::DevCpu;
+    using DevHost = alpaka::DevCpu;
 
     // Select specific devices
-    auto const devAcc = alpaka::pltf::getDevByIdx< Acc >( 0u );
-    auto const devHost = alpaka::pltf::getDevByIdx< DevHost >( 0u );
+    auto const devAcc = alpaka::getDevByIdx< Acc >( 0u );
+    auto const devHost = alpaka::getDevByIdx< DevHost >( 0u );
 
     // Get valid workdiv for the given problem
     uint32_t elemPerThread = 1;
-    alpaka::vec::Vec<
+    alpaka::Vec<
         Dim,
         Idx
     > const extent { numNodesX };
-    using WorkDiv = alpaka::workdiv::WorkDivMembers<
+    using WorkDiv = alpaka::WorkDivMembers<
         Dim,
         Idx
     >;
     auto workdiv = WorkDiv{
-        alpaka::workdiv::getValidWorkDiv< Acc >(
+        alpaka::getValidWorkDiv< Acc >(
             devAcc,
             extent,
             elemPerThread,
             false,
-            alpaka::workdiv::GridBlockExtentSubDivRestrictions::Unrestricted
+            alpaka::GridBlockExtentSubDivRestrictions::Unrestricted
         )
     };
 
     // Select queue
-    using QueueProperty = alpaka::queue::Blocking;
-    using QueueAcc = alpaka::queue::Queue<
+    using QueueProperty = alpaka::Blocking;
+    using QueueAcc = alpaka::Queue<
         Acc,
         QueueProperty
     >;
     QueueAcc queue { devAcc };
 
     // Initialize host-buffer
-    using BufHost = alpaka::mem::buf::Buf<
+    using BufHost = alpaka::Buf<
         DevHost,
         double,
         Dim,
@@ -166,7 +166,7 @@ auto main( ) -> int
     >;
     // This buffer holds the calculated values
     auto uNextBufHost = BufHost{
-        alpaka::mem::buf::alloc<
+        alpaka::allocBuf<
             double,
             Idx
         >(
@@ -176,7 +176,7 @@ auto main( ) -> int
     };
     // This buffer will hold the current values (used for the next step)
     auto uCurrBufHost = BufHost{
-        alpaka::mem::buf::alloc<
+        alpaka::allocBuf<
             double,
             Idx
         >(
@@ -185,18 +185,18 @@ auto main( ) -> int
         )
     };
 
-    double * const pCurrHost = alpaka::mem::view::getPtrNative( uCurrBufHost );
-    double * const pNextHost = alpaka::mem::view::getPtrNative( uNextBufHost );
+    double * const pCurrHost = alpaka::getPtrNative( uCurrBufHost );
+    double * const pNextHost = alpaka::getPtrNative( uNextBufHost );
 
     // Accelerator buffer
-    using BufAcc = alpaka::mem::buf::Buf<
+    using BufAcc = alpaka::Buf<
         Acc,
         double,
         Dim,
         Idx
     >;
     auto uNextBufAcc = BufAcc{
-        alpaka::mem::buf::alloc<
+        alpaka::allocBuf<
             double,
             Idx
         >(
@@ -205,7 +205,7 @@ auto main( ) -> int
         )
     };
     auto uCurrBufAcc = BufAcc{
-        alpaka::mem::buf::alloc<
+        alpaka::allocBuf<
             double,
             Idx
         >(
@@ -214,8 +214,8 @@ auto main( ) -> int
         )
     };
 
-    double * pCurrAcc = alpaka::mem::view::getPtrNative( uCurrBufAcc );
-    double * pNextAcc = alpaka::mem::view::getPtrNative( uNextBufAcc );
+    double * pCurrAcc = alpaka::getPtrNative( uCurrBufAcc );
+    double * pNextAcc = alpaka::getPtrNative( uNextBufAcc );
 
     // Apply initial conditions for the test problem
     for( uint32_t i = 0; i < numNodesX; i++ )
@@ -229,25 +229,25 @@ auto main( ) -> int
     HeatEquationKernel kernel;
 
     // Copy host -> device
-    alpaka::mem::view::copy(
+    alpaka::memcpy(
         queue,
         uCurrBufAcc,
         uCurrBufHost,
         extent
     );
     // Copy to the buffer for next as well to have boundary values set
-    alpaka::mem::view::copy(
+    alpaka::memcpy(
         queue,
         uNextBufAcc,
         uCurrBufAcc,
         extent
     );
-    alpaka::wait::wait( queue );
+    alpaka::wait( queue );
 
     for( uint32_t step = 0; step < numTimeSteps; step++ )
     {
         // Compute next values
-        alpaka::kernel::exec< Acc >(
+        alpaka::exec< Acc >(
             queue,
             workdiv,
             kernel,
@@ -268,13 +268,13 @@ auto main( ) -> int
     }
 
     // Copy device -> host
-    alpaka::mem::view::copy(
+    alpaka::memcpy(
         queue,
         uNextBufHost,
         uNextBufAcc,
         extent
     );
-    alpaka::wait::wait( queue );
+    alpaka::wait( queue );
 
     // Calculate error
     double maxError = 0.0;

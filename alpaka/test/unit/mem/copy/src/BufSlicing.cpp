@@ -22,37 +22,37 @@ template<
     typename TIdx,
     typename TAcc,
     typename TData,
-    typename Vec = alpaka::vec::Vec<
+    typename Vec = alpaka::Vec<
         TDim,
         TIdx>>
 struct TestContainer
 {
 
-    using AccQueueProperty = alpaka::queue::Blocking;
-    using DevQueue = alpaka::queue::Queue<
+    using AccQueueProperty = alpaka::Blocking;
+    using DevQueue = alpaka::Queue<
         TAcc,
         AccQueueProperty
     >;
-    using DevAcc = alpaka::dev::Dev<TAcc>;
-    using PltfAcc = alpaka::pltf::Pltf<DevAcc>;
+    using DevAcc = alpaka::Dev<TAcc>;
+    using PltfAcc = alpaka::Pltf<DevAcc>;
 
-    using DevHost = alpaka::dev::DevCpu;
-    using PltfHost = alpaka::pltf::Pltf<DevHost>;
+    using DevHost = alpaka::DevCpu;
+    using PltfHost = alpaka::Pltf<DevHost>;
 
-    using BufHost = alpaka::mem::buf::Buf<
+    using BufHost = alpaka::Buf<
         DevHost,
         TData,
         TDim,
         TIdx
     >;
-    using BufDevice = alpaka::mem::buf::Buf<
+    using BufDevice = alpaka::Buf<
         DevAcc,
         TData,
         TDim,
         TIdx
     >;
 
-    using SubView = alpaka::mem::view::ViewSubView<
+    using SubView = alpaka::ViewSubView<
         DevAcc,
         TData,
         TDim,
@@ -66,8 +66,8 @@ struct TestContainer
 
     // Constructor
     TestContainer():
-        devAcc(alpaka::pltf::getDevByIdx<PltfAcc>(0u)),
-        devHost(alpaka::pltf::getDevByIdx<PltfHost>(0u)),
+        devAcc(alpaka::getDevByIdx<PltfAcc>(0u)),
+        devHost(alpaka::getDevByIdx<PltfHost>(0u)),
         devQueue(devAcc)
     {}
 
@@ -78,7 +78,7 @@ struct TestContainer
     ) -> BufHost
     {
         BufHost bufHost(
-            alpaka::mem::buf::alloc<
+            alpaka::allocBuf<
                 TData,
                 TIdx
             >(
@@ -87,7 +87,7 @@ struct TestContainer
             ));
         if(indexed)
         {
-            TData *const ptr = alpaka::mem::view::getPtrNative(bufHost);
+            TData *const ptr = alpaka::getPtrNative(bufHost);
             for(TIdx i(0);i < extents.prod();++i)
             {
                 ptr[i] = static_cast<TData>(i);
@@ -100,7 +100,7 @@ struct TestContainer
     auto createDeviceBuffer(Vec extents) -> BufDevice
     {
         BufDevice bufDevice(
-            alpaka::mem::buf::alloc<
+            alpaka::allocBuf<
                 TData,
                 TIdx
             >(
@@ -117,7 +117,7 @@ struct TestContainer
         Vec extents
     ) -> void
     {
-        alpaka::mem::view::copy(
+        alpaka::memcpy(
             devQueue,
             bufAcc,
             bufHost,
@@ -132,7 +132,7 @@ struct TestContainer
         Vec extents
     ) -> void
     {
-        alpaka::mem::view::copy(
+        alpaka::memcpy(
             devQueue,
             bufHost,
             bufAcc,
@@ -155,7 +155,7 @@ struct TestContainer
             offsets
         );
         // Copy the subView into a new buffer.
-        alpaka::mem::view::copy(
+        alpaka::memcpy(
             devQueue,
             slicedBuffer,
             subView,
@@ -171,13 +171,13 @@ struct TestContainer
         Vec const & extents
     ) const
     {
-        TData const *const ptrA = alpaka::mem::view::getPtrNative(bufferA);
-        TData const *const ptrB = alpaka::mem::view::getPtrNative(bufferB);
+        TData const *const ptrA = alpaka::getPtrNative(bufferA);
+        TData const *const ptrB = alpaka::getPtrNative(bufferB);
         for(TIdx i(0);i < extents.prod();++i)
         {
             INFO("Dim: " << TDim::value)
             INFO("Idx: " << typeid(TIdx).name())
-            INFO("Acc: " << alpaka::acc::traits::GetAccName<TAcc>::getAccName())
+            INFO("Acc: " << alpaka::traits::GetAccName<TAcc>::getAccName())
             INFO("i: " << i)
             REQUIRE(ptrA[i] == Approx(ptrB[i]));
         }
@@ -194,7 +194,7 @@ using DataTypes = std::tuple<
 using TestAccWithDataTypes =
 alpaka::meta::CartesianProduct<
     std::tuple,
-    alpaka::test::acc::TestAccs,
+    alpaka::test::TestAccs,
     DataTypes
 >;
 
@@ -210,13 +210,13 @@ TEMPLATE_LIST_TEST_CASE("memBufSlicingTest",
         1,
         TestType
     >;
-    using Dim = alpaka::dim::Dim<Acc>;
+    using Dim = alpaka::Dim<Acc>;
     // fourth-dimension is not supposed to be tested currently
     if(Dim::value == 4)
     {
         return;
     }
-    using Idx = alpaka::idx::Idx<Acc>;
+    using Idx = alpaka::Idx<Acc>;
     TestContainer<
         Dim,
         Idx,
@@ -225,18 +225,18 @@ TEMPLATE_LIST_TEST_CASE("memBufSlicingTest",
     > slicingTest;
 
     auto const extents(
-        alpaka::vec::createVecFromIndexedFn<
+        alpaka::createVecFromIndexedFn<
             Dim,
             alpaka::test::CreateVecWithIdx<Idx>::template ForExtentBuf
         >());
 
     auto const extentsSubView(
-        alpaka::vec::createVecFromIndexedFn<
+        alpaka::createVecFromIndexedFn<
             Dim,
             alpaka::test::CreateVecWithIdx<Idx>::template ForExtentSubView
         >());
     auto const offsets(
-        alpaka::vec::createVecFromIndexedFn<
+        alpaka::createVecFromIndexedFn<
             Dim,
             alpaka::test::CreateVecWithIdx<Idx>::template ForOffset
         >());
@@ -278,23 +278,23 @@ TEMPLATE_LIST_TEST_CASE("memBufSlicingTest",
         extentsSubView,
         false
     );
-    Data *ptrNative = alpaka::mem::view::getPtrNative(correctResults);
-    using Dim1 = alpaka::dim::DimInt<1u>;
+    Data *ptrNative = alpaka::getPtrNative(correctResults);
+    using Dim1 = alpaka::DimInt<1u>;
 
     for(Idx i(0);i < extentsSubView.prod();++i)
     {
-        auto mappedToND = alpaka::idx::mapIdx<
+        auto mappedToND = alpaka::mapIdx<
             Dim::value,
             Dim1::value
         >(
-            alpaka::vec::Vec<
+            alpaka::Vec<
                 Dim1,
                 Idx
             >(i),
             extentsSubView
         );
         auto addedOffset = mappedToND + offsets;
-        auto mappedTo1D = alpaka::idx::mapIdx<Dim1::value>(
+        auto mappedTo1D = alpaka::mapIdx<Dim1::value>(
             addedOffset,
             extents
         )[0]; // take the only element in the vector

@@ -39,7 +39,7 @@ public:
         for( auto const input : inputs )
         {
             std::int32_t const expected = ffsNaive(input);
-            std::int32_t const actual = alpaka::intrinsic::ffs(acc, input);
+            std::int32_t const actual = alpaka::ffs(acc, input);
             ALPAKA_CHECK(*success, actual == expected);
         }
     }
@@ -60,14 +60,14 @@ private:
 };
 
 //-----------------------------------------------------------------------------
-TEMPLATE_LIST_TEST_CASE( "ffs", "[intrinsic]", alpaka::test::acc::TestAccs)
+TEMPLATE_LIST_TEST_CASE( "ffs", "[intrinsic]", alpaka::test::TestAccs)
 {
     using Acc = TestType;
-    using Dim = alpaka::dim::Dim<Acc>;
-    using Idx = alpaka::idx::Idx<Acc>;
+    using Dim = alpaka::Dim<Acc>;
+    using Idx = alpaka::Idx<Acc>;
 
     alpaka::test::KernelExecutionFixture<Acc> fixture(
-        alpaka::vec::Vec<Dim, Idx>::ones());
+        alpaka::Vec<Dim, Idx>::ones());
 
     FfsTestKernel<std::int32_t> kernel32bit;
     REQUIRE(

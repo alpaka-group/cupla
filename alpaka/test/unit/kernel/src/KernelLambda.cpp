@@ -24,12 +24,16 @@ struct TestTemplateLambda
 template< typename TAcc >
 void operator()()
 {
-    using Dim = alpaka::dim::Dim<TAcc>;
-    using Idx = alpaka::idx::Idx<TAcc>;
+    using Dim = alpaka::Dim<TAcc>;
+    using Idx = alpaka::Idx<TAcc>;
 
     alpaka::test::KernelExecutionFixture<TAcc> fixture(
-        alpaka::vec::Vec<Dim, Idx>::ones());
+        alpaka::Vec<Dim, Idx>::ones());
 
+#if BOOST_COMP_MSVC || defined(BOOST_COMP_MSVC_EMULATED)
+    #pragma warning(push)
+    #pragma warning(disable: 4702)  // warning C4702: unreachable code
+#endif
     auto kernel =
         [] ALPAKA_FN_ACC (
             TAcc const & acc,
@@ -38,8 +42,11 @@ void operator()()
         {
             ALPAKA_CHECK(
                 *success,
-                static_cast<alpaka::idx::Idx<TAcc>>(1) == (alpaka::workdiv::getWorkDiv<alpaka::Grid, alpaka::Threads>(acc)).prod());
+                static_cast<alpaka::Idx<TAcc>>(1) == (alpaka::getWorkDiv<alpaka::Grid, alpaka::Threads>(acc)).prod());
         };
+#if BOOST_COMP_MSVC || defined(BOOST_COMP_MSVC_EMULATED)
+    #pragma warning(pop)
+#endif
 
     REQUIRE(fixture(kernel));
 }
@@ -51,11 +58,11 @@ struct TestTemplateArg
 template< typename TAcc >
 void operator()()
 {
-    using Dim = alpaka::dim::Dim<TAcc>;
-    using Idx = alpaka::idx::Idx<TAcc>;
+    using Dim = alpaka::Dim<TAcc>;
+    using Idx = alpaka::Idx<TAcc>;
 
     alpaka::test::KernelExecutionFixture<TAcc> fixture(
-        alpaka::vec::Vec<Dim, Idx>::ones());
+        alpaka::Vec<Dim, Idx>::ones());
 
     std::uint32_t const arg = 42u;
     auto kernel =
@@ -80,11 +87,11 @@ struct TestTemplateCapture
 template< typename TAcc >
 void operator()()
 {
-    using Dim = alpaka::dim::Dim<TAcc>;
-    using Idx = alpaka::idx::Idx<TAcc>;
+    using Dim = alpaka::Dim<TAcc>;
+    using Idx = alpaka::Idx<TAcc>;
 
     alpaka::test::KernelExecutionFixture<TAcc> fixture(
-        alpaka::vec::Vec<Dim, Idx>::ones());
+        alpaka::Vec<Dim, Idx>::ones());
 
     std::uint32_t const arg = 42u;
 
@@ -113,17 +120,17 @@ void operator()()
 
 TEST_CASE( "lambdaKernelIsWorking", "[kernel]")
 {
-    alpaka::meta::forEachType< alpaka::test::acc::TestAccs >( TestTemplateLambda() );
+    alpaka::meta::forEachType< alpaka::test::TestAccs >( TestTemplateLambda() );
 }
 
 TEST_CASE( "lambdaKernelWithArgumentIsWorking", "[kernel]")
 {
-    alpaka::meta::forEachType< alpaka::test::acc::TestAccs >( TestTemplateArg() );
+    alpaka::meta::forEachType< alpaka::test::TestAccs >( TestTemplateArg() );
 }
 
 TEST_CASE( "lambdaKernelWithCapturingIsWorking", "[kernel]")
 {
-    alpaka::meta::forEachType< alpaka::test::acc::TestAccs >( TestTemplateCapture() );
+    alpaka::meta::forEachType< alpaka::test::TestAccs >( TestTemplateCapture() );
 }
 
 #endif

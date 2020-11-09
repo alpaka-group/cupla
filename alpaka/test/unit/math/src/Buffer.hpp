@@ -38,21 +38,21 @@ struct Buffer
 {
     using value_type = TData;
     static constexpr size_t capacity = Tcapacity;
-    using Dim = typename alpaka::dim::traits::DimType<TAcc>::type;
-    using Idx = typename alpaka::idx::traits::IdxType<TAcc>::type;
+    using Dim = typename alpaka::traits::DimType<TAcc>::type;
+    using Idx = typename alpaka::traits::IdxType<TAcc>::type;
 
     // Defines using's for alpaka-buffer.
-    using DevAcc = alpaka::dev::Dev< TAcc >;
-    using DevHost = alpaka::dev::DevCpu;
-    using PltfHost = alpaka::pltf::Pltf< DevHost >;
+    using DevAcc = alpaka::Dev< TAcc >;
+    using DevHost = alpaka::DevCpu;
+    using PltfHost = alpaka::Pltf< DevHost >;
 
-    using BufHost = alpaka::mem::buf::Buf<
+    using BufHost = alpaka::Buf<
         DevHost,
         TData,
         Dim,
         Idx
     >;
-    using BufAcc = alpaka::mem::buf::Buf<
+    using BufAcc = alpaka::Buf<
         DevAcc,
         TData,
         Dim,
@@ -76,24 +76,24 @@ struct Buffer
     // Constructor needs to initialize all Buffer.
     Buffer(const DevAcc & devAcc)
       :
-        devHost{ alpaka::pltf::getDevByIdx< PltfHost >( 0u ) },
+        devHost{ alpaka::getDevByIdx< PltfHost >( 0u ) },
         hostBuffer
         {
-            alpaka::mem::buf::alloc<TData, Idx>(devHost, Tcapacity)
+            alpaka::allocBuf<TData, Idx>(devHost, Tcapacity)
         },
         devBuffer
         {
-            alpaka::mem::buf::alloc<TData, Idx>(devAcc, Tcapacity)
+            alpaka::allocBuf<TData, Idx>(devAcc, Tcapacity)
         },
-        pHostBuffer{ alpaka::mem::view::getPtrNative( hostBuffer ) },
-        pDevBuffer{ alpaka::mem::view::getPtrNative( devBuffer ) }
+        pHostBuffer{ alpaka::getPtrNative( hostBuffer ) },
+        pDevBuffer{ alpaka::getPtrNative( devBuffer ) }
     {}
 
     // Copy Host -> Acc.
     template< typename Queue >
     auto copyToDevice( Queue queue ) -> void
     {
-        alpaka::mem::view::copy(
+        alpaka::memcpy(
             queue,
             devBuffer,
             hostBuffer,
@@ -105,7 +105,7 @@ struct Buffer
     template< typename Queue >
     auto copyFromDevice( Queue queue ) -> void
     {
-        alpaka::mem::view::copy(
+        alpaka::memcpy(
             queue,
             hostBuffer,
             devBuffer,

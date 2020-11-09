@@ -47,11 +47,11 @@ public:
     -> void
     {
         static_assert(
-            alpaka::dim::Dim<TAcc>::value == 1,
+            alpaka::Dim<TAcc>::value == 1,
             "The VectorAddKernel expects 1-dimensional indices!");
 
-        auto const gridThreadIdx(alpaka::idx::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0u]);
-        auto const threadElemExtent(alpaka::workdiv::getWorkDiv<alpaka::Thread, alpaka::Elems>(acc)[0u]);
+        auto const gridThreadIdx(alpaka::getIdx<alpaka::Grid, alpaka::Threads>(acc)[0u]);
+        auto const threadElemExtent(alpaka::getWorkDiv<alpaka::Thread, alpaka::Elems>(acc)[0u]);
         auto const threadFirstElemIdx(gridThreadIdx * threadElemExtent);
 
         if(threadFirstElemIdx < numElements)
@@ -69,22 +69,22 @@ public:
     }
 };
 
-using TestAccs = alpaka::test::acc::EnabledAccs<
-    alpaka::dim::DimInt<1u>,
+using TestAccs = alpaka::test::EnabledAccs<
+    alpaka::DimInt<1u>,
     std::size_t>;
 
 TEMPLATE_LIST_TEST_CASE( "separableCompilation", "[separableCompilation]", TestAccs)
 {
     using Acc = TestType;
-    using Idx = alpaka::idx::Idx<Acc>;
+    using Idx = alpaka::Idx<Acc>;
 
     using Val = double;
 
-    using DevAcc = alpaka::dev::Dev<Acc>;
-    using PltfAcc = alpaka::pltf::Pltf<DevAcc>;
-    using QueueAcc = alpaka::test::queue::DefaultQueue<alpaka::dev::Dev<Acc>>;
-    using PltfHost = alpaka::pltf::PltfCpu;
-    using DevHost = alpaka::dev::Dev<PltfHost>;
+    using DevAcc = alpaka::Dev<Acc>;
+    using PltfAcc = alpaka::Pltf<DevAcc>;
+    using QueueAcc = alpaka::test::DefaultQueue<alpaka::Dev<Acc>>;
+    using PltfHost = alpaka::PltfCpu;
+    using DevHost = alpaka::Dev<PltfHost>;
 
     Idx const numElements(32);
 
@@ -93,63 +93,63 @@ TEMPLATE_LIST_TEST_CASE( "separableCompilation", "[separableCompilation]", TestA
 
     // Get the host device.
     DevHost const devHost(
-        alpaka::pltf::getDevByIdx<PltfHost>(0u));
+        alpaka::getDevByIdx<PltfHost>(0u));
 
     // Select a device to execute on.
     DevAcc const devAcc(
-        alpaka::pltf::getDevByIdx<PltfAcc>(0));
+        alpaka::getDevByIdx<PltfAcc>(0));
 
     // Get a queue on this device.
     QueueAcc queueAcc(devAcc);
 
     // The data extent.
-    alpaka::vec::Vec<alpaka::dim::DimInt<1u>, Idx> const extent(
+    alpaka::Vec<alpaka::DimInt<1u>, Idx> const extent(
         numElements);
 
     // Let alpaka calculate good block and grid sizes given our full problem extent.
-    alpaka::workdiv::WorkDivMembers<alpaka::dim::DimInt<1u>, Idx> const workDiv(
-        alpaka::workdiv::getValidWorkDiv<Acc>(
+    alpaka::WorkDivMembers<alpaka::DimInt<1u>, Idx> const workDiv(
+        alpaka::getValidWorkDiv<Acc>(
             devAcc,
             extent,
             static_cast<Idx>(3u),
             false,
-            alpaka::workdiv::GridBlockExtentSubDivRestrictions::Unrestricted));
+            alpaka::GridBlockExtentSubDivRestrictions::Unrestricted));
 
     std::cout
         << typeid(kernel).name() << "("
-        << "accelerator: " << alpaka::acc::getAccName<Acc>()
+        << "accelerator: " << alpaka::getAccName<Acc>()
         << ", workDiv: " << workDiv
         << ", numElements:" << numElements
         << ")" << std::endl;
 
     // Allocate host memory buffers.
-    auto memBufHostA(alpaka::mem::buf::alloc<Val, Idx>(devHost, extent));
-    auto memBufHostB(alpaka::mem::buf::alloc<Val, Idx>(devHost, extent));
-    auto memBufHostC(alpaka::mem::buf::alloc<Val, Idx>(devHost, extent));
+    auto memBufHostA(alpaka::allocBuf<Val, Idx>(devHost, extent));
+    auto memBufHostB(alpaka::allocBuf<Val, Idx>(devHost, extent));
+    auto memBufHostC(alpaka::allocBuf<Val, Idx>(devHost, extent));
 
     // Initialize the host input vectors
     for (Idx i(0); i < numElements; ++i)
     {
-        alpaka::mem::view::getPtrNative(memBufHostA)[i] = static_cast<Val>(rand()) / static_cast<Val>(RAND_MAX);
-        alpaka::mem::view::getPtrNative(memBufHostB)[i] = static_cast<Val>(rand()) / static_cast<Val>(RAND_MAX);
+        alpaka::getPtrNative(memBufHostA)[i] = static_cast<Val>(rand()) / static_cast<Val>(RAND_MAX);
+        alpaka::getPtrNative(memBufHostB)[i] = static_cast<Val>(rand()) / static_cast<Val>(RAND_MAX);
     }
 
     // Allocate the buffers on the accelerator.
-    auto memBufAccA(alpaka::mem::buf::alloc<Val, Idx>(devAcc, extent));
-    auto memBufAccB(alpaka::mem::buf::alloc<Val, Idx>(devAcc, extent));
-    auto memBufAccC(alpaka::mem::buf::alloc<Val, Idx>(devAcc, extent));
+    auto memBufAccA(alpaka::allocBuf<Val, Idx>(devAcc, extent));
+    auto memBufAccB(alpaka::allocBuf<Val, Idx>(devAcc, extent));
+    auto memBufAccC(alpaka::allocBuf<Val, Idx>(devAcc, extent));
 
     // Copy Host -> Acc.
-    alpaka::mem::view::copy(queueAcc, memBufAccA, memBufHostA, extent);
-    alpaka::mem::view::copy(queueAcc, memBufAccB, memBufHostB, extent);
+    alpaka::memcpy(queueAcc, memBufAccA, memBufHostA, extent);
+    alpaka::memcpy(queueAcc, memBufAccB, memBufHostB, extent);
 
     // Create the executor task.
-    auto const taskKernel(alpaka::kernel::createTaskKernel<Acc>(
+    auto const taskKernel(alpaka::createTaskKernel<Acc>(
         workDiv,
         kernel,
-        alpaka::mem::view::getPtrNative(memBufAccA),
-        alpaka::mem::view::getPtrNative(memBufAccB),
-        alpaka::mem::view::getPtrNative(memBufAccC),
+        alpaka::getPtrNative(memBufAccA),
+        alpaka::getPtrNative(memBufAccB),
+        alpaka::getPtrNative(memBufAccC),
         numElements));
 
     // Profile the kernel execution.
@@ -161,17 +161,17 @@ TEMPLATE_LIST_TEST_CASE( "separableCompilation", "[separableCompilation]", TestA
         << std::endl;
 
     // Copy back the result.
-    alpaka::mem::view::copy(queueAcc, memBufHostC, memBufAccC, extent);
-    alpaka::wait::wait(queueAcc);
+    alpaka::memcpy(queueAcc, memBufHostC, memBufAccC, extent);
+    alpaka::wait(queueAcc);
 
     bool resultCorrect(true);
-    auto const pHostData(alpaka::mem::view::getPtrNative(memBufHostC));
+    auto const pHostData(alpaka::getPtrNative(memBufHostC));
     for(Idx i(0u);
         i < numElements;
         ++i)
     {
         auto const & val(pHostData[i]);
-        auto const correctResult(std::sqrt(alpaka::mem::view::getPtrNative(memBufHostA)[i]) + std::sqrt(alpaka::mem::view::getPtrNative(memBufHostB)[i]));
+        auto const correctResult(std::sqrt(alpaka::getPtrNative(memBufHostA)[i]) + std::sqrt(alpaka::getPtrNative(memBufHostB)[i]));
         auto const absDiff = (val - correctResult);
         if( absDiff > std::numeric_limits<Val>::epsilon() )
         {
