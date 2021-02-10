@@ -105,7 +105,8 @@ OPTION(ALPAKA_ACC_CPU_B_SEQ_T_FIBERS_ENABLE "Enable the fibers CPU block thread 
 OPTION(ALPAKA_ACC_CPU_B_TBB_T_SEQ_ENABLE "Enable the TBB CPU grid block back-end" OFF)
 OPTION(ALPAKA_ACC_CPU_B_OMP2_T_SEQ_ENABLE "Enable the OpenMP 2.0 CPU grid block accelerator" OFF)
 OPTION(ALPAKA_ACC_CPU_B_SEQ_T_OMP2_ENABLE "Enable the OpenMP 2.0 CPU block thread accelerator" OFF)
-OPTION(ALPAKA_ACC_CPU_BT_OMP4_ENABLE "Enable the OpenMP 4.0 CPU block and block thread accelerator" OFF)
+OPTION(ALPAKA_ACC_ANY_BT_OMP5_ENABLE "Enable the OpenMP 5 offloading block and block thread accelerator" OFF)
+OPTION(ALPAKA_ACC_ANY_BT_OACC_ENABLE "Enable the experimental OpenACC offloading block and block thread accelerator" OFF)
 OPTION(ALPAKA_ACC_GPU_CUDA_ENABLE "Enable the CUDA GPU accelerator" OFF)
 OPTION(ALPAKA_ACC_GPU_HIP_ENABLE "Enable the HIP back-end (all other back-ends must be disabled)" OFF)
 
