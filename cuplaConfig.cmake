@@ -119,7 +119,14 @@ if(${cupla_ALPAKA_PROVIDER} STREQUAL "intern")
     set(BUILD_TESTING OFF)
     add_subdirectory(${_cupla_ROOT_DIR}/alpaka ${CMAKE_BINARY_DIR}/alpaka)
 else()
-    find_package(alpaka HINTS $ENV{ALPAKA_ROOT})
+    set(_cupla_MIN_ALPAKA_VERSION 0.6.0)
+    set(_cupla_UNSUPPORTED_ALPAKA_VERSION 0.7.0)
+    find_package(alpaka ${_cupla_MIN_ALPAKA_VERSION} HINTS $ENV{ALPAKA_ROOT})
+
+    if(alpaka_VERSION VERSION_GREATER_EQUAL _cupla_UNSUPPORTED_ALPAKA_VERSION)
+        message(WARNING "Unsupported alpaka version ${alpaka_VERSION}. "
+                "Supported versions [${_cupla_MIN_ALPAKA_VERSION},${_cupla_UNSUPPORTED_ALPAKA_VERSION}).")
+    endif()
 endif()
 
 if(NOT TARGET alpaka::alpaka)
