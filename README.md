@@ -1,4 +1,4 @@
-**cupla** - C++ User interface for the Platform independent Library Alpaka
+**cupla** - C++ User interface for the Platform Independent Library alpaka
 ==========================================================================
 
 [![Code Status dev](https://gitlab.com/hzdr/crp/cupla/badges/dev/pipeline.svg?key_text=dev)](https://gitlab.com/hzdr/crp/cupla/pipelines/dev/latest)
