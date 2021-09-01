@@ -90,13 +90,13 @@ namespace detail
      * function qualifier correctly                                            \
      */                                                                        \
     ->  decltype(                                                              \
-        alpaka::math::traits::alpakaMathTrait<                                 \
+        alpaka::core::declval<alpaka::math::traits::alpakaMathTrait<                                 \
             alpaka::concepts::ImplementationBase<                              \
                 alpakaMathConcept,                                             \
                 accOrMathImpl                                                  \
             >,                                                                 \
             T_Type                                                             \
-        >::functionName(                                                       \
+        >>()(                                                       \
             detail::getConcept< accOrMathImpl, alpakaMathConcept >(),          \
             arg                                                                \
         )                                                                      \
@@ -108,7 +108,7 @@ namespace detail
                 accOrMathImpl                                                  \
             >,                                                                 \
             T_Type                                                             \
-        >::functionName(                                                       \
+        >{}(                                                       \
             detail::getConcept< accOrMathImpl, alpakaMathConcept >(),          \
             arg                                                                \
         );                                                                     \
@@ -136,14 +136,14 @@ namespace detail
      * function qualifier correctly                                            \
      */                                                                        \
     ->  decltype(                                                              \
-        alpaka::math::traits::alpakaMathTrait<                                 \
+        alpaka::core::declval<alpaka::math::traits::alpakaMathTrait<                                 \
             alpaka::concepts::ImplementationBase<                              \
                 alpakaMathConcept,                                             \
                 accOrMathImpl                                                  \
             >,                                                                 \
             T_Type1,                                                           \
             T_Type2                                                            \
-        >::functionName(                                                       \
+        >>()(                                                       \
             detail::getConcept< accOrMathImpl, alpakaMathConcept >(),          \
             arg1,                                                              \
             arg2                                                               \
@@ -157,7 +157,7 @@ namespace detail
             >,                                                                 \
             T_Type1,                                                           \
             T_Type2                                                            \
-        >::functionName(                                                       \
+        >{}(                                                       \
             detail::getConcept< accOrMathImpl, alpakaMathConcept >(),          \
             arg1,                                                              \
             arg2                                                               \
