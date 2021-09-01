@@ -54,24 +54,26 @@ macro(createCuplaTarget
     TARGET_COMPILE_DEFINITIONS(${TARGET_NAME} PUBLIC "CUPLA_STREAM_ASYNC_ENABLED=0")
   endif()
 
-  # GNU
-  if(CMAKE_COMPILER_IS_GNUCXX)
-    TARGET_COMPILE_OPTIONS(${TARGET_NAME}
-      PRIVATE
-      "-Wall"
-      "-Wextra"
-      "-Wno-unknown-pragmas"
-      "-Wno-unused-parameter"
-      "-Wno-unused-local-typedefs"
-      "-Wno-attributes"
-      "-Wno-reorder"
-      "-Wno-sign-compare")
-    # ICC
-  elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
-    TARGET_COMPILE_OPTIONS(${TARGET_NAME} PRIVATE "-Wall")
-    # PGI
-  elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "PGI")
-    TARGET_COMPILE_OPTIONS(${TARGET_NAME} PRIVATE "-Minform=inform")
+  if(NOT(ALPAKA_ACC_GPU_CUDA_ENABLE OR ALPAKA_ACC_GPU_HIP_ENABLE))
+    # GNU
+    if(CMAKE_COMPILER_IS_GNUCXX)
+      TARGET_COMPILE_OPTIONS(${TARGET_NAME}
+        PRIVATE
+        "-Wall"
+        "-Wextra"
+        "-Wno-unknown-pragmas"
+        "-Wno-unused-parameter"
+        "-Wno-unused-local-typedefs"
+        "-Wno-attributes"
+        "-Wno-reorder"
+        "-Wno-sign-compare")
+      # ICC
+    elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
+      TARGET_COMPILE_OPTIONS(${TARGET_NAME} PRIVATE "-Wall")
+      # PGI
+    elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "PGI")
+      TARGET_COMPILE_OPTIONS(${TARGET_NAME} PRIVATE "-Minform=inform")
+    endif()
   endif()
 
   add_library(${TARGET_NAME}::${TARGET_NAME} ALIAS ${TARGET_NAME})
