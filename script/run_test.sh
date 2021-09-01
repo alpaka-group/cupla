@@ -12,7 +12,7 @@ fi
 # cmake config builder
 ###################################################
 
-CUPLA_CONST_ARGS="-Dcupla_BUILD_EXAMPLES=ON -Dcupla_ALPAKA_PROVIDER=\"internal\""
+CUPLA_CONST_ARGS="-Dcupla_BUILD_EXAMPLES=ON -Dcupla_ALPAKA_PROVIDER=internal"
 CUPLA_CONST_ARGS="${CUPLA_CONST_ARGS} -DCMAKE_BUILD_TYPE=${CUPLA_BUILD_TYPE}"
 CUPLA_CONST_ARGS="${CUPLA_CONST_ARGS} ${CUPLA_CMAKE_ARGS}"
 
