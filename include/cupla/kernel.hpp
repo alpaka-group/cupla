@@ -126,13 +126,12 @@ inline namespace CUPLA_ACCELERATOR_NAMESPACE
                 m_blockSize,
                 m_elemSize
             );
-            auto const exec(
-                ::alpaka::createTaskKernel< T_Acc >(
-                    workDiv,
-                    CuplaKernel< T_KernelType >{ m_dynSharedMemSize },
-                    std::forward< T_Args >( args )...
-                )
+            auto const exec = ::alpaka::createTaskKernel< T_Acc >(
+                workDiv,
+                CuplaKernel< T_KernelType >{ m_dynSharedMemSize },
+                std::forward< T_Args >( args )...
             );
+
             auto & stream = cupla::manager::Stream<
                 cupla::AccDev,
                 cupla::AccStream
