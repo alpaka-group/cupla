@@ -159,6 +159,19 @@ addSubdirectoryExternal:
   tags:
     - x86_64
 
+# build external project and use cupla via cmake add_subdirectory()
+# alpaka was included in the project cmake before cupla
+addSubdirectoryThirdPartyAlpaka:
+  stage: compile-and-run
+  image: registry.gitlab.com/hzdr/crp/alpaka-group-container/alpaka-ci-gcc:1.4
+  variables:
+    GIT_SUBMODULE_STRATEGY: normal
+    CUPLA_BOOST_VERSION: 1.73.0
+  script:
+    - source script/integration/build_add_subdirectory_third_party_alpaka.sh
+  tags:
+    - x86_64
+
 # build external project and use cupla via cmake find_package()
 # cupla was installed with disabled examples
 findPackageWithoutExample:
