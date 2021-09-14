@@ -61,29 +61,33 @@ option(cupla_BUILD_EXAMPLES "Build examples" OFF)
 set(_CUPLA_MIN_ALPAKA_VERSION 0.7.0)
 set(_CUPLA_UNSUPPORTED_ALPAKA_VERSION 0.8.0)
 
-# the alpaka provider for the internal alpaka is only available,
-# if cupla is used via add_subdirectory in another project
-# or examples are build
-if(cupla_BUILD_EXAMPLES OR (NOT ${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME}))
-  set(cupla_ALPAKA_PROVIDER "internal" CACHE STRING "Select which alpaka is used")
-  set_property(CACHE cupla_ALPAKA_PROVIDER PROPERTY STRINGS "internal;external")
-  mark_as_advanced(cupla_ALPAKA_PROVIDER)
+# do not search for alpaka if it already exists
+# for example, a project that includes alpaka via add_subdirectory before including cupla via add_subdirectory
+if(NOT TARGET alpaka::alpaka)
+  # the alpaka provider for the internal alpaka is only available,
+  # if cupla is used via add_subdirectory in another project
+  # or examples are build
+  if(cupla_BUILD_EXAMPLES OR (NOT ${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME}))
+    set(cupla_ALPAKA_PROVIDER "internal" CACHE STRING "Select which alpaka is used")
+    set_property(CACHE cupla_ALPAKA_PROVIDER PROPERTY STRINGS "internal;external")
+    mark_as_advanced(cupla_ALPAKA_PROVIDER)
 
-  if(${cupla_ALPAKA_PROVIDER} STREQUAL "internal")
-    set(alpaka_BUILD_EXAMPLES OFF)
-    set(BUILD_TESTING OFF)
-    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/alpaka)
-  else()
-    find_package(alpaka ${_CUPLA_MIN_ALPAKA_VERSION} REQUIRED HINTS $ENV{ALPAKA_ROOT})
+    if(${cupla_ALPAKA_PROVIDER} STREQUAL "internal")
+      set(alpaka_BUILD_EXAMPLES OFF)
+      set(BUILD_TESTING OFF)
+      add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/alpaka)
+    else()
+      find_package(alpaka ${_CUPLA_MIN_ALPAKA_VERSION} REQUIRED HINTS $ENV{ALPAKA_ROOT})
 
-    if(alpaka_VERSION VERSION_GREATER_EQUAL _CUPLA_UNSUPPORTED_ALPAKA_VERSION)
+      if(alpaka_VERSION VERSION_GREATER_EQUAL _CUPLA_UNSUPPORTED_ALPAKA_VERSION)
         message(WARNING "Unsupported alpaka version ${alpaka_VERSION}. "
-                "Supported versions [${_CUPLA_MIN_ALPAKA_VERSION},${_CUPLA_UNSUPPORTED_ALPAKA_VERSION}).")
+          "Supported versions [${_CUPLA_MIN_ALPAKA_VERSION},${_CUPLA_UNSUPPORTED_ALPAKA_VERSION}).")
+      endif()
     endif()
-  endif()
 
-  if(NOT TARGET alpaka::alpaka)
-    message(FATAL_ERROR "Required cupla dependency alpaka could not be found!")
+    if(NOT TARGET alpaka::alpaka)
+      message(FATAL_ERROR "Required cupla dependency alpaka could not be found!")
+    endif()
   endif()
 endif()
 
