@@ -102,6 +102,12 @@ if(cupla_BUILD_EXAMPLES OR (NOT ${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME}))
   include("${CMAKE_CURRENT_LIST_DIR}/cmake/addExecutable.cmake")
   include("${CMAKE_CURRENT_LIST_DIR}/cmake/cuplaTargetHelper.cmake")
 
+  # export HIP_HIPCC_FLAGS to the parent scope else the variable is not visible
+  # for application files
+  if(HIP_HIPCC_FLAGS)
+    set(HIP_HIPCC_FLAGS ${HIP_HIPCC_FLAGS} PARENT_SCOPE)
+  endif()
+
   createCuplaTarget(${PROJECT_NAME}
     ${PROJECT_SOURCE_DIR}/include # include directory path
     ${PROJECT_SOURCE_DIR}/src # src directory path
