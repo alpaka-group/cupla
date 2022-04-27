@@ -68,7 +68,6 @@
     - hipcc --version
   script:
     # use Vega 64 of the CI node
-    - export HIP_VISIBLE_DEVICES=2
     - source script/run_test.sh
   tags:
     - amd
