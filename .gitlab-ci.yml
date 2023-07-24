@@ -31,6 +31,8 @@ pull-request-validation:
     - source $CI_PROJECT_DIR/script/check_cpp_code_style.sh
   tags:
     - x86_64
+    - cpuonly
+  interruptible: true
 
 cuda110:
   stage: compile-and-run
@@ -123,6 +125,8 @@ addSubdirectoryInternal:
     - source script/integration/build_add_subdirectory.sh
   tags:
     - x86_64
+    - cpuonly
+  interruptible: true
 
 # build external project and use cupla via cmake add_subdirectory()
 # use installed alpaka
@@ -138,6 +142,8 @@ addSubdirectoryExternal:
     - source script/integration/build_add_subdirectory.sh
   tags:
     - x86_64
+    - cpuonly
+  interruptible: true
 
 # build external project and use cupla via cmake add_subdirectory()
 # alpaka was included in the project cmake before cupla
@@ -151,6 +157,8 @@ addSubdirectoryThirdPartyAlpaka:
     - source script/integration/build_add_subdirectory_third_party_alpaka.sh
   tags:
     - x86_64
+    - cpuonly
+  interruptible: true
 
 # build external project and use cupla via cmake find_package()
 # cupla was installed with disabled examples
@@ -167,6 +175,8 @@ findPackageWithoutExample:
     - source script/integration/build_find_package.sh
   tags:
     - x86_64
+    - cpuonly
+  interruptible: true
 
 # build external project and use cupla via cmake find_package()
 # cupla was installed with enabled examples
@@ -183,3 +193,5 @@ findPackageWithExample:
     - source script/integration/build_find_package.sh
   tags:
     - x86_64
+    - cpuonly
+  interruptible: true

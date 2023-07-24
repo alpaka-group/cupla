@@ -11,6 +11,8 @@
   # x86_64 tag is used to get a multi-core CPU for the tests
   tags:
     - x86_64
+    - cpuonly
+  interruptible: true
 
 .base_clang:
   image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04:3.1
@@ -27,6 +29,8 @@
   # x86_64 tag is used to get a multi-core CPU for the tests
   tags:
     - x86_64
+    - cpuonly
+  interruptible: true
 
 .base_cuda:
   variables:
@@ -41,6 +45,7 @@
   tags:
     - cuda
     - intel
+  interruptible: true
 
 .base_cuda_clang:
   variables:
@@ -58,6 +63,7 @@
   tags:
     - cuda
     - intel
+  interruptible: true
 
 .base_hip:
   variables:
@@ -73,3 +79,4 @@
   tags:
     - amd
     - rocm
+  interruptible: true
