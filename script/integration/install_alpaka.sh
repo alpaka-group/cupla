@@ -1,5 +1,10 @@
 #!/bin/bash
 
+##########################
+# update environment
+##########################
+PATH=$(agc-manager -b cmake@3.22)/bin:$PATH
+
 CUPLA_ROOT=$(pwd)
 cd alpaka
 mkdir build

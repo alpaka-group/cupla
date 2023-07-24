@@ -3,6 +3,11 @@
 CUPLA_ROOT=$(pwd)
 
 ##########################
+# update environment
+##########################
+PATH=$(agc-manager -b cmake@3.22)/bin:$PATH
+
+##########################
 # create external project
 ##########################
 mkdir /tmp/external_project
