@@ -22,8 +22,6 @@
                   alpaka_ACC_CPU_B_OMP2_T_SEQ_ENABLE"
                   # alpaka_ACC_CPU_B_SEQ_T_OMP2_ENABLE=ON
                   # alpaka_ACC_CPU_B_SEQ_T_THREADS_ENABLE=ON
-  before_script:
-      - source ${CI_PROJECT_DIR}/script/install_clang.sh
   script:
       - source ${CI_PROJECT_DIR}/script/run_test.sh
   # x86_64 tag is used to get a multi-core CPU for the tests
@@ -57,7 +55,6 @@
   before_script:
     - nvidia-smi
     - nvcc --version
-    - source ${CI_PROJECT_DIR}/script/install_clang.sh
   script:
       - source ${CI_PROJECT_DIR}/script/run_test.sh
   tags:
