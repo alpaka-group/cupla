@@ -58,7 +58,7 @@ inline namespace CUPLA_ACCELERATOR_NAMESPACE
             auto& buf = cupla::manager::Memory<cupla::AccDev, cupla::AlpakaDim<2u>>::get().alloc(extent);
 
             *devPtr = ::alpaka::getPtrNative(buf);
-            *pitch = ::alpaka::getPitchBytes<1u>(buf);
+            *pitch = ::alpaka::getPitchesInBytes(buf)[0];
         }
         catch(...)
         {
@@ -78,7 +78,7 @@ inline namespace CUPLA_ACCELERATOR_NAMESPACE
 
             *pitchedDevPtr = make_cuplaPitchedPtr(
                 ::alpaka::getPtrNative(buf),
-                ::alpaka::getPitchBytes<2u>(buf),
+                ::alpaka::getPitchesInBytes(buf)[1],
                 extent.width,
                 extent.height);
         }
