@@ -1,5 +1,5 @@
 .base_gcc:
-  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04-gcc:3.1
+  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04-gcc:3.2
   variables:
     GIT_SUBMODULE_STRATEGY: normal
     ALPAKA_ACCS: "alpaka_ACC_CPU_B_SEQ_T_SEQ_ENABLE
@@ -15,7 +15,7 @@
   interruptible: true
 
 .base_clang:
-  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04:3.1
+  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04:3.2
   variables:
     GIT_SUBMODULE_STRATEGY: normal
     ALPAKA_ACCS: "alpaka_ACC_CPU_B_SEQ_T_SEQ_ENABLE

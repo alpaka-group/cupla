@@ -36,14 +36,14 @@ pull-request-validation:
 
 cuda110:
   stage: compile-and-run
-  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04-cuda110-gcc:3.1
+  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04-cuda110-gcc:3.2
   variables:
     CUPLA_BOOST_VERSIONS: "1.74.0 1.75.0"
   extends: .base_cuda
 
 cuda114:
   stage: compile-and-run
-  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04-cuda114-gcc:3.1
+  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04-cuda114-gcc:3.2
   variables:
     CUPLA_BOOST_VERSIONS: "1.74.0 1.75.0"
   extends: .base_cuda
@@ -78,7 +78,7 @@ clang:
 
 cudaClang110:
   stage: compile-and-run
-  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04-cuda110:3.1
+  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04-cuda110:3.2
   variables:
     CUPLA_CXX: "clang++-15"
     CUPLA_BOOST_VERSIONS: "1.74.0 1.75.0"
@@ -86,7 +86,7 @@ cudaClang110:
 
 cudaClang114:
   stage: compile-and-run
-  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04-cuda114:3.1
+  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04-cuda114:3.2
   variables:
     CUPLA_CXX: "clang++-15"
     CUPLA_BOOST_VERSIONS: "1.74.0 1.75.0"
@@ -94,7 +94,7 @@ cudaClang114:
 
 hip54:
   stage: compile-and-run
-  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04-rocm5.4:3.1
+  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04-rocm5.4:3.2
   variables:
     CMAKE_MODULE_PATH: "/opt/rocm/hip/cmake"
     CUPLA_BOOST_VERSIONS: "1.74.0 1.75.0"
@@ -102,7 +102,7 @@ hip54:
 
 hip55:
   stage: compile-and-run
-  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04-rocm5.5:3.1
+  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04-rocm5.5:3.2
   variables:
     CMAKE_MODULE_PATH: "/opt/rocm/hip/cmake"
     CUPLA_BOOST_VERSIONS: "1.74.0 1.75.0"
@@ -116,7 +116,7 @@ hip55:
 # use internal alpaka
 addSubdirectoryInternal:
   stage: compile-and-run
-  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04-gcc:3.1
+  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04-gcc:3.2
   variables:
     GIT_SUBMODULE_STRATEGY: normal
     CUPLA_BOOST_VERSION: 1.74.0
@@ -132,7 +132,7 @@ addSubdirectoryInternal:
 # use installed alpaka
 addSubdirectoryExternal:
   stage: compile-and-run
-  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04-gcc:3.1
+  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04-gcc:3.2
   variables:
     GIT_SUBMODULE_STRATEGY: normal
     CUPLA_BOOST_VERSION: 1.74.0
@@ -149,7 +149,7 @@ addSubdirectoryExternal:
 # alpaka was included in the project cmake before cupla
 addSubdirectoryThirdPartyAlpaka:
   stage: compile-and-run
-  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04-gcc:3.1
+  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04-gcc:3.2
   variables:
     GIT_SUBMODULE_STRATEGY: normal
     CUPLA_BOOST_VERSION: 1.74.0
@@ -164,7 +164,7 @@ addSubdirectoryThirdPartyAlpaka:
 # cupla was installed with disabled examples
 findPackageWithoutExample:
   stage: compile-and-run
-  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04-gcc:3.1
+  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04-gcc:3.2
   variables:
     GIT_SUBMODULE_STRATEGY: normal
     CUPLA_BOOST_VERSION: 1.74.0
@@ -182,7 +182,7 @@ findPackageWithoutExample:
 # cupla was installed with enabled examples
 findPackageWithExample:
   stage: compile-and-run
-  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04-gcc:3.1
+  image: registry.hzdr.de/crp/alpaka-group-container/alpaka-ci-ubuntu20.04-gcc:3.2
   variables:
     GIT_SUBMODULE_STRATEGY: normal
     CUPLA_BOOST_VERSION: 1.74.0
