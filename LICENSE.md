@@ -1,5 +1,5 @@
  cupla - Licenses
-================================================================================
+=================
 
 **Copyright 2015-2016** Rene Widera
 
@@ -11,7 +11,8 @@ following licenses apply:
 
 ### cupla
 
-**cupla** is licensed under **LGPLv3** or later.
+**cupla** is licensed under **LGPL-3.0-or-later** or later.
+For license information please refer to the file `LGPL-3.0-or-later.txt`.
 
 
 ### other licenses
